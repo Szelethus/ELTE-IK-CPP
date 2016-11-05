@@ -1,0 +1,449 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{language=C++, basicstyle=\ttfamily, keywordstyle=\color{blue}\ttfamily, stringstyle=\color{red}\ttfamily}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		1 óra.
+	\end{center}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	\section{Bevezető.}
+	A c++ egy nagyon hatékony kódot tud alkotni. Akkor amikor a facebooknak a kódját 1\%ot sikerült javítani, óriási összegeket spóroltak meg áramköltségen. Nem használ garbage collectort: az olyan nyelveknél, amiben van, néha addig szünetelteti a programot, amíg le nem fut. Itt ilyen probléma sosincs.
+	
+	\medskip
+	Cél: Úgy leadni a tárgyat hogy ne fussunk nagyon alap hibákba, és kialakítsanak valami intuíciót, mert mindent amit hallottunk a gépekkel/programozással kapcsolatban, az hazugság volt.
+	\subsection{Mi az hogy c++?}
+	Egy olyan szabvány, ami megmondja melyik kulcsszó mit jelentsen, és hogyan forduljon le a program. Az első ilyen szabvány a {c++98} volt. További szabványai: {c++03}, {c++11}, {c++14}, {c++17}.
+	
+	\medskip
+	Különböző fordítók is vannak: MSVC (visual studio), GCC, CLANG. 
+	\section{Első óra.}
+	\subsection{Nem definiált viselkedések.}
+	\begin{example}\ 
+		
+		\begin{lstlisting}
+int main()
+{
+	int i = 0;
+	std::cout << ++i << ++i << std::endl;
+}
+		\end{lstlisting}
+		
+		Lefordítás és futtatás után különböző eredményeket kaphatunk, mert itt az mikor értékelődik ki a \texttt{++i}, az \textbf{nem definiált.} Ha a szabvány nem terjed ki arra, hogy mit tegyen a fordító, akkor teljesen a fordítótól függ, hogy az hogyan lesz megoldva. 
+		
+		\medskip
+		Gyakran eldönthetetlen is hogy melyik a jobb megoldás.
+		
+		\medskip
+		Ez lehetőséget ad a fordítónak arra hogy \textbf{optimalizáljon.} 
+	\end{example}
+	
+	A c++ban nincs megadva hogy az utasításokank milyen sorrendben kell végrehajtódniuk.
+	
+	\medskip
+	A c++ban van un. szekvenciapontok, és a szabvány csak at mondja ki, hogy egy szekvenciapont előtti kód előbb hajtódjon végre mint az utánalevő.  Mivel itt az \textit{i} értékadása után és csak az \texttt{std::endl} után van szekvenciapont, így az, hogy milyen sorrendben legyen kiértékelés, az teljesen a fordítóra van bízva.
+	
+	\medskip
+	Az, hogy mind a két utasítás szekvenciapont elválasztása nélkül ugyanazt a memóriaterületet akarja müdosítani, \textbf{nem definiált} viselkedést eredményez.
+	\begin{note}
+		Az a program, amely nem definiált viselkedéseket tartalmaz, nem számít jó programnak.
+	\end{note}
+	\subsection{Nem specifikált viselkedések.}
+	Itt most több dolog között várhat, hogy először értékel növel az egyiknek, értéket növel a másiknak, stb\ldots Az, hogy itt melyiket válassza, az \textbf{nem specifikált}.
+	
+	A nem specifikált viselkedés önmagában nem probléma, mert ha módosulna a kód erre:
+	
+	\begin{example}\ 
+		
+		\begin{lstlisting}
+int main()
+{
+	int i = 0;
+	int j = 0;
+	std::cout << ++i << ++j << std::endl;
+}
+		\end{lstlisting}
+	\end{example}
+	Itt nincs gond, mert azt továbbra se tudjuk, hogy \texttt{i} vagy \texttt{j} mikor értékelődik ki, (\textit{nem specifikált}), de azt hogy 11-et fog kiírni, azt biztosra tudjuk (az hogy mi lesz kiírva a konzolja, az \textit{definiált}).
+	
+	\section{A fordító működése.}
+	
+	\begin{center}
+		$\begin{matrix}
+		&\fbox{.h}\\
+		&\swarrow\searrow&\\
+		\fbox{\text{.cpp}}&&\fbox{.cpp}\\
+		\downarrow&&\downarrow\\
+		\fbox{CU}&&\fbox{CU}\\
+		\downarrow&&\downarrow\\
+		\fbox{O}&&\fbox{O}\\
+		&\searrow\swarrow&\\
+		&\fbox{exe}&
+	\end{matrix}$
+	\end{center}
+	\begin{compactitem}
+		\item Preprocesszálás
+		\item Fordítás (tárgy kód létrehozása)
+		\item linkelés
+	\end{compactitem}
+	\subsection{Preprocesszor.}
+	Amikor csak lehet, kerüljük el, és ha lehet, csak include-oláshoz használjuk. A preprocesszor \textbf{buta.} A preprocesszor ezen kívül \textbf{nyelvfüggetlen.}
+	\begin{example}\ 
+		alma.h
+		\begin{lstlisting}
+#define ALMA 5
+
+ALMA ALMA ALMA
+		\end{lstlisting}
+		Command line-ban preprocesszálási fázis eljuthatunk a \texttt{cpp alma.h} kód segítségével.
+		
+		Ezután azt látjuk hogy a fájban annyi van hogy \texttt{5 5 5}.
+	\end{example}
+	\begin{example}\
+		
+		\begin{lstlisting}
+#define ALMA 5
+#define KORTA
+ALMA ALMA ALMA
+
+#ifdef KORTE
+MEGVAN
+#else
+KORTE
+#endif
+		\end{lstlisting}
+		Kimenetelben csak az van benne, hogy MEGVAN.
+	\end{example}
+	
+	\begin{example}\
+		
+		\begin{lstlisting}
+#define ALMA 5
+#define KORTA
+ALMA ALMA ALMA
+
+#undef KORTE
+
+#ifdef KORTE
+MEGVAN
+#else
+KORTE
+#endif
+		\end{lstlisting}
+		Itt a kimenetelben KORTE lesz.
+	\end{example}
+	A preprocesszor segít abban is, hogy bár össze-visza vágja a kódot, de észben tartja, hogy melyik sor volt eredetileg ami módosult.
+	\begin{note}\
+		\texttt{g++ -save-temps hello.cpp} $\rightarrow$ Minden köztes állapot meglegyen.
+	\end{note}
+	Mivel az \texttt{include}-ok szó szerint beillesztenek, nagyon gyorsan meg tudják dobni a kód méretét, ami a fordítást lassítja, Ezért óvatosan kell vele bánni.
+	\begin{example}\ 
+		pp.h
+		\begin{lstlisting}
+#define ALMA 5
+#define KORTA
+#include "pp.h"
+ALMA ALMA ALMA
+
+#undef KORTE
+
+#ifdef KORTE
+MEGVAN
+#else
+KORTE
+#endif
+		\end{lstlisting}
+	\end{example}
+		
+	Ilyenkor a fordító szól, hogy túl mélyre include-olt egy idő után, és leállítja a preprocesszálást.
+	
+	Itt könnyű lábon lőni magunkat, mert nagyon sok halmozott include esetén nehéz átlátni hogy mi mit akar bevágni.
+	\begin{note}
+		\texttt{\#define KORTE$\backslash$ALMA} azt jelenti, hogy \texttt{KORTE}-t \texttt{ALMA}-ra cseréli.
+	\end{note}
+	\begin{example}\ 
+		
+		pp.h
+		\begin{lstlisting}
+#ifndef _PP_H_
+#define _PP_H_
+
+#include "pp.h"
+FECSKE
+
+#endif
+		\end{lstlisting}
+		
+		alma.h
+		\begin{lstlisting}
+#define ALMA 5
+#define KORTA
+#include "pp.h"
+#include "pp.h"
+#include "pp.h"
+#include "pp.h"
+#include "pp.h"
+ALMA ALMA ALMA
+
+#undef KORTE
+
+#ifdef KORTE
+MEGVAN
+#else
+KORTE
+#endif
+		\end{lstlisting}
+	\end{example}
+	
+	Ezzel a trükkel megmentettük magunkat attól, hogy többször be legyen illesztve \texttt{FECSKE}. Itt először megnézzük hogy \texttt{\_PP\_H\_} van-e definiálva. Ha nincs, definiáljuk, és beillesztünk. Ekkor legközelebb ha megint ezt meg akarnánk tenni, nem illeszti be \texttt{FECSKE}-t, mert \texttt{\#ifndef \_PP\_H\_} megállítja.
+	
+	Ez az úgy nevezett \textbf{header guard.}
+	
+	\medskip
+	A preprocesszort sokkal többet tud, de gyakran nem érdemes használni.
+	\subsection{Fordítás.}
+	\begin{example}\
+		
+		\begin{lstlisting}
+int factorial(int n)
+{
+	if (n <= 0) return 1;
+	else return n*factorial(n-1);
+}
+
+int main()
+{
+	std::cout << factorial(5) << std::endl;
+}
+		\end{lstlisting}
+		
+		Itt assembly kód vizsgálatával megállapítható, hogy 5-el lett meghívva a faktoriális függvény.
+		\begin{note}
+			\texttt{g++ -save-temps hello.cpp -O2}
+			
+			Kevésbé aggresszív optimalizálás.
+		\end{note}
+		
+		Ilyenkor assembly kódból kiolvasható, hogy a kód (ezen az implementáción) úgy fordult, hogy rögtön kiszámolta, és 120at írt be egyből.
+		
+		A fordító sokat \textbf{optimalizál.}
+	\end{example} 
+	\begin{note}
+		\texttt{-O3} Olyan optimalizálásokat is tartalmazhat, amik ronthatnak a kódon, vagy nem eredményezheti ugyanazt.
+		
+		\texttt{-O2} Kevésbé aggresszív, és ha optimalizál is, nem változtatja meg, a kód jelentését.
+		
+		Mivel nem definiált viselkedésekre extrém rosszul tud reagálni az \texttt{-O3}, így nem érdemes túl gakran használni.
+	\end{note}
+	
+	\subsection{Linkelés.}
+	\begin{example}\ 
+		
+		fecske.cpp
+		\begin{lstlisting}
+void fecske()
+{
+
+}
+		\end{lstlisting}
+		
+		main.cpp
+		\begin{lstlisting}
+int factorial(int n)
+{
+	if (n <= 0) return 1;
+	else return n*factorial(n-1);
+}
+
+int main()
+{
+	fecske();
+	std::cout << factorial(5) << std::endl;
+}
+		\end{lstlisting}
+		
+		Ez nem fog fordulni, mert vagy csak a fecske.h-t, vagy a fecske.h-t látja, és nem látjuk őket egyszerre. Megoldás az ha forward deklarálunk, \texttt{void fecske()}-t beillesztjük a main függvény felé. Ekkor a fordítás a linkelés fázisánál hibát jlez, mert nem találja a fecske függvény definícióját.
+		
+		Ha lefordítom külön a main.cpp-t, a fecske.cpp-t, akkor kapok két object fájlt, és a
+		
+		\texttt{g++ main.o fecske.o}
+		
+		fordítja egybe. Rövidebb, ha egyből a cpp fájlokat rakjuk össze.
+	\end{example}
+	Ha a fecske.cpp-ben sokminden van, akkor nem célszerű egyesével forward deklarálni.Ennél egyszerűbb egy ehader fájl megírása, amiben definiáljuk a fecske.cpp függvényeit.
+	
+	fecske.h
+	\begin{lstlisting}
+#ifndef _FECSKE_H_
+#define _FECSKE_H_
+void fecske();
+#endif
+	\end{lstlisting}
+	Ilyenkor elég a \texttt{fecske.h}-t includeolni.
+	
+	\begin{definition}
+		Definíció: Amikor megmondjuk a függvénynek hogy mit csináljon.
+	\end{definition}
+	\begin{definition}
+		Deklaráció: Amikor csak szólunk a compiler-nek, hogy mit várjon egy függvénytől. (pl. mivel tér vissza, mik a paraméterei egy adott függvénynek)
+	\end{definition}
+	\begin{note}
+		Ezek a definíciók csak a függvényekre vonatkoznak, de nem csak függvényeken értelmezzük őket. Erről később lesz részletesebb leírás.
+	\end{note}
+	Szokás a fecske.h-t a fecske.cpp-be is beilleszteni, mert ha hibát követünk el és véletlenül rosszul definiálnék a fordítási egységben, akkor kapnék hibaüzenetet.
+	\begin{definition}
+		One Definition Rule (ODR): Bármit lehet bármennyiszer deklarálni, azonban ha azok ellentmondanak egymásnak, akkor fordítási hibát kapunk.
+	\end{definition}
+	\begin{example}
+		
+		fecske.h
+		\begin{lstlisting}
+#ifndef _FECSKE_H_
+#define _FECSKE_H_
+void fecske();
+int macska() {}
+#endif
+		\end{lstlisting}
+		
+		Itt ha több fordítási egységet fordítok egybe, akkor a preprocesszor több macska függvényt definíciót csinál, és linkeléskor a linker azt látja, hogy egy függvény többször van definiálva, és fordítási hibát eredményez.
+	\end{example}
+	\begin{note}
+		A header fájlokban NAGYON nem érdemes definíciókat rakni (bár kivétel létezhet, pl. template-ek, de általában elkerülendő).
+	\end{note}
+	\subsection{Implementáció által definiált dolgok.}
+	A szabvány nem köti meg, hogy pl. egy \textit{int} egy adott platformon mennyi byte-ból álljon. Ez állandó, egy adott platformon egy adott fordító mindig ugyanakkorát hoz létre, de platform/fordítóváltás esetén ez változhat.
+	\section{Amiben hazudtak.}
+	\begin{example}
+		A main függvény végrehajtásával kezdődik a program futása tényleg?
+		\begin{lstlisting}
+std::ostream& o = std::cout << "Hello";
+int main()
+{
+	std::cout << "valami";
+}
+		\end{lstlisting}
+		Kimenet: \texttt{Hellovalami}.
+		
+		Tehát ez nem volt igaz. A program végrehajtásánál az első lépés a globális változók inicializálása. Ennek az oka az, hogyha \texttt{o}-t akarnám használni a main() függvény első sorában, akkor tudjam (lévén elvárás az, hogy egy globális változó bárhol elérhető legyen).
+		\begin{lstlisting}
+int f()
+{
+	return 5;
+}
+int x = f();
+
+int main()
+{
+	std::cout << "valami";
+}
+		\end{lstlisting}
+		Itt szintén az \texttt{f()} függvény előbb van.
+	\end{example}
+	\begin{example}
+		A linkelés nem változatathat a programon?
+		
+		main.cpp
+		\begin{lstlisting}
+std::ostream& o = std::cout << "Hello";
+int main() {}
+		\end{lstlisting}
+		fecske.cpp
+		\begin{lstlisting}
+std::ostream& o = std::cout << " World";
+		\end{lstlisting}
+		Itt nem specifikált a két globális változók inicializációs sorrendje, és ha más sorredben fordítjuk, mást ír ki.
+		
+		{\centering \texttt{g++ main.cpp fecske.cpp \quad $\not=$\quad g++ fecske.cpp main.cpp} \par}
+	\end{example}
+	\begin{note}
+		Ez utolsó példa nem jó kódnak számít, mert nem specifikált viselkedést használ ki.
+	\end{note}
+\end{document}

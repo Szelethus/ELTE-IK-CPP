@@ -1,0 +1,515 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{language=C++, basicstyle=\ttfamily, keywordstyle=\color{blue}\ttfamily, stringstyle=\color{red}\ttfamily}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		5. óra.
+	\end{center}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	\section{Memória.}
+	Eddig a stack-et használtuk, mely nagyon hasznos és jó is, de pár dologhoz nem megfelelő.
+	\subsection{A c++ memóriamodellje.}
+	\begin{center}
+		\begin{tabular}{|c|}
+			\\
+			\\
+			\\
+			\\
+			stack\\
+			\\
+			\hline
+		\end{tabular}\quad 
+		\begin{tabular}{|c|}
+			\hline
+			\quad \quad \\
+			\\
+			Globális/statikus\\
+			\\
+			\hline
+		\end{tabular}\quad 
+		\begin{tabular}{|c|}
+			\hline
+			\quad \quad \\
+			\\
+			Heap/free storage\\
+			\\
+			\hline
+		\end{tabular}
+	\end{center}
+	A globális változók a program futásának elejétől végéig élnek és elérhetőek.
+	
+	A stacken:
+	\begin{lstlisting}
+#include <iostream>
+
+int f()
+{
+	int x = 0;
+	++x;
+	return x;
+}
+
+int main()
+{
+	std::cout << f() << std::endl;
+	std::cout << f() << std::endl;
+	std::cout << f() << std::endl;
+	std::cout << f() << std::endl;
+	std::cout << f() << std::endl;
+}
+	\end{lstlisting}
+	Minden alkalommal maikor meghívjuk az \texttt{f()} függvényt, akkor mindig újra létrehozzuk az \texttt{x}-et, újra növeljük az értékét, visszaadjuk, és kidobjuk a stackből, így mindig 1-et fog kiírni. Azonban ha:
+	\begin{lstlisting}
+
+int f()
+{
+	static int x = 0;
+	++x;
+	return x;
+}
+	\end{lstlisting}
+	Ebben az esetben azonban a függvény első hivásától a program futásának végéig benne marad az \texttt{x}, így mindig egyre nagyobb számokat ad majd \texttt{f()} vissza.
+	\begin{note}
+		Nem igazán szeretjük a \texttt{static} változókat. Például a multithread programok különösen tudnak szenvedni tőle, mert nehéz, vagy lehetetlen átlátni, hogy mikor mire változik az értékük.
+	\end{note}
+	A stacken a változók nagyon jók, mert jól látható, mikor jönnek jönnek létre, mikor semmisülnek meg, stb. Azonban fordulhat elő olyan, hogy nem szeretnénk, hogy minden alkalommal megsemmisüljön a fenti példában az \texttt{x}, de azt se, hogy statikus legyen. Ilyenkor használatos a
+	\subsection{Heap.}
+	Itt nagyon nagy a szabadságunk, azonban nagy szabadsággal kötelességek is járnak.
+	\begin{lstlisting}
+int main()
+{
+	int *p = new int(5);
+}
+	\end{lstlisting}
+	Ez a kód a stacken létrehoz egy \texttt{p} pointert, mely a heapen létrehozott 5 értékű \texttt{int}-re mutat.
+	\begin{center}
+		
+		\begin{tabular}{|c|}
+			\\
+			\\
+			\quad \quad \quad \quad \quad \\
+			p\\
+			\\
+			\\
+			\hline
+		\end{tabular}\quad*nyilacska \texttt{p}-ből a benti négyzetre*
+		\begin{tabular}{|c|}
+			\hline
+			\quad \quad\quad \quad \quad \quad  \\
+			\quad \quad \fbox{5}\\
+			\\
+			\hline
+		\end{tabular}
+	\end{center}
+	A heapen nincs a változóknak nevük, így mindig szükségünk lesz egy mutatóra, hogy tudjunk rá hivatkozni. \textbf{Ha egyszer létrehozunk valamit a heap-en, nekünk is kell gondoskodni arról, hogy felszabadítsuk.} Az egyik leggyakoribb hiba a dinamikus memóriakezelésnél, ha a memóriát nem szabadítjuk, fel, ez a \textit{memory leak.} Bár az operációs rendszer erre szokott figyelni, de nem mindenható, előfordulhat hogy néha nem tudja a program futásának végeztével felszabadítani azt, és ilyenkor az a memóriaterület újraindításig lefoglalva maradnak.
+	\medskip
+	
+	A kivételezésnél szintén nagyon kell figyelni, és rengeteg további dolognál, így nagyon nehéz lehet elérni azt, hogy minden memóriaterület fel van szabadítva. Azonban ha nagyon ügyelünk rá, előfordulhat hogy nem figyelünk, és egy memóriaterületet kétszer szabadítunk fel, ami nem definiált viselkedés.
+	\medskip
+	
+	Előfordulhat, hogy egy már felszabadított memóriaterületre akarunk írni. Ez hiba: a \texttt{delete} parancsa \texttt{p} által mutatott memóriaterületet, nem a \texttt{p}-t fogja törölni. Így ezt a hibát nagyon is el lehet követni.
+	\begin{lstlisting}
+int *np = 0;
+delete np;
+	\end{lstlisting}
+	\begin{note}
+		Amint elvesztettük az utolsó mutatót, ami egy adott lefoglalt memóriacímre mutat, az közel garantáltan elszivárgott memória. A szabvány nem foglal magában semmilyen lehetőséget ezeknek a visszaszerzésére. (És könnyen látható, hogy ha meg is oldjuk, a szabványtól függetlenül hogy ezeket a memóriacímeket összevadásszuk, az igen költséges lenne)
+	\end{note}
+	Láthatjuk, hogy a \texttt{heap} használata macerás, hibaforrásokkal teli, ráadásul az allokálás még lassabb is. De miért használjuk mégis? Nos, ha egy mód van rá, ne tegyük. Ha meg lehet oldani, hogy a stack-en el tudjunk tárolni valamit, tegyük azt. A stacken azonban nem lehet mindent létrehozni, továbbá nagyon véges, hamar be tud telni (\textit{stack overflow}), illetve kevésbé tudjuk kontrollálni a memóriát. A heap-en e téren sokkal nagyobb a szabadságunk.
+	\subsection{A láncolt lista implementációja}
+	\LaTeX-ben nehéz rajzolgatni, így ajánlom hogy az ember idézze fel az algo-n tanultakat.
+	\begin{lstlisting}
+struct List
+{
+	int data;
+	List *next
+}
+
+int main()
+{
+	List *head = new List;
+	head->data = 8;
+	head->next = new List;
+	head->next->data = 7;
+	head->next->next = new List;
+	head->next->next->data = 2;
+	head->next->next->next = 0;
+	
+	delete head;
+	delete head->next;
+	delete head->next->next;
+}
+	\end{lstlisting}
+	Lesz egy \texttt{data} adattagom, és egy \texttt{next} mutatóm, előbbibe az adatot, másodikba a következő listaelem helyét tárolom.
+	
+	Ezzel tulajdonképpen használható láncolt listaként (bár valóban igen kényelmetlen).
+	\medskip
+	
+	Ez a kód egy kicsit hibás, mert először kitörlöm a fejelemet, viszont a fejelem tárolja, hogy a többi elem hol van. Így ez egy \textit{use after delete} eset, mely nem definiált viselkedés.
+	\begin{center}
+		\texttt{(*head).data\quad ==\quad head->data}
+	\end{center}
+	A megoldás:
+	\begin{lstlisting}
+delete head->next->next;
+delete head->next;
+delete head;
+	\end{lstlisting}
+	\begin{note}
+		A heap-en arra is figyelni kell, hogy jó sorrendben szabadítsuk fel a dolgokat. Könnyen lábonlőhetjük magunkat azzal, hogy egy kitörlünk valamit, ami hivatkozik egy másik memóriacímre, így azt a címet vagy elleakeljük, vagy ráhivatkozással nem definiált viselkedésbe keverünk.
+	\end{note}
+	A változók a stacken fordított sorrendben semmisülnek meg, pont emiatt.
+	\medskip
+	
+	Ez a ,,láncolt lista'' eddig eléggé gyér. A fő baj az, hogy nagyon sokat kell írni, és nem feltétlenül kéne. Van egy alap programozási gondolatmenet, a 
+	DRY - Dont Repeat Yourself. Itt sokszor írjuk le közel ugyanazt -- erre kell hogy legyen egy egyszerűbb megoldás. Írjunk függvényt az új listaelem létrehozásához!
+	\begin{lstlisting}
+List *add(List *head, int data)
+{
+	if (head == 0)
+	{
+		List *ret = new List;
+		ret->data = data;
+		ret->next = 0;
+		return ret;
+	}
+	head->next = add(head->next, data);
+	return head;
+}
+	\end{lstlisting}
+	Ez egy olyan rekurzív függvény, mely addig hívja meg saját magát, míg a lista végére nem ár (azaz nem lesz \texttt{head} egy nullpointer). Amikor oda elér, létrehoz egy új listaelemet, ráfűzi a lista végére, és az új elem pointer adattagját (\texttt{next}) nullpointerré teszi.
+	\medskip
+	
+	Nem ártana egy függvény a felszabadítsára is.
+	\begin{lstlisting}
+void free(List *head)
+{
+	if (head == 0)
+		return;
+	free(head->next);
+	delete head;
+}
+	\end{lstlisting}
+	Itt a rekurzió addig fog menni, amíg az utolsó elemhez el nem érünk, ami nullpointer. Itt simán visszatérünk, aztán fordított sorrendben kitörlünk minden elemet.
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			\texttt{data}&\texttt{next}\\
+			\hline
+		\end{tabular}
+		\smallskip
+		
+		Egy listaelem.
+	\end{center}
+	\begin{note}
+		A rekurzív függvények nem olyan hatékonyak, mint az iterativ (pl. \texttt{for} vagy \texttt{while} ciklus) társaik, továbbá a sok függvényhívás könnyen stack overflow-hoz vezetnek. Azonban jó agytornák, és segíthetnek az alapötletben. Egy rekurzív függvényt mindig át lehet írni iteratívvá.
+	\end{note}
+	Beszéljünk arról, mennyi a teher a felhasználón. Eddig tudnia kellett, milyen sorrendben kell felszabadítani midnent, de most már elég arra figylenie, hog lista használata után meg kell hívnia a \texttt{free} függvényt. A felhasználó így kisebb eséllyel követ el hibát, jobban tud figyelni arra, ami valóban a dolga. Legyenek a függvényeink és osztályaink olyanok, hogy \textbf{könnyű legyen őket jól használni, és nehéz legyen rosszul}.
+	
+	\medskip
+	Teszteljünk!
+	\begin{lstlisting}
+int main()
+{
+	List *head = 0;
+	head = add(head, 8);
+	head = add(head, 7);
+	head = add(head, 2);
+	
+	free(head);
+}
+	\end{lstlisting}
+	\begin{center}
+		
+		\begin{tabular}{|c|c|}
+			\hline
+			\texttt{8}&\texttt{}\\
+			\hline
+		\end{tabular}$\rightarrow$
+		\begin{tabular}{|c|c|}
+			\hline
+			\texttt{7}&\texttt{}\\
+			\hline
+		\end{tabular}$\rightarrow$
+		\begin{tabular}{|c|c|}
+			\hline
+			\texttt{2}&\texttt{$\emptyset$}\\
+			\hline
+		\end{tabular}
+	\end{center}
+	A program lefordult, és (nálunk) tökéletesen le is futott. Azonban ha történt memory leak, az egy nem definiált viselkedés, így nem lehetünk benne biztosak, hogy valóban nem történt szivárgás.
+	\begin{center}
+		\texttt{g++ list.cpp -fsanitize=address -g}
+	\end{center}
+	Ha így fordítjuk a kódot, akkor úgy fordul a kód, hogy futási időjű ellenőrzéséket végez, hogy nem szivárog-e a memória (a \texttt{-g} a szebb hibaüzenetekhez kell). Amennyiben egy memóriacímet nem szabadítottunk fel, vagy egyet kétszer töröltünk, megállítja a program futását, és ,,jól'' átlátható hibaüzenetet ad.
+	
+	\medskip
+	Ez a láncolt liste még mindig messze áll egy jó struktúrától.
+	\begin{lstlisting}
+struct List
+{
+	List(int _data, List *_next = 0) : data(_data), next(_next) {}
+	
+	int data;
+	List *next;
+};
+	\end{lstlisting}
+	Itt most írtunk egy \textbf{konstruktort}. A konstruktorok hozzák létre az objektumokat; vannak paraméterei, és nincs visszatérési értéke. Itt írtunk egy alapértelmezett paramétert is - ha mi csak egy \texttt{int} paraméterrel hívjuk meg a konstruktort, akkor a \texttt{\_next}-et alapértelmezetten nullpointernek veszi.
+	
+	\medskip
+	Azonban a struktúránk működött eddig is, mégse írtunk konstruktort. Azonban az mindig kell a létrehozáshoz, hogyan lehet ez? Úgy, hogy a fordító a hiányzó kulcsfontosságú függvényeket megírja nekünk, létrehoz egy un. \textbf{default konstruktort} (többek között), melynek nincs paraméterei, és minden adattagot alapértelmezetten hoz létre. Fontos azonban, hogyha mi írunk egy konstruktort, akkor a fordító már nem fog generálni ilyet.
+	
+	\medskip
+	A kódban van továbbá egy un. \textbf{inicializációs lista}. Ez az a rész, ami a konstruktor paraméterei után kettőspont után következik. Az inicializációs lista elkerülhető néha, de nem éri meg általában. Ugyanis ha ezt írnánk:
+	\begin{lstlisting}
+List(int _data, List *_next = 0)
+{
+	data = _data;
+	next = _next;
+}
+	\end{lstlisting}
+	akkor mire a kapcsos zárójeles részhez érünk, addigra a \texttt{data} és a \texttt{next} létre lenne hozva, és utána kapna csak értéket. A fenti inicializációs listában az elemet a megadott értékkel inicializálódnak, és nem csak később kapnak értéket.
+	\begin{note}
+		A létrehozás és értékadás 2 lépés, az inicializálás csak 1.
+	\end{note}
+	Fontos megjegyzés, hogy az a struktúra elemei mindig megadott sorrendben haladnak. Tehát, bármilyen sorrendben írjuk mi az inicializációs listát, mindig először a \texttt{data}, és utána a \texttt{next} fog inicializálódni, hacsak nem cseréljük fel a sorrendjüket a struct-ban.
+	
+	\medskip
+	Illene akkor az osztályunkhoz írni egy \textbf{destruktor}t is.  A fordító alapértelmezetten ebből is generál egy alapértelmezett verziót, de mi használhatnánk a memória felszabadítására. A destruktor mindig az objektum élettartamának végén hívódik meg.
+	\begin{lstlisting}
+
+struct List
+{
+	//ctor (construktor)
+	List(int data, List *next = 0) : data(data), next(next) {}
+	//dtor (destructor)
+	~List()
+	{
+		delete next;
+	}
+	int data;
+	List *next;
+};
+	\end{lstlisting}
+	Ez is egy rekurzív függvény: a \textbf{next} törlésekor megpróbál kitörölni egy \texttt{List} típusú elemet, ami megint meghívja ezt a destruktort, stb. A lista végén a \texttt{next} egy nullpointer, azzal nem tesz semmit, a destuktor futása befejeződik, és fordított irányban kitöröl mindent.
+	
+	\medskip
+	Teszteljünk!
+	\begin{lstlisting}
+int main()
+{
+	List head(8);
+	add(&head, 7);
+	add(&head, 2);
+}
+	\end{lstlisting}
+	Most úgy alakítottuk át a kódot, hogy amikor létrehozzuk a listát, akkor a fejelemet a stacken hozzuk létre, melynek értéke 8, és a pointer része nullpointer. Később az \texttt{add} függvénnyel létrehozunk a heapen egy olyan listaelemet, mely 7-et tárol, és pointer része nullpointer, és az eredeti lista fejét ráállítjuk erre.
+	
+	Itt sikeresen elértük azt, hogy a lista első eleme a stack-en, de minden más eleme a heap-en legyen. Mivel olyan struktrát írtunk, mely gondoskodik arról, hogy minden dinamikusan lefoglalt területet felszabadítson, mindent csak egyszer töröl, jó sorrendben, egy  \textit{RAII} (\textit{Resource acquisition is initialization}) osztályt írtunk. Ez Bjorne-nek egy
+	\begin{center}
+		\textit{,,iszonyatosan szar''}
+		
+		/Horváth Gábor/
+	\end{center}
+	acronymje. Azt mondja ki, hogy a nyelv által garantált módon pontosan tudjuk hogy az objektumok mikor jönnek létre, mikor semmisülnek meg, stb. Bjorne továbbá kijelentette, hogy ez a legjobban gargabe kollektált nyelv, mert nincs benne gargabe. Ha jól programozunk, akkor az objektumok mindig eltakarítanak maguk után. 
+	
+	Sikerült azt is elérnünk, hogy ez nagyon hatékony legyen, hiszen a ha nem így konstruktor/destruktor trükközéssel dogloznánk, akkor kézzel kéne írni, ami ennél nem lenne gyorsabb, csak kényelmetlenebb.
+	
+	\medskip
+	Csináljunk az \texttt{add} függvényből metódust (tagfüggvényt)!
+	\begin{lstlisting}
+struct List
+{
+	List(int data, List *next = 0) : data(data), next(next) {}
+	~List()
+	{
+		delete next;
+	}
+	
+	
+	void add(int data) //eltunt egy parameter!
+	{
+		if (next == 0)
+		{
+			next = new List(data);
+		}
+		else
+		{
+			next->add(data);
+		}
+	}
+	int data;
+	List *next;
+};
+
+int main()
+{
+	List head(8);
+	head.add(7);
+	head.add(2);
+}
+	\end{lstlisting}
+	Ez a nyelv egyik szépsége, hisz a felhasználónak nem kell tudnia, mi megy a háttérben, sőt, még értenie se kell az apróbb részletekhez. De nyilván még messze vagyunk az ideáltól.
+	\medskip
+	
+	A fordító nagyon sokmindent megír a struktunkba: konstruktoron és destruktoron kívül még \textbf{másoló konstruktor}t (\textit{copy constructor}) is ír. Azonban ez az alapértelmezett másoló konstruktor bitről bitre másol Ez mit jelent?
+	\begin{lstlisting}
+int main()
+{
+	List head(8);
+	head.add(7);
+	head.add(2);
+	{
+		List cHead = head;
+	} //itt lefut cHead destruktora
+}
+	\end{lstlisting}
+	Fentebb csináltunk fogunk egy másolatot, és értékül adtuk az eredeti listának, de a másolatnak a destruktora hamarabb lefut. Futáskor (ha sanitizerrel fordítunk) egy kilométer hibaüzenetet kapunk: többször próbáltuk meg ugyanazt a memóriaterületet felszabadítani. Ennek az az oka, hogy a \texttt{cHead}-ben lévő pointer \textbf{ugyanarra} a listára fog mutatni (lévén a bitről bitre történő másolásnál a pointerek ugyanazt a memóriacímet adják értékül egymásnak), és a \texttt{cHead} megsemmisülése után a \texttt{head} is megpróbálja a már kitörölt listát kitörölni.
+	\medskip
+	
+	Kerüljük ki a hibát, és írjunk saját copy konstruktort!
+	
+	
+\begin{lstlisting}
+struct List
+{
+	List(int data, List *next = 0) : data(data), next(next) {}
+	~List()
+	{
+		delete next;
+	}
+	void add(int data)
+	{
+		if (next == 0)
+		{
+			next = new List(data);
+		}
+		else
+		{
+			next->add(data);
+		}
+	}
+	
+	//copy ctor
+	List(const List &other) : data(other.data), next(0)
+	{
+		if (other.next != 0)
+		{
+			next = new List(*other.next);
+		}
+	}
+	
+	int data;
+	List *next;
+};
+
+int main()
+{
+	List head(8);
+	head.add(7);
+	head.add(2);
+	{
+		List cHead = head;
+	}
+}
+\end{lstlisting}
+	Itt egy rekurzív függvénnyel dolgozunk: a \texttt{new List(*other.next)} újra és újra meghívja a copy konstruktort, amíg az other.next nem lesz nullpointer.
+	
+	\medskip
+	Ezzel meg is oldottuk a problémát. Figyelem, ez egy {\large \textbf{copy konstruktor, nem értékadás operátor hívás!}} Itt a \texttt{cHead} még nincs létrehozva, amikor head-el \textbf{inicializálni} próbáljuk. Ha az egyenlőségjel bal oldalán lévő objektum még nem jött létre, mint itt, akor a copy konstruktor hívódik meg. Ellenkező esetben értékadás operátor hívódik meg.
+	\begin{lstlisting}
+List cHead = head; //copy ctor
+
+List cHead;
+cHead = head; //ertekadas
+	\end{lstlisting}
+\end{document}

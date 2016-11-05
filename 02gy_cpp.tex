@@ -1,0 +1,381 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{language=C++, basicstyle=\ttfamily, keywordstyle=\color{blue}\ttfamily, stringstyle=\color{red}\ttfamily}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		2 óra.
+	\end{center}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Porkoláb} Zoltán  gyakorlatán. (\today)
+	
+	Porkoláb Zoltán emailje: gsd@inf.elte.hu
+	
+	\section{Kifejezések kiértékelése.}
+	
+	\begin{example}
+		\begin{lstlisting}
+#include <iostream>
+
+int main()
+{
+	int i = 1;
+	std::cout << i << ++i << std::endl;
+	return 0;
+}
+		\end{lstlisting}
+	\end{example}
+	
+	Ez egy \textbf{nem definiált viselkedés.} Itt látható egy \texttt{$>>$} operátor, ami így is felírható: \texttt{std::cout.operator$<<$(i)}. Ennek a függvényhívásnak van visszatérési értéke, méghozzá \texttt{std::cout}, így a függvényhívás láncolható. Ez itt egy member function, mellyel majdnem minden alaptípus  rendelkezik Ezalól kivétel a \texttt{std::string}, melynek \texttt{operator$>>$}-ja globális.
+	\begin{note}
+		Ennek az is lehet értelme, hogy ne függjön az operátor az osztálytól. Jó példa erre a \texttt{template}, mert annak csak akkor kell példányt létrehoznia, ha meghívják.
+	\end{note}
+	A fenti kódban lévő rész így is felírható:
+	
+	\texttt{std::cout.operator$<<$(i).operator$<<$(++i)}.
+	
+	Az, hogy a második szám 2 lesz, az biztos. De hogy az első mennyi, az nem definiált.
+	
+	\textit{1. ábra.}
+	
+	\begin{example}
+		\texttt{x = k + 2}\quad \quad \texttt{y = k + 2}
+	\end{example}
+	
+	Ebben a példában (jó eséllyel) a fordító kioptimalizálja ezt, és \texttt{k+2}-t csak egyszer számolja ki. A c++ban a nem szabványba foglalt szabályoknak köszönhetően sokkal hatékonyabb programokat kaphatunk, mert a fordítónak nagy szabadsága van abban, hogyan optimalizálja a kódunkat.
+	
+	\begin{example}
+		Itt a cél az lenne, hogy a tömb elemeit feltöltsük növekvő számokkal.
+		
+		\begin{lstlisting}
+int i = 0;
+int t[10];
+while (i < 10)
+{
+	t[i] = i++;
+}
+		\end{lstlisting}
+		
+		Azonban ez egy nem definiált viselkedés, mert hiába van ott egy \textbf{post-fix} ++\quad operator, az hogy az egyenlőség melyik oldalán levő \texttt{i} értékelődik ki először, az ismét nem definiált.
+	\end{example}
+	
+	Itt leggyakrabban szekvenciapontok használata tud segíteni.
+	
+	\begin{definition}
+		(szekvenciapont) ami elválasztja, hogy mikor minek kell végrehajtódnia futási időben. A szekvenciapont előtt minden kifejezésnek ki kell értékelődnie. Több szekvenciapont létezik: vessző, \texttt{\&\&}, \texttt{||}, \texttt{?\quad :} 
+	\end{definition}
+	\begin{example}
+		\begin{lstlisting}
+f(i), ++i;
+i++<10 && f(i);
+i++<10 || f(i);
+i++<10 ? f(i) : g(i);
+		\end{lstlisting}
+		Ezek mint definiáltak, minden kifejezést egy szekvenkciapont választ el a másiktól.
+		\begin{lstlisting}
+f(i++, j++);
+		\end{lstlisting}
+		Itt azonban az, hogy i vagy j értéke növekszik-e meg először, az már nem definiált. Bár valóban található ott vessző, de a vessző mint szekvenciapont nem ekvivalens a függvény paramétereit elválasztó vesszővel.
+	\end{example}
+	\begin{note}
+		Az optimalizálás nagyon fontos szabálya, hogy mindig úgy szabad csak megtörténnie, hogy a program kimenetele ne változzon. 
+	\end{note}
+	\begin{note}
+		Ha hibásra optimalizálja a kódot a compiler, az nagy szívás. Ez leggyakrabban multi-threaded programoknál fordulhat elő.
+	\end{note}
+	
+	\begin{example}\ 
+		
+		\begin{lstlisting}
+int f() {cout << 'f'; return 2;}
+int g() {cout << 'g'; return 1;}
+int h() {cout << 'h'; return 0;}
+		\end{lstlisting}
+		Mi fog történni \texttt{f() == g() == h()} kód írásakor?
+		
+		Itt azon fog múlni a dolog, hogy milyen sorrendben értékelődnek ki az egyenlőség-vizsgáló operátorok. Az operátoroknak van megadott precedenciájuk: erős például a pont, nyíl, [], stb, gyengébb ennél a dereferencia, és így tovább. Azonban az azonos precedenciájú kifejezéseknél kérdéses, milyen sorrendben értékelődnek ki, vagy egyáltaln definiált-e az. Régen fortran-ban ez különösképp problémás volt:
+		
+		\begin{center}
+			\texttt{A*B / C*D}
+		\end{center}Itt nem lehetett tudni, hogy először megszorozza \texttt{A*B}-t, \texttt{D}-vel, és csak utána osztja le \texttt{C}-vel, vagy fordítva.
+		
+		Visszatérve a fenti példára, a végrehajtási sorrend:
+		 \texttt{(f() == g()) == h()}. Azaz, a \texttt{==} operátor balről jobbra asszociatív. De milyen sorrendben lesznek kiírva a karakterek? Ez (brace yourselves) nem definiált., hisz az, hogy ezen belül melyik sorrendben fog kiértékelődni a függvényhívás, nincs meghatározva.
+		 
+		 Van ahol más a zárójelezés, pl. \texttt{!++*++p}. Itt Először előrelépünk a p pointerrel, dereferáljuk, megnöveljük az értékét, és negáljuk. \texttt{!(++(*(++p)))}. Ilyen példa szintén az egyenlőség operátor: \texttt{x = y = z = 3.14}. 
+		 \begin{note}
+		 	Bővebben: \url{http://en.cppreference.com/w/cpp/language/operator_precedence}
+		 \end{note}
+	\end{example}
+	Az optimalizációk azért is segítenek, mert platformspecifikusak gyakran. Úgy csinálja meg a fordítást, hogy az adott gépból a legtöbbet préselje ki.
+	\section{Láthatóság, élettartam.}
+	\begin{example}
+		\begin{lstlisting}
+#include <iostream>
+
+char* answer (char *q);
+		
+int main()
+{
+	std::cout << answer("Hogy vagy?") << std::endl;
+	return 0;
+}
+
+char* answer (char *q)
+{
+	cout << q;
+	char buffer[80];
+	cin >> buffer;
+	return buffer;
+}
+		\end{lstlisting}
+		A deklaráció és definíció leírása az első gyakjegyzetben vannak.
+		
+		Ez a kód sok sebből vérzik. Az első az, hogy a buffer egy 80 elemű tömb, és egy sokkal hosszabb választ adunk, akkor túlindexelünk, és olyen memóriaterületeket írunk felül, amiket nagyon nem kéne.
+		
+		Ez a program azonban gyakran elszáll. Nem feltétlenül, de esélyes, ami igazán nehézzé teszi a debuggolást is. Ennek az oka az, hogy az \texttt{answer} függvényben fog létrejönni egy 80 karakternyi tömb, és akkor meg is szűnik, amikor a függvényből kilépünk.
+		\begin{center}
+			\begin{tabular}{|c|}
+				\\
+				\hline
+				\texttt{answer}\\
+				\texttt{függvény}\\
+				\texttt{változói}\\
+				\hline
+				\\
+				\hline
+				\texttt{main}\\
+				\texttt{függvény}\\
+				\texttt{változói}\\
+				\hline
+			\end{tabular}
+		\end{center}
+		Ezen a stacken látható, hogy a buffer akkor lesz berakva a stackbe, amikor az answer függvény meghívódik, és a függvény lefutása után ki lesz dobva a stackből. Ez azt jelenti, hogy ennek a szövegnek (melyet a nulla karakter zár hogy jelezze a szöveg végét) a memóriacíme már nincs a programunknak lefoglalva, így lehet hogy valaki más ír oda valamit. Ez azért igazán kínos, mert lehet hogy a programunk jó választ ad, ha addig ezt nem írta felül senki, de az is lehet, hogy felülírták, sőt, a 0 karakter módosulhatott, mely esetben egy nagyon undorító értéket kapunk vissza.
+	\end{example}
+	\begin{example}\ 
+		\begin{lstlisting}
+#include <iostream>
+
+char* answer (char *q);
+
+char buffer[80];
+
+int main()
+{
+	std::cout << answer("Hogy vagy?") << std::endl;
+	return 0;
+}
+
+char* answer (char *q)
+{
+	std::cout << q;
+	//char buffer[80];
+	std::cin.getline(buffer,80);
+	return buffer;
+}
+		\end{lstlisting}
+		Ez csak 79 karaktert fog beolvasni, többet nem fog. A globális változó is megoldja a második problémát, bár azokat sose célszerű használni. Ennél szebb megoldás:
+		\begin{lstlisting}
+#include <iostream>
+
+char* answer (char *q);
+
+//char buffer[80];
+
+int main()
+{
+	std::cout << answer("Hogy vagy?") << std::endl;
+	return 0;
+}
+
+char* answer (char *q)
+{
+	std::cout << q;
+	static char buffer[80];
+	std::cin.getline(buffer,80);
+	return buffer;
+}
+		\end{lstlisting}
+		
+		Ez egyel elegánsabb megoldás, mert a függvényen belül statikusként deklarált változók a függvény első hívásakor jönnek létre, és a program futásának végéig meg is maradnak. Így az élettartam a függvény hívás vége után is tart, így vissza tudjuk adni.
+	\end{example}
+	Fontos megállapítás, hogy meddig férünk hozzá egy statikus függvényváltozóhoz, nem ekvivalens annak élettartamával. Itt ha meghívjuk a függvényt akkor kívülről láthatjuk, de máshogy nem tudunk hozzáférni, pedig a program futása végéig megmarad.
+	
+	Azonban ez még mindig rossz megoldás: ez a változó nagyon sokáig él, várhatóan nem lesz sokat használva, arról nem is beszélve, hogy kompikáltabb programok, pl. amik multithreading-et is alkalmaznak, könnyen hanyat vághatják magukat ezen. Általános megállapítás, hogy a globális/statikus változókat kerüljök, leglábbis legyen nyomós indokunk a használatukra.
+	
+	\medskip
+	Picit bonyolítsunk, kérdezzük meg, biztos hogy jól vagyunk-e!
+	\begin{example}\ 
+		
+		\begin{lstlisting}
+#include <iostream>
+
+char* answer (char *q);
+
+int main()
+{
+	std::cout << answer("Hogy vagy?") << answer("Biztos?") << std::endl;
+	return 0;
+}
+
+char* answer (char *q)
+{
+	std::cout << q;
+	static char buffer[80];
+	std::cin.getline(buffer,80);
+	return buffer;
+}
+		\end{lstlisting}
+		Itt már azt is meg akarjuk kérdezni, hogy biztos-e. Itt már találkoztunk a problémával, hogy a kiíratás sorrendje rossz. 
+		
+		\texttt{std::cout $<<$ answer("Biztos?") $<<$ answer("Hogy vagy?") $<<$ std::endl;}
+		
+		Ez már jó. (a kiértékelés nem definiált, de a kiíratási sorrend igen!)
+		
+		Ez az igazán jó megoldás, itt kevesebbet kell filózni:
+		
+		\text{std::cout $<<$ answer("Hogy vagy?");}
+		
+		\texttt{std::cout $<<$ answer("Biztos?");}
+		
+	\end{example}
+	
+	Azonban a statikus változótól még nem szabadultunk meg. Egy másik megoldás lehet a dinamikus memória kezelés.
+	\medskip
+	
+	A dinamikusan lefoglalt memória az ,,átlagos'' stacken lévő objektumokkal szemben a mi felelőségünk teljesen. Nekünk kell őket allokálni, és ha nincs már rá szükségünk, nekünk is kell felszabadítani. c++11ben smart-pointerekkel ezt valamelyest automatizálhatjuk.
+	\begin{example}\ 
+		
+		\begin{lstlisting}
+#include <iostream>
+
+char* answer (char *q);
+
+int main()
+{
+	std::cout << answer("Hogy vagy?");
+	std::cout << answer("Biztos?");
+	return 0;
+}
+
+char* answer (char *q)
+{
+	std::cout << q;
+	char* buffer = new char[80];
+	std::cin.getline(buffer,80);
+	return buffer;
+}
+		\end{lstlisting}
+		Ez így nagyon szép megoldás, de a memória sajnos elúszott. Ahogy említve volt, a \texttt{new} kulcsszóval létrehoztunk a dinamikus tárhelyen egy új változót, de azt soha nem szabadítottuk fel. Ezért a legszebb megoldás még mindig az, hogyha referenciával átadok még egy paramétert, amiben el tudjuk tárolni a választ. Ennél azonban még egyszerűbb megoldás az, ha az \texttt{std::string}-et használjuk.
+		\begin{lstlisting}
+#include <iostream>
+
+std::string answer (char *q);
+
+int main()
+{
+	std::cout << answer("Hogy vagy?");
+	std::cout << answer("Biztos?");
+	return 0;
+}
+
+std::string answer (std::string q)
+{
+	std::cout << q;
+	std::string buffer;
+	std::cin >> buffer;
+	return buffer;
+}
+		\end{lstlisting}
+		
+		Ez a memóriában úgy néz ki, hogy a stacken létrejön egy pointer, heapre (vagy dinamikus tárhelyen) mutató területen tárolja el a buffert, copy konstruktorral adjuk vissza megoldást, a buffer destruktora felszabadítaná a tárhelyet. Ez így igen költséges. c++11ben annyi segítséget kapunk, hogy a move szemantika javít a hatékonyságon.
+	\end{example}
+	
+\end{document}

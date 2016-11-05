@@ -1,0 +1,357 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{language=C++, basicstyle=\ttfamily, keywordstyle=\color{blue}\ttfamily, stringstyle=\color{red}\ttfamily}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		4. óra.
+	\end{center}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	
+	\section{Tömbök.}
+	\begin{lstlisting}
+#include <iostream>
+
+void f(int t[])
+{
+	std::cout << sizeof(t) << std::endl;
+}
+
+int main()
+{
+	int t[] = {1,2,3,4,5};
+	std::cout << sizeof(t) << std::endl;
+	f(t);
+}
+	\end{lstlisting}
+	Ez a kód le fog fordulni, előző esetben (ezen az implementáción) először 20at, utána 8at ír ki. Az fog történni, hogy a \texttt{t} a függvényben átkonvertálódik mutatóvá, és ezen az implementáción a mutató mérete 8.
+	\begin{lstlisting}
+void f(int t[8])
+{
+	std::cout << sizeof(t) << std::endl;
+}
+	\end{lstlisting}
+	Ebben az esetben még mindig 8 lesz a második kiírt szám. Az a tanulság, hogy ha tömbméretet adunk át, a paraméter át fog konvertálódni pointerré. Az, hogy miért tehetjük meg mégis, hogy egy tömböt írunk oda mégis pointert kapunk, 
+	\begin{center}
+		\textit{,,az egy faszság.''}
+		
+		/Horváth Gábor/
+	\end{center}
+	Van egy ismert módszer arra, hogy egy tömb méretét megkapjuk:
+	\begin{lstlisting}
+#include <iostream>
+
+void f(int *t, int size)
+{
+	std::cout << sizeof(t) << std::endl;
+}
+
+int main()
+{
+	int t[] = {1,2,3,4,5};
+	std::cout << sizeof(t) << std::endl;
+	f(t, sizeof(t)/sizeof(t[0]));
+}
+	\end{lstlisting}
+	\begin{note}
+		Amennyiben c++11ben programozunk, érdemes az \texttt{std::array}-t használnunk, ami majdnem ugyanaz, mint egy tömb, legalább olyan hatékony, de nem tud pointerré változni és mindig tudja a méretét.
+	\end{note}
+	Amennyiben egy tömre mutató mutatót csinálunk, akkor nem veszik el a mérete feltétlenül. Azonban figyelni kell a szintaktikára: \texttt{int *t[5]} ez egy olyan tömb lesz, melyre intre mutató mutatók lesznek.
+	
+	\medskip
+	Ha valóban tömbre mutató mutatót szeretnék, így csinálhatjuk:
+	\begin{lstlisting}
+void g(int (*t)[5])
+{
+	std::cout << sizeof(t) << std::endl;
+}
+	\end{lstlisting}
+	Azonban ez még mindig 8at fog kiírni (ezen az implementáción!), mert a \texttt{t} az egy sima mutató! Ahhoz, hogy megkapjuk, mire mutat, dereferálnunk kell, így a \texttt{sizeof} paraméterének \texttt{*t}-t kell megadni.
+	\medskip
+	
+	Itt ha olyat csinálnánk, hogy megnöveljük a tömb méretét egyel, akkor nem fordul le a kód, mert nem tud a g függvényben egy 5 elemű tömbre mutató mutató 6 elemű tömbre mutató mutatóvá konvertálódni.
+	\begin{lstlisting}
+int main()
+{
+	int a[6];
+	g(a); //forditasi hiba!
+	int b[5];
+	g(b); //ok
+}
+	\end{lstlisting}
+	\section{Referenciák.}
+	\begin{lstlisting}
+void swap(int * const a, int * const b)
+{
+	//...
+}
+	\end{lstlisting}
+	Megállapítható, hogy amikor mutatókkal dolgoztunk előző órán, akkor nem változtattuk meg azt, hogy mire mutassanak a pointerek, így azokat konstansként is definiálhatnánk.
+	\begin{lstlisting}
+void swapRef(int &a, int &b)
+{
+	int tmp = a;
+	a = b;
+	b = tmp;
+}
+	\end{lstlisting}
+	Ezzel a kis szintaktikai cukorkával azt, hogy folyton kiírjuk a csillagot. A referencia úgy működik, mintha egy konstans referencia lenne. Ez a két függvény lényegében ekvivalensek. Egy referenciát nem állíthatunk másra. Különbség továbbá, hogy egy pointer lehet nullpointer, de egy referencia nem lehet sose null.
+	\begin{note}
+		Ez bár referencia szerinti átvétel, de it is történik másolás, a memóriacímet így is érték szerint vesszük át.
+	\end{note}
+	Megjegyzendő, hogy a fenti \texttt{swapRef} függvénynek nem kell memóriacímeket átadni, \texttt{swapRef(c,d)} teljesen jó.
+	\begin{note}
+		Egy referenciát mindig inicializálni kell. Csak úgy mint egy konstanst (különben fordítási hibát kapunk.)
+	\end{note}
+	\section{Karakterláncok.}
+	\begin{lstlisting}
+#include <iostream>
+
+int main()
+{
+	char *hello = "Hello";
+}
+	\end{lstlisting}
+	Ez egy konstans karakterekből álló 6 méretű tömb. (\texttt{const char[6]})
+	
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|}
+			\hline
+			H&E&L&L&O&$\backslash$n\\
+			\hline
+		\end{tabular}
+	\end{center}
+	Ez, amikor átkonvertálódik, egy konstans mutatóra kéne konvertálódnia. Ennek ellenére, a fenti kód lefordul, pedig \texttt{hello} egy nem konstansra mutató pointer. Ez azért van, mert az eredeti C-ben nem volt konstans kulcsszó. Ezért, a kompatibilitás végett c++ban lehet egy nem konstans karakterre mutatni. 
+	\begin{note}
+		Ez egy nagyon rossz dolog, és kerülni kell, amennyire csak lehet. Lefordul, de kapunk rá warningot.
+	\end{note}
+	\begin{lstlisting}
+int main()
+{
+	const char *hello = "Hello";
+	hello[1] = o;
+}
+	\end{lstlisting}
+	Ez azért kerülendő nagyon, mert sérti a konstans korrektséget. Ha eljátszom azt a trükköt, hogy az egyik elemet o-ra cserélem, akkor nem definiált viselkedést kapok. 
+	
+	Futtatáskor (legalábbis ebben az esetben, hisz nem definiált viselkedésről van szó) futási idejű hibát kapunk, szegmentálási hibát. Ennek a magyarázata az, hogy van a gépünknek sima és virtuális memóriája is. Megfigyelhető, hogy sokkal több memóriát tudunk használni, mint amennyi ténylegesen van. Ez úgy oldható meg, hogy a virtuális memórián az alkalmazásunk kap egy memóriaterületet a memóriában, és ez leképződik a virtuális memóriára is. Vannak dolgok, melyek tudnak változni futási időben, és vannak olyanok, melyik változatlanok (például mi maga a programkód). Ezen külön vannak tárolva. Ha mi ezt a programot mégegyszer elindítjuk, a memóriában kapni fog egy újabb színteret a program, amiben benne lesznek az adatoki, melyeket futási időben módosíthat, illetve azok amiket nem. Az operációs rendszerünk azonban van olyan okos, hogy nem rakja be a nem módosíthatókat még egyszer, a nem változtatható kódot a 2 külön működő azonos program ugyanarra a részére fogja irányítani a virtuális memóriában.
+	
+	\medskip
+	Erre jó példa az, hogy a C-nek a standard könyvtárait közel minden program használja, így olcsóbb úgy megoldani, hogy minden programot ugyanide mutat.
+	
+	\medskip
+	Miért kapunk szegmentálási hibát? A konstansok ezen nem módosítható részen belül vannak. Ha módosítanánk, akkor a másik program futása is változna. Az olyan programokat, amik ilyet próbálnak csinálni, szinte azonnal ki lesznek írva. Az operációs rendszernek ugyanis nagyon fontos az, hogy a programok egymást futását nem zavarják (\textit{szeparálja} őket).
+	
+	\medskip
+	Ez jól rámutat arra, hogy miért is nem jó az, ha a fenti hbát megengedjük.
+	\section{Objektumok mérete.}
+	\subsection{Literálok.}
+	Vannak primitív típusaink, ilyen például az \textit{int}. Például, ha veszünk egy \texttt{5} literált, annak a típusa \texttt{int}. Ha azt írjuk \texttt{5.}\ , az egy \texttt{double} lesz.
+	\begin{note}
+		Viszonylag kevés esetben éri meg \texttt{float}-ot használni \texttt{double} helyett. Modern CPU-k ugyanolyan hatékonyan dolgoznak mind a kettővel, így érdemesebb a pontosabbat választani. Ha GPU-t programozunk, akkor az például egy kívételes eset.
+		
+		Amennyiben azt írom hogy \texttt{5.f}, akkor egy \texttt{float}-tá konvertálja a literálomat.
+		\begin{center}
+			
+		\begin{tabular}{c|l}
+			5&\texttt{int}\\
+			\hline
+			5.&\texttt{double}\\
+			\hline
+			5.f&\texttt{float}\\
+			\hline
+			5e-4&\texttt{double}, értéke 0.0005\\
+			\hline
+			5e-4f&\texttt{float}\\
+			\hline
+			0xFF&{16-os számrendszerben}\\
+			& ábrázolt \texttt{int}\\
+			\hline
+			012&{8-as számrendszerben}\\
+			&ábrázolt \texttt{int}\\
+			\hline
+			5l&\texttt{long int}\\
+			\hline
+			5u&\texttt{unsigned int}\\
+			\hline
+			5ul&\texttt{unsigned long int}\\
+		\end{tabular}
+		\end{center}
+	\end{note}
+	\begin{note}
+		Alapértelmezetten mnden \texttt{int} egy \texttt{signed int}.
+	\end{note}
+	A \texttt{sizeof(char)} mindig 1-et ad vissza. A karakter mérete mindig az egység. A \texttt{sizeof} függvény azt adja vissza, hogy paraméterül megadott dolog mennyi \texttt{char} méretű. A kérdésre, hogy mennyi \texttt{sizeof(char)} mennyi, a válasz mindig 1, de hogy ezt valóban hány byte-on tároljuk, az már implementációfüggő.
+	\medskip
+	
+	Létezik c++ban egy \texttt{signed} kulcsszó. Ez eredetileg a char miatt volt, mert az is egész számokat tartalmazott, de azt nem definiálták külön, hogy a \texttt{char} lehessen vagy ne lehessen signed, ezért az, hogy egy adott platformon lehet-e az, az implementációfüggő.
+	\begin{note}
+		Érdemes mindig \texttt{int}et használnunk, hacsak nincs jó okunk arra, hogy \texttt{short}-ot, vagy \texttt{long}.ot írjunk. Az \texttt{int}-re általában a leghatékonyabb a processzor.
+	\end{note}
+	\subsection{Struct mérete.}
+	\begin{lstlisting}
+#include <iostream>
+
+struct Hallgato
+{
+	double atlag;
+	int kor;
+	int magassag;
+}
+
+int main()
+{
+	std::cout << sizeof(double) << std::endl;
+	std::cout << sizeof(int) << std::endl;
+	std::cout << sizeof(Hallgato) << std::endl;
+}
+	\end{lstlisting}
+	Itt, ezen a gépen a \texttt{double} mérete 8, az \texttt{int} mérete 4, \texttt{Hallgato}-é 4. Ezen azt látjuk, hogy a \texttt{Hallgato} tiszta adat.
+	\begin{lstlisting}
+struct Hallgato
+{
+	int kor;
+	double atlag;
+	int magassag;
+}
+	\end{lstlisting} 
+	Amikor ennek a méretét kérdezzük le (figyeljük meg, hogy változott a sorrend), akkor a válasz már 24. Ennek az oka az, hogy így volt letárolva ez a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
+	\begin{center}
+		\begin{tabular}{|c||c|c|}
+			\hline
+			atlag&k&m\\
+			\hline
+		\end{tabular}
+	\end{center}
+	Azaz, \texttt{atlag}, illetve \texttt{kor} és \texttt{magassag} pont efértek 1-1 gép szóban. Viszont, ha megcseréljük a sorrendet, pont nem férne bele 1 gép szóba.
+	\begin{center}
+		\begin{tabular}{|c|c||c|c|}
+			\hline
+			k&atl&ag&m\\
+			\hline
+		\end{tabular}
+	\end{center}
+	Sajnos itt már szétvágná \texttt{atlag}-ot. Ez nagyon nem hatékony, mert állandóan gondolnia kéne a fordítónak arra, hogy épp hogyan kaparja össze \texttt{atlag}-ot.
+	\begin{center}
+		\begin{tabular}{|c|c||c||c|c|}
+			\hline
+			k&\quad &atlag&m&\quad \\
+			\hline
+		\end{tabular}
+	\end{center}
+	Ez így sokkal hatékonyabb, bár 3 gép szót használ. Ebben az esetben a kód eltárolja, hogy legyen egy kis \textit{padding } a változó után. Tehát semmi extráért nem kell fizetnünk, de attól még picit több memóriát foglalunk le.
+	
+	\begin{note}
+		A szabvány kimondja, hogy egy \texttt{struct} mérete az adottagok méreteinek összegénél nagyobbegyenlő.
+	\end{note}
+	Az, hogy egy gép szó mekkora, implementációfüggő.
+	\begin{lstlisting}
+int main()
+{
+	//...
+	Hallgato a;
+	std::cout << a.kor << std::endl;
+	Hallgato b = a;
+	b.magassag = 3;
+}
+	\end{lstlisting}      
+	\section{Inicializáció.}
+	Ezek mint jól ismert műveletek. Megjegyzendő, hogy az adottagokra az adott adattag default konstruktora fog meghívódni, ebben az esetben minden adattag memóriaszemetet kap kezdésül.
+	\begin{lstlisting}
+int i;
+
+int main() {...}
+	\end{lstlisting}   
+	Itt ha kiíratjuk \texttt{i}-t, 0-t fogunk kapni. Azaz a globális változók mindig 0-val inicializálódnak (legalábbis az \texttt{int}-ek). Ennek az az oka, hogy a globális változókat csak egyszer hozzuk létre a program futásakot, mely várhatóan nem sok munka. A stacken rengetegszer létre kell hozni változót, nem csak egyszer, így ott nem éri meg minden alkalommal egy jól definiált kezdőértékkel inicializálni. Sokkal nagyobb lenne a hatása a futási időre.
+	
+	A globálisokat azért 0-ra inicializálja, mert az nagyon gyors, és determinisztikus. Sokkal könnyebb kiszűrni így egy hibát, mert mindig tudom, hogy egy globális változó 0 értéket vesz fel alapértelmezetten.
+	
+\end{document}
