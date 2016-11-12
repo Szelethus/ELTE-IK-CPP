@@ -92,16 +92,16 @@
 		
 		{\Large Gyakorlat jegyzet}
 		
-		1 óra
+		1. óra
 	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gzakorlatán. (\today)
 	\section{Bevezető}
 	A C++ többek között a hatákonyságáról is híres. Andrei Alexandrescu azt nyilatkozta, hogy amikor a Facebooknál a backend kódján 1\%ot sikerült optimalizálni, több mint 10 évnyi fizetését spórolta meg a cégnek havonta csak az áramköltségen. Nem használ garbage collectort: nincs nem várt szünet a program végrehajtásában a menedzselt nyelvekkel szemben.
 	
 	\medskip
 	Cél: a tárgy során kialakítani a nyelvvel kapcsolatban egy intuíciót, ami segítéségével elkerülhetőek alapvető hibák is. Az előzménytárgyakban az egyszerűség kedvéért gyakran féligazságok hangzottak el, ezeket is helyre kell rakni.
 	\subsection{Mi az a C++?}
-  Egy szabvány, ami meghatározza a nyelv nyelvtanját, valamint azt, hogy mit jelentenek a leforduló programok (többé kevésbé). Emellett a szabvány definiálja a szabványkönyvtárat is, amit mindan szabványos C++ fordító mellé szállítani kell.. Az első C++ szabvány a {C++98} volt. További szabványai: {C++03}, {C++11}, {C++14}, {C++17}.
+  Alapvetően a nyelv két összetevőből áll. Az aktuális szabványból és annak implementációiból (fordítók + szabványkönyvtárak). A szabvány, ami meghatározza a nyelv nyelvtanját, valamint azt, hogy mit jelentenek a leforduló programok (többé kevésbé). Emellett a szabvány definiálja a szabványkönyvtárat is, amit mindan szabványos C++ fordító mellé szállítani kell.. Az első C++ szabvány a {C++98} volt. További szabványai: {C++03}, {C++11}, {C++14}, {C++17}.
 	
 	\medskip
   %% TODO linkek.
@@ -135,7 +135,7 @@ int main()
 	\medskip
 	Az, hogy két részkifejezés szekvenciaponttal történő elválasztás nélkül ugyanazt a memóriaterületet módosítha, \textbf{nem definiált} viselkedést eredményez. Nem definiált viselkedés esetén a fordító vagy a futó program bármit csinálhat. A szabvány semmiféle megkötést nem alkalmaz.
 	\begin{note}
-		Az a program, amely nem definiált viselkedéseket tartalmaz, hibás programnak számít.
+		Az a program, amely nem definiált viselkedéseket tartalmaz, hibás.
 	\end{note}
 	\subsection{Nem specifikált viselkedések}
 	Amennyiben a szabvány definiál néhány lehetséges opciót, de a fordítóra bízza, hogy az melyiket választja, akkor \textbf{nem specifikált} viselkedésről beszélünk.
@@ -161,7 +161,7 @@ int main()
 		$\begin{matrix}
     &\fbox{\text{header állomány}}\\
 		&\swarrow\searrow&\\
-    \fbox{\text{cpp fájl}}&&\fbox{\text{.cpp fájl}}\\
+    \fbox{\text{cpp fájl}}&&\fbox{\text{cpp fájl}}\\
 		\downarrow&&\downarrow\\
 		\fbox{Fordítási egység}&&\fbox{Fordítási egység}\\
 		\downarrow&&\downarrow\\
@@ -176,7 +176,7 @@ int main()
     \item Linkelés (Szerkesztés)
 	\end{compactitem}
 	\subsection{Preprocesszor}
-	A preprocessor használata a legtöbb esetben kerülendő. Ez alól kivétel a header állományok include-olása. A preprocesszor \textbf{buta} és \textbf{nyelvfüggetlen.} Mivel semmit nem tud a C++-ról, ezért sokszor a fejlesztő számára meglepő viselkedést okozhat a használata.
+	A preprocessor használata a legtöbb esetben kerülendő. Ez alól kivétel a header állományok include-olása. A preprocesszor \textbf{primitív} szabályok alapján dolgozik és \textbf{nyelvfüggetlen.} Mivel semmit nem tud a C++-ról, ezért sokszor a fejlesztő számára meglepő viselkedést okozhat a használata.
 	\begin{example}\ 
 		alma.h
 		\begin{lstlisting}
@@ -191,9 +191,7 @@ ALMA ALMA ALMA
 	\begin{example}\
 		
 		\begin{lstlisting}
-#define ALMA 5
-#define KORTA
-ALMA ALMA ALMA
+#define KORTE
 
 #ifdef KORTE
 MEGVAN
@@ -207,9 +205,7 @@ KORTE
 	\begin{example}\
 		
 		\begin{lstlisting}
-#define ALMA 5
-#define KORTA
-ALMA ALMA ALMA
+#define KORTE
 
 #undef KORTE
 
@@ -237,7 +233,7 @@ KORTE
 	
   Sok és hosszú include láncok esetén nehéz megakadályozni, hogy kör kerüljön az include gráfba (rekurzív include-ok).
 	\begin{note}
-		\texttt{\#define KORTE$\backslash$ALMA} jelentése: \texttt{KORTE} cseréje \texttt{ALMA}-ra.
+		\texttt{\#define KORTE ALMA} jelentése: \texttt{KORTE} cseréje \texttt{ALMA}-ra.
 	\end{note}
 	\begin{example}\ 
 		
@@ -246,7 +242,6 @@ KORTE
 #ifndef _PP_H_
 #define _PP_H_
 
-#include "pp.h"
 FECSKE
 
 #endif
@@ -254,13 +249,11 @@ FECSKE
 		
 		alma.h
 		\begin{lstlisting}
-#define ALMA 5
 #include "pp.h"
 #include "pp.h"
 #include "pp.h"
 #include "pp.h"
 #include "pp.h"
-ALMA ALMA ALMA
 		\end{lstlisting}
 	\end{example}
 	
@@ -318,12 +311,6 @@ void fecske()
 		
 		main.cpp
 		\begin{lstlisting}
-int factorial(int n)
-{
-	if (n <= 0) return 1;
-	else return n*factorial(n-1);
-}
-
 int main()
 {
 	fecske();
