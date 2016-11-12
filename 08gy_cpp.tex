@@ -1,0 +1,708 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{
+	language=C++, 
+	basicstyle=\ttfamily, 
+	keywordstyle=\color{blue}\ttfamily, 
+	stringstyle=\color{red}\ttfamily,
+	tabsize = 4
+}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks = true	
+}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		8. óra.
+	\end{center}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	\section{Template.}
+	\begin{lstlisting}
+#include <iostream>
+
+template <typename T>
+class X
+{
+	void f()
+	{
+		T t;
+		t.foo();
+	}
+};
+class Y
+{
+	void bar() {}
+};
+int main()
+{
+	
+}
+	\end{lstlisting}
+	Ez a kód nagyon úgy tűnhet, hogy nem fog lefordulni, de mégis le fog. Ez azért van, mert a template osztályok (és függvények) gyakorlatilag sablonok, amiből mi létrehozhatunk egy konkrét osztályt, és mivel sose példányosítottuk, ez olyan fordítás után, mintha benne se lenne a kódban. Szintaktikus ellenőrzést végez a fordító, pl. zárójelek be vannak-e zárva, pontosvessző nem hiányzik-e stb., de azt, hogy van-e olyan \texttt{T} típus, ami rendelkezik \texttt{foo()} függvénnyel, nem nézi.
+\begin{lstlisting}
+#include <iostream>
+
+template <typename T>
+class X
+{
+	void f()
+	{
+		T t;
+		t.foo();
+	}
+};
+class Y
+{
+	void bar() {}
+};
+int main()
+{
+	X<Y> x;
+}
+\end{lstlisting}
+	Ekkor már azt várnánk hogy valóban nem fordul le, hogy \texttt{Y}-nak nincs \texttt{foo()} metódusa. Azonban lefordul, mivel az \texttt{f()} függvényt nem hívtuk meg, így nem is példányosult az osztályon belül.
+	\begin{lstlisting}
+int main()
+{
+	X<Y> x;
+	x.f();
+}
+	\end{lstlisting}
+	Itt már végre kapunk fordítási hibát, mert példányosul \texttt{f()}. Ez jól mutatja, hogy a template-ek lusták, és csak akkor példányosulnak, ha nagyon muszáj.
+	\medskip
+	
+	A template-eknek adhatunk meg alapértelmezett értéket.
+
+\begin{lstlisting}
+template <typename T = void> //alapertelmezett parameter
+class X
+{
+	void f()
+	{
+		T t;
+		t.foo();
+	}
+};
+class Y
+{
+	void bar() {}
+};
+int main()
+{
+	X<Y> x;
+	X<> x2;
+}
+\end{lstlisting}
+	Ilyenkor nem szükséges megadni template paramétert. Továbbá lehet olyan template osztályunk is, mely egy template-et vár.
+
+\begin{lstlisting}
+template <typename T>
+class X
+{
+	void f()
+	{
+		T t;
+		t.foo();
+	}
+};
+
+template <template <typename> class Templ>
+class Z
+{
+	Templ<int> t;
+};
+
+int main()
+{
+	X<Y> x;
+	Z<X> z;
+}
+\end{lstlisting}
+	Ez a \texttt{Templ} egy olyan template, aminek a template paramétere egy típus. Így \texttt{Z}-nek a template paramétere egy olyan template, aminek a template paramétere egy típus. Mivel \texttt{X} egy template, így megadható \texttt{Z}-nek template paraméterként.
+	\medskip
+	
+	A fenti példákban mindig egy default konstruktort használunk. Helyes lenne-e ez?
+\begin{lstlisting}
+int main()
+{
+	X<Y> x();
+	X<> y2();
+	Z<X> z();
+}
+\end{lstlisting}
+	A kód helyesen lefordul, de nem ugyanaz, mintha nem lenne ott a zárójel. Mivel a c++ nyelvtana nem egyértelmű, más kontextusban ugyanaz a kódrészlet mást jelenthet (egyik legegyszerűbb példa a \texttt{static} kulcsszó), így meg kellett alkotni egy olyan szabályt, miszerint amit deklarációként lehet értelmezni, azt deklarációként \textbf{kell} értelmezni. Itt ezek gyakorlatilag függvénydeklarációk lesznek: Az első esetben például egy olyan függvényt deklarálunk, melynek neve \texttt{x}, \texttt{X<Y>}-al tér vissza és nem vár paramétert. 
+	
+	Így ha default konstruktort szeretnék meghívni, semmilyen zárójelt nem szabad használni.
+	\begin{note}
+		C++11ben lehet gömbölyű helyett \{\} zárójelet alkalmazni, melynél ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
+	\end{note}
+	Visszatérve a korábban írt láncolt listánkhoz, Mely meglehetősen jó már. Gyakorlatilag mindent tud, amit szeretnénk. Már csak nagyon apró dolgokat kéne javítani rajtuk: szét kéne szednünk őket header fájlra és fordítási egységre. 
+	
+	\medskip
+	\fbox{\textbf{list.hpp:}}
+\begin{lstlisting}
+#ifndef LIST_H
+#define LIST_H
+
+#include <iosfwd>
+
+class List;
+
+class Iterator 
+{
+public:
+	explicit Iterator(List *p) : p(p) {}
+	bool operator==(Iterator other) const { return p == other.p; }
+	bool operator!=(Iterator other) const { return !(*this == other); }
+	Iterator operator++();
+	int &operator*() const;
+private:
+	friend class ConstIterator;
+	List *p;
+};
+
+class ConstIterator
+{
+public:
+	ConstIterator(Iterator it) : p(it.p) {}
+	explicit ConstIterator(const List *p) : p(p) {}
+	bool operator==(ConstIterator other) const { return p == other.p; }
+	bool operator!=(ConstIterator other) const { return !(*this == other); }
+	ConstIterator operator++();
+	int operator*() const;
+private:
+	const List *p;
+};
+
+class List 
+{
+public:
+	explicit List(int data_, List *next = 0) : data(data_), next(next) {}
+	~List() { delete next; }
+	List(const List &other);
+	List &operator=(const List &other);
+	void add(int data);
+	Iterator begin() { return Iterator(this); }
+	ConstIterator begin() const { return ConstIterator(this); }
+	Iterator end() { return Iterator(0); }
+	ConstIterator end() const { return ConstIterator(0); }
+private:
+	friend Iterator;
+	friend ConstIterator;
+	int data;
+	List *next;
+};
+
+#endif
+\end{lstlisting}
+
+	\fbox{\textbf{list.cpp:}}
+\begin{lstlisting}
+#include <iostream>
+
+#include "list.hpp"
+#include <iostream>
+
+List::List(const List &other) : data(other.data), next(0) 
+{
+	if (other.next != 0) 
+	{
+		next = new List(*other.next);
+	}
+}
+
+List& List::operator=(const List &other) 
+{
+	if (this == &other)
+	return *this;
+	delete next;
+	data = other.data;
+	if (other.next) 
+	{
+		next = new List(*other.next);
+	} 
+	else 
+	{
+		next = 0;
+	}
+	return *this;
+}
+
+void List::add(int data) 
+{
+	if (next == 0) 
+	{
+		next = new List(data);
+	} 
+	else 
+	{
+		next->add(data);
+	}
+}
+
+Iterator Iterator::operator++() 
+{
+	p = p->next;
+	return *this;
+}
+
+int& Iterator::operator*() const 
+{
+	return p->data;
+}
+
+ConstIterator ConstIterator::operator++() 
+{
+	p = p->next;
+	return *this;
+}
+
+int ConstIterator::operator*() const 
+{
+	return p->data;
+}
+\end{lstlisting}
+	\fbox{\textbf{main.cpp:}}
+\begin{lstlisting}
+#include <iostream>
+#include "list.hpp"
+
+void print(const List &l)
+{
+	for(ConstIterator it = l.begin(); it != begin(); ++it)
+	{
+		std::cout << *i << ' ';
+	}
+	std::cout << std::endl;
+}
+
+int main() {
+	List head(5);
+	head.add(8);
+	head.add(10);
+	head.add(8);
+}
+
+\end{lstlisting}
+	
+	Ez így sokkal jobb, mert a \texttt{List}-hez tartozó információk sokkal kisebb helyen elférnek. Azonban valami érdekes még mindig bent maradt: a list.hpp továbbá is tartalmaz definíciókat! Tekintsük azt a példát, amikor a \texttt{void f() {}} függvényt is beillesztjük a headerbe: több fordítási egység esetén linkelési hibát fog okozni. Ekkor használatos az \textbf{inline} kulcsszót: Ez megakadályozza a linker hibát: minden fordítási egységbe kerül egy \texttt{f()} definíció, és azok közül egyet kiválaszt. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
+	
+	\begin{center}
+		$\begin{matrix}
+		&&\fbox{f()}&&\\
+		&\swarrow&&\searrow&\\
+		\fbox{\text{main.cpp}}&&&&\fbox{list.cpp}\\
+		\downarrow&&&&\downarrow\\
+		\fbox{\quad   f() \quad }&&&&\fbox{ \quad f()\quad  }\\
+		&\searrow&&\swarrow&\\
+		&&\fbox{exe}&&
+		\end{matrix}$
+	\end{center}
+	Az \texttt{f()} egy úgynevezett strong reference-el jön létre ha nem inline, így a linker hibát dob. Ha azonban inline-ként adjuk meg, akkor un. weak reference-ként értelmezi, és csak simán kiválaszt egyet. Ez kicsit ellentmond az ODR-nek. Ez azzal oldódik meg, hogy minden \texttt{f()}-nek ugyanolyannak kell lennie, különben nem definiált viselkedést okoz.
+	\begin{note}
+		A legtöbb fordítónál lehet egy LTO (\textit{link time optimalization}) funkciót bekapcsolni, mely a linkelésnél optimalizál, többek között ott végzi el az inlineolást.
+	\end{note}
+	Az első pár függvényt azonban átemeltük egy cpp fájlba, így azok mégse lesznek inline-ok. Így az osztályban minden definiált függvény inline lesz, és minden nem definiált függvény out-of-line.
+	
+	\medskip
+	Írjuk meg a \texttt{print} függvényt értelmesebben:
+	\begin{lstlisting}
+std::ostream& operator<<(std::ostream& os, const List &l)
+{
+	for(ConstIterator it = l.begin(); it != l.end(); ++it)
+	{
+		os << *it;
+	}
+	return os;
+}
+	\end{lstlisting}
+	Azért kell visszaadni, hogy tudjuk a kiíratást láncolni. Mivel itt még nem tudjuk, mi az az \texttt{ostream}, így kell valamit include-olni. Ilyenkor a header fájlba inkább érdemes az \texttt{iosfwd} headert berakni, mert ez minden beolvaással és kiíraátssal kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység méretét. (azonban a cpp fájlban muszáj \texttt{iostream}-et használni)
+	
+	A probléma csak az, hogy nagyon sok hasznos nevet elhasználtunk, pl. több \texttt{Iterator} nevű osztályt nem hozhatunk létre (az un. \textit{global namespace}-be kerültek), pedig várhatóan nem csak ennek az egy konténernek szeretnék iterátort írni. Megoldás lehet, hogyha az iterátorainkat egy namespace-ebe rakjuk.
+\begin{lstlisting}
+namespace detail
+{
+	class Iterator
+	{
+		//...
+	};
+	class ConstIterator
+	{
+		//...
+	};
+}
+\end{lstlisting}
+	Már csak az a baj, hogy így a \texttt{List} nem tudja, mi az az \texttt{Iterator}, hisz az egy \texttt{datail} nevű namespace-ben van, így ezt meg kell mondanunk neki pl. így: \texttt{detail::Iterator}, vagy pedig létrehozunk egy typedef-et az osztályon belül:
+\begin{lstlisting}
+class List
+{
+public:
+	typedef detail::Iterator Iterator;
+	typedef detail::ConstIterator ConstIterator;
+	//...
+};
+\end{lstlisting}
+	Így a \texttt{List}-en belül (és csak ott!) elegendő lehet \texttt{Iterator}t írni. Ennek segítségével (mivel ezek a tpyedef-ek publikusak) így is lehet hivatkozni a \texttt{List} iterátorára: \texttt{List::Iterator}.
+	
+	Erre másik megoldás lehet, hogyha inline class-t hozunk létre, azaz az iterátor teljes deklarációját beillesztjük a \texttt{List}-be.
+\begin{lstlisting}
+class List
+{
+public:
+	class Iterator
+	{
+		//...
+	};
+	//...
+};
+\end{lstlisting}
+	Már csak az a probléma, hogy ez az osztály csak \texttt{int}-ekre működik. Így csináljunk belőle inkább egy template osztályt! Feladatunk csupán annyi, hogy az osztály elé írjunk egy \texttt{tempalte <typename T>}-t, és minden \texttt{List}-et \texttt{List<T>}-re cseréljünk, és minden \texttt{int}-et \texttt{T}-re. Ehhez nyilván az iterátorainkat is módosítani kell, így azokat is így kell módosítani.
+	
+	\medskip
+	Időközben felmerül a hatékonyság kérdése is. A listánkban eddig minden érték szerint vettünk át, ami \texttt{int}-nél hatékonyabb, mint a referencia szerinti, azonban template-eknél nem garantáljuk, hogy ilyen alap osztállyal fogják példányosítani az osztályunkat, így konstans referenciával szokás átvenni átvenni a \texttt{T} típusokat. Sőt, még a \texttt{ConstIterator} dereferáló operátora is inkább konstans referenciát adjon vissza!
+	
+	\fbox{\textbf{list.hpp:}}
+\begin{lstlisting}
+#ifndef LIST_H
+#define LIST_H
+
+#include <iosfwd>
+
+template<typename T>
+class List;
+
+namespace detail 
+{
+	
+	template<typename T>
+	class Iterator
+	{
+	public:
+		explicit Iterator(List<T> *p) : p(p) {}
+		bool operator==(Iterator other) const { return p == other.p; }
+		bool operator!=(Iterator other) const { return !(*this == other); }
+		Iterator operator++();
+		T &operator*() const;
+	private:
+		template<typename>
+		friend class ConstIterator;
+		List<T> *p;
+	};
+	
+	template<typename T>
+	class ConstIterator
+	{
+	public:
+		ConstIterator(Iterator<T> it) : p(it.p) {}
+		explicit ConstIterator(const List<T> *p) : p(p) {}
+		bool operator==(ConstIterator other) const { return p == other.p; }
+		bool operator!=(ConstIterator other) const { return !(*this == other); }
+		ConstIterator operator++();
+		const T &operator*() const;
+	private:
+		const List<T> *p;
+	};	
+}
+
+template <typename T>
+class List 
+{
+public:
+	typedef detail::Iterator<T> Iterator;
+	typedef detail::ConstIterator<T> ConstIterator;
+	explicit List(const T &data_, List *next = 0) :
+	data(data_), next(next) {}
+	~List() { delete next; }
+	List(const List &other);
+	List &operator=(const List &other);
+	void add(const T &data);
+	Iterator begin() { return Iterator(this); }
+	ConstIterator begin() const { return ConstIterator(this); }
+	Iterator end() { return Iterator(0); }
+	ConstIterator end() const { return ConstIterator(0); }
+private:
+	friend Iterator;
+	friend ConstIterator;
+	T data;
+	List *next;
+};
+
+template<typename T>
+std::ostream &operator<<(std::ostream& os, const List<T> &l);
+
+#endif
+\end{lstlisting}
+	\fbox{\textbf{list.cpp:}}
+\begin{lstlisting}
+#include "list.hpp"
+#include <iostream>
+
+template<typename T>
+List<T>::List(const List &other) : data(other.data), next(0) 
+{
+	if (other.next != 0) 
+	{
+		next = new List(*other.next);
+	}
+}
+
+template<typename T>
+List<T> &List<T>::operator=(const List<T> &other) 
+{
+	if (this == &other)
+	return *this;
+	delete next;
+	data = other.data;
+	if (other.next) 
+	{
+		next = new List(*other.next);
+	} 
+	else 
+	{
+		next = 0;
+	}
+	return *this;
+}
+
+template <typename T>
+void List<T>::add(const T &data) 
+{
+	if (next == 0) 
+	{
+		next = new List(data);
+	} 
+	else 
+	{
+		next->add(data);
+	}
+}
+
+namespace detail 
+{
+	
+	template <typename T>
+	Iterator<T> Iterator<T>::operator++() 
+	{
+		p = p->next;
+		return *this;
+	}
+	
+	template <typename T>
+	T &Iterator<T>::operator*() const 
+	{
+		return p->data;
+	}
+	
+	template <typename T>
+	ConstIterator<T> ConstIterator<T>::operator++() 
+	{
+		p = p->next;
+		return *this;
+	}
+	
+	template <typename T>
+	const T &ConstIterator<T>::operator*() const 
+	{
+		return p->data;
+	}
+}
+
+template<typename T>
+std::ostream &operator<<(std::ostream& os, const List<T> &l) 
+{
+	for(List<T>::ConstIterator it = l.begin(); it != l.end(); ++it) 
+	{
+		os << *it << ' ';
+	}
+	os << std::endl;
+	return os;
+}
+\end{lstlisting}
+	Itt a kiírató operátorunk miatt nem fog fordulni a kódunk! A \texttt{ConstIterator} egy un. \textbf{dependent scope}-ban lesz, így meg kell ígérnünk a fordítónak, hogy a scope operátor (::) előtt garantáltan típus lesz. Ezt a typename kulcsszóval tudjuk megtenni.
+	
+	\begin{lstlisting}
+template<typename T>
+std::ostream &operator<<(std::ostream& os, const List<T> &l) 
+{
+	for(typename List<T>::ConstIterator it = l.begin(); it != l.end(); ++it) 
+	{
+		os << *it << ' ';
+	}
+	os << std::endl;
+	return os;
+}
+	\end{lstlisting}
+	
+	\fbox{\textbf{main.cpp}}
+	\begin{lstlisting}
+#include <iostream>
+#include "list.hpp"
+
+int main() 
+{
+	List<int> head(5); // *
+	head.add(8);
+	head.add(10);
+	head.add(8);
+	std::cout << head;
+}
+	\end{lstlisting}
+	
+	Kérdés, hogy a megjelölt helyen kell-e typename vagy sem? A válasz az hogy nem, mert itt az \texttt{int} egy ismert típus, az előbbi példában meg \texttt{T} nem volt ismert, és az aztán bármi lehetett. A fordító a konkrét behelyettesítésnél tudni fogja, hogy \texttt{ConstIterator} egy típus lesz.
+	
+	\medskip
+	No, fordítsunk!
+	
+	\medskip
+	Igen, sejthető volt hogy ez nem fog menni. Úgy tűnhet, hogy semmi se úgy működik ebbe a nyelvbe, ahogy azt gondolnánk. Mindenre van magyarázat,
+	\begin{center}
+		\textit{,,néha az hogy valaki elkúrta.''}
+		
+		/Horváth Gábor/
+	\end{center}
+	Linkelési hibát kaptunk, de miért? A list.hpp-ben benne van mindenféle deklaráció, és a list.cpp-ben meg több \texttt{List}-béli implementáció. Amikor a list.cpp-t fordítjuk, létrejön az object fájl, a mainben szintén. Azonban minden implementált függvény template: a háttérben a list.cpp-ben semmit sem példányosítunk, így az szinte teljesen üres fordítás után. A main.cpp-ben így hiába megy az object fájl kreálása, lévén nem kell ismerni ahhoz a függvények definícióit, azonban a linkelésnél már meg kéne tudnunk találni azokat. Így a template osztályokat/függvényeket a header fájlokban kell tárolni.
+	
+	Itt megoldás lehet, hogyha az egész cpp-t beemeljük a list.hpp-be (itt mát azonban muszáj lesz az \texttt{iosfwd}-t \texttt{iostream}-re váltani). Az átláthatóság azonban nem lett áldozat, mert a fájl tetején van a deklaráció, és szétszedve van benne definíció.
+	
+	No, próbáljuk meg alkalmazni a listánkat! Példaképp eresszük rá az alapból megírt algoritmusok egyikét:
+\begin{lstlisting}
+#include <algorithm>
+#include <iostream>
+#include "list.hpp"
+
+int main()
+{
+	List<int> head(5);
+	head.add(8);
+	head.add(10);
+	head.add(8);
+	List<int>::Iteratorit = std::find(head.begin(), head.end(), 8);
+}
+\end{lstlisting}
+	Azonban ez a kód nem fog lefordulni.
+	
+	\url{http://en.cppreference.com/w/cpp/iterator}
+	
+	Mivel netet mindig lehet használni, célszerű lehet a cppreference-t böngészni. Ezen a linken láthatjuk, hogy több iterátor típus is létezik.
+	
+	Láthatjuk, hogy több iterátor kategória is létezik, egyesek többet tudnak mint mások: erre a legfényesebb példa a listánk forward iterátora és egy tömb random access iterátora. A mi listánkon kizárólag az első elemtől az utolsóig tudunk sorban menni, míg egy tömb bármelyik elemére bármikor hivatkozhatunk. Világos, hogy egy flexibilisebb iterátorral több mindent meg tudunk tenni, vagy ugyanazt a funkciót hatékonyabban is meg tudjuk valósítani. Emiatt minden STL algoritmusnak (mint pl. az \texttt{std::find}) tudnia kell a template paraméterként kapott iterátor kategóriáját.
+	
+	Egy iterátornak úgy tudjuk a legegyszerűbben megadni a típusát, ha származunk az \texttt{std::iterator} típusból.
+	
+	\url{http://en.cppreference.com/w/cpp/iterator/iterator}
+	
+	\begin{lstlisting}
+class Iterator : public std::iterator<std::forward_iterator_tag, T>
+{
+	//..
+};
+class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
+{
+	//..
+};
+	\end{lstlisting}
+	Ezzel a módosítással már lefordul a kódunk! Így már tudjuk majd használni az \texttt{STL} algoritmusokat is a konténereinken. Ez egy baromi nagy dolog: létrehoztunk egy új adatszerkezetet, és ez tök jól együttműködik az eddigi algoritmusokkal.
+	
+	\medskip
+	Írjunk egy függvény mely a második adott értékű elemet adja vissza.
+	\begin{lstlisting}
+template <class It, class Val>
+It find2(It begin, It end, const Val &v)
+{
+	It first = std::find(begin, end, v);
+	if(first == end)
+		return end;
+	++first;
+	return std::find(first, end, v);
+}
+	\end{lstlisting}
+	Azaz még viszonylag egyszerűen egy új függvényt is létre tudunk hozni, ami minden adatszerkezettel működni fog! C++ban az algoritmusok nem a konténereken működnek: lévén úgy szokás konténereket létrehozni, hogy írunk hozzá iterátort is, így elegendő egy algirtmusnak azt tudnia, hogy hogyan kell használni azt az iterátort. Emiatt várja el egy STL algoritmus, hogy közöüljük, milyen típusú iterátorunk van. Igaz, a konténereinkkel többet kell dolgoznunk, mert ezt az iterátort egyszer meg kell írni, de hosszú távon még így is rengeteg munkát tudunk megspórolni.
+\end{document}
