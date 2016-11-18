@@ -108,20 +108,20 @@
 	
 	{\LARGE TODO kódokat leellenőrizni, van fordítási hiba}
 	\subsection{Konténerek}
-	Alapértelemzett tároló egy tömb. Azonban ez meglehetősen kényelmetlen lehet: mivel ezek egymés mellett lévő memóriacímek, nem tudjuk csak úgy bővíteni őket. Egy tömb mérete nem változhat, sőt, stack-en létrehozva még a méretüket is ismerni kell fordítási időben. Ezért jobban járunk, ha egyedi konténereket írunk:
+	Alapértelmezett tároló egy tömb. Azonban ez meglehetősen kényelmetlen lehet: mivel ezek egymás mellett lévő memóriacímek, nem tudjuk csak úgy bővíteni őket. Egy tömb mérete nem változhat, sőt, stack-en létrehozva még a méretüket is ismerni kell fordítási időben. Ezért jobban járunk, ha egyedi konténereket írunk:
 	\subsubsection{vector}
-	A \texttt{<vector>} könytárban található, a \texttt{std::vector} egy template konténer. Csakúgy mint minden STL konténer, a \texttt{std::vector} az \texttt{std} névtér tagja. Bár a pontos definíciója értelemszerűen implementációfüggő, de vannak olyan tulajdonságok, melyeket elvár a szabvány, pl. az hogy rendelkezzen egy \texttt{push\_back} művelettel.
+	A \texttt{<vector>} könyvtárban található, a \texttt{std::vector} egy template konténer. Csakúgy mint minden STL konténer, a \texttt{std::vector} az \texttt{std} névtér tagja. Bár a pontos definíciója értelemszerűen implementációfüggő, de vannak olyan tulajdonságok, melyeket elvár a szabvány, pl. az hogy rendelkezzen egy \texttt{push\_back} művelettel.
 	\smallskip
 	
-	A probléma ott merülhet fel, hogy a \texttt{vector} implementációja leggyakrabban egy tömbben tárol: viszont egy tömb mérete nem növelhető, így ha túl sok elemet akarunk beletenni, a \texttt{vector} lefoglal egy nagyobb memóriaterületet (leggyakrabban kétszer akkorát). Így a \texttt{push\_back}-nek a amortizált konstans a műveletigénye: Általában konstans, de ha új memóriaterületet kell lefoglalni és a meglevő elemet átmásolni, akkor lineáris.
-%	
+	A probléma ott merülhet fel, hogy a \texttt{vector} implementációja leggyakrabban egy tömbben tárol: viszont egy tömb mérete nem növelhető, így ha túl sok elemet akarunk beletenni, a \texttt{vector} lefoglal egy nagyobb memóriaterületet (leggyakrabban kétszer akkorát). Így a \texttt{push\_back}-nek a műveletigénye amortizált konstans: Általában konstans, de ha új memóriaterületet kell lefoglalni és a meglevő elemet átmásolni, akkor lineáris.
+	
 	\smallskip
 	Még szabvány által elvárt tagfüggvények:
 	\begin{itemize}
 		\item \texttt{size()} - visszaadja a felahsználó által trolt elemek számáét a \texttt{vectorban}
 		\item \texttt{capacity()} - visszaadja, hogy mennyi elemet tárolhat legfeljebb átmásolás előtt.
 	\end{itemize}
-	Gyakorlatilag teljesen lehtetlen minden tagfüggvényt megjegyezni, és nem is érdemes. Bátran forduljunk ide: \url{http://en.cppreference.com/w/cpp/container/vector}.
+	Gyakorlatilag teljesen lehetetlen minden tagfüggvényt megjegyezni, és nem is érdemes. Bátran forduljunk ide: \url{http://en.cppreference.com/w/cpp/container/vector}.
 	\subsubsection{set}
 	\url{http://en.cppreference.com/w/cpp/container/set}
 	
@@ -130,7 +130,7 @@
 	\begin{note}
 		A szabvány elvárja, hogy az \texttt{insert} műveletigénye logaritmikus legyen.
 	\end{note}
-	Vegyük észre, hogy a matematikai halmaz alapértelemezetten rendezett, így ez a konténer is az. A rendezés, csakúgy mint a tárolandó típus, template paraméterként van megadva. Például:
+	Vegyük észre, hogy a matematikai halmaz alapértelmezetten rendezett, így ez a konténer is az. A rendezés, csakúgy mint a tárolandó típus, template paraméterként van megadva, azonban van alapértelmezett is. Például:
 	\begin{lstlisting}
 struct Kor
 {
@@ -139,7 +139,10 @@ struct Kor
 
 std::set<Kor> s;
 	\end{lstlisting}
-	Itt probléma lesz, mert nem adtunk meg tempalte paraméterként egy rendezést, és az alapértelmezett rendezés a \texttt{<} operátort használja, melyet nem írtunk meg a \texttt{Kor}-hoz.
+	Itt probléma lesz, mert nem adtunk meg template paraméterként egy rendezést, és az alapértelmezett rendezés a \texttt{<} operátort használja, melyet nem írtunk meg a \texttt{Kor}-hoz.
+	\begin{note}
+		A rendezés megadása template paraméterekkel funktorokkal történik, melyekről később lesz szó.
+	\end{note}
 	\begin{lstlisting}
 struct Kor
 {
@@ -161,25 +164,25 @@ s.insert(Kor(0,0,2));
 s.insert(Kor(1,1,2));
 std::cout << s.size() << std::endl;
 \end{lstlisting}
-	Itt azt várnánk, hogy a halmaz mérete 3 legyen, de 2 lesz mégis. Ez abból adódik, hogy a \texttt{<} operátort úgy alkottuk meg, hogy sugártól függ, hogy egyik kör nagyobb-e mint a másik. Ez alapján az ekvivalenciát is le tudja vezetni konténer: ha $\neg(a<b)$ és $\neg(b<a)$ akkor $a=b$.
+	Itt azt várnánk, hogy a halmaz mérete 3 legyen, de 2 lesz mégis. Ez abból adódik, hogy a \texttt{<} operátort úgy alkottuk meg, hogy sugártól függ (azaz az \texttt{r} adattagról), hogy egyik kör nagyobb-e mint a másik. Ez alapján az ekvivalenciát is le tudja vezetni konténer: ha $\neg(a<b)$ és $\neg(b<a)$ akkor $a=b$.
 	\subsubsection{list}
 	Ez a konténer nagyon hasonló ahhoz, mint amit mi írtunk, csak lehet üres, és kétirányú. 
 	\smallskip
 	
-	Feltűnő lehet, hogy az \texttt{std::vector}-ral szemben ennek a konténernek nincs \texttt{[]} operátora, hiszen ahogy azt korábban is megállapítottuk, mire egy adott elemt elérünk, szépen el kell oda lépegetni egyesével. A szögletes zárójel operátort csak akkor szokás írni, hogy ha nagyon hatékony, lehetőleg kosntans az adott elem lekérdezése, de ez a listánál nem teljesül.
+	Feltűnő lehet, hogy az \texttt{std::vector}-ral szemben ennek a konténernek nincs \texttt{[]} operátora, hiszen ahogy azt korábban is megállapítottuk, mire egy adott elemet elérünk, szépen el kell oda lépegetni egyesével. A szögletes zárójel operátort csak akkor szokás írni, hogy ha nagyon hatékony, lehetőleg konstans az adott elem lekérdezése, de ez a listánál nem teljesül.
 	\begin{note}
-		Bár elméletben gyorsabb egy láncolt lsitába beszúrni, de általában ez mégsem igaz. Azért, mert az egy dolog, hogy az elemeket egyesével odább kell tolni egy vekotrban, azonban mivel abban szekvenciálisan vannak a memóriacímek egymás mellett, és a processzor nem egyesével adja vissza az elemeit, hanem egy nagyobb blokkot mutat belőle, míg a listánál muszáj egyik címről a másikra menni.
+		Bár elméletben gyorsabb egy láncolt lsitába beszúrni, de általában ez mégsem igaz. Azért, mert az egy dolog, hogy az elemeket egyesével odább kell tolni egy vektorban, azonban mivel abban szekvenciálisan vannak a memóriacímek egymás mellett, és a processzor nem egyesével adja vissza az elemeit, hanem egy nagyobb blokkot mutat belőle, míg a listánál muszáj egyik címről a másikra menni.
 	\end{note}
-%	
-	Ha mindenáron szeretnék 3 elemmel előrébb menni gyorsan, ez lehet megoldás:
+	
+	Ha mindenáron szeretnék 3 elemmel előrébb menni kevés gépeléssel, ez lehet megoldás:
 \begin{lstlisting}
 std::list<int> l;
 std::list<int>::iterator i = l.begin();
 std::advance(i, 3);
 \end{lstlisting}
-	Persze, itt listánál egyesével kell előrelépni, de \texttt{std::vector}nál létezik hatékonyabb megoldás is. Erre majd később látunk egy megoldást.
+	Persze, itt listánál egyesével kell előrelépni, de \texttt{std::vector}nál létezik hatékonyabb megoldás is, hogyha simán csak 3-al előrébb ugranánk. Erre majd később látunk egy megoldást.
 	\subsubsection{map}
-	A map egy párokat tároló konténer, mely minden kulcshoz egy értéket rendel. Van egy speciális beszúró függvénye is:
+	A map egy kulcs-érték párokat tároló konténer, mely minden kulcshoz egy értéket rendel. Van egy speciális beszúró függvénye is:
 \begin{lstlisting}
 std::map<std::string, int> m;
 m["Hello"] = 42;
@@ -228,7 +231,7 @@ bool tartalmaz(const std::set<int> &s, int x)
 		if(*i == x)
 			return true;
 	}
-no	return false;
+	return false;
 }
 	\end{lstlisting}
 	
@@ -245,7 +248,7 @@ bool tartalmaz(const std::set<T> &s, int x)
 	return false;
 }
 \end{lstlisting}
-	Ez persze nem biztos hogy működni fog, ugyanis senki nem garantálja, hogy a \texttt{T} típusnak van van \texttt{==} operátora. (és ez a kód amőgy is még verzik pár sebből)
+	Ez persze nem biztos hogy működni fog, ugyanis senki nem garantálja, hogy a \texttt{T} típusnak van van \texttt{==} operátora. (és ez a kód amúgy is még vérzik pár sebből)
 	
 	\medskip
 	Mellékesen, milyen jó lenne, ha nem csak \texttt{std::set}-re működne ez, hanem bármilyen itárorral rendelkező konténerre!
@@ -317,8 +320,7 @@ std::set<int>>::iterator i = s.begin();
 template <typename T>
 bool tartalmaz(const std::set<T> &s, int x)
 {
-	for(typename std::set<T>::const_iterator i = s.begin(); 
-												i != s.end(); ++i)
+	for(typename std::set<T>::const_iterator i = s.begin(); i != s.end(); ++i)
 	{
 		if(*i == x)
 		return true;
@@ -328,8 +330,7 @@ bool tartalmaz(const std::set<T> &s, int x)
 \end{lstlisting}
 	
 	\medskip
-	Közel az összes STL algoritmus iterátor párokat vár, legyenek pl. \texttt{first} és \texttt{last}. Ilyenkor az első elemtől az utolsóig megy, így: \texttt{[first, last)}. Azaz a \texttt{last} iterátorhoz már nem ér!
-	\smallskip
+	Közel az összes STL algoritmus iterátor párokat vár, legyenek pl. \texttt{first} és \texttt{last}. Ilyenkor az első elemtől az utolsóig megy, így: \texttt{[first, last)}. Azaz a \texttt{last} iterátorhoz már nem ér! (Erre könnyű is magyarázatot találni, miért: a mi általunk írt lista \texttt{end()} metódusa egy olyan iterátort ad vissza, mely gyakorlatilag egy nullpointer. Ha ezt megkapnánk dereferálni, nem definiált viselkedést kapnánk, így általában az end() nem az utolsó elemet, hanem az utolsó utáni elemet adja vissza)
 	
 	\subsubsection{find}
 	Értelemszerűen, nem kell megírni a find függvényt, hisz ez alapból benne van az STL-ben. Ehhez a függvényhez az \texttt{<algorithm>} könyvtár beillezstésével férhetünk hozzá. 
@@ -356,6 +357,6 @@ bool operator==(const Kor &lhs, const Kor &rhs)
 	return lhs.r == rhs.r && lhs.x == rhs.y && lhs.y == rhs.y;
 }
 \end{lstlisting}
-	Itt az a veszély, hogy ha az STL-el find-al szemben a sajátunkat ahsználjuk, más lehet a végeredmény, hisz a \texttt{Kor}-t ők máshogy hasonlítják össze.
+	Itt az a veszély, hogy ha az STL-es find-al szemben a sajátunkat használjuk, más lehet a végeredmény, hisz a \texttt{Kor}-t ők máshogy hasonlítják össze.
 	
 \end{document}
