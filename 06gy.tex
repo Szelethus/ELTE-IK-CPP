@@ -226,14 +226,14 @@ int a = b = c = d = 0; // a = (b = (c = (d = 0)))
 			\item értékadás operátora, továbbá
 			\begin{lstlisting}
 T b;
-T a = b;
+T a;
+a = b;
 			\end{lstlisting}
 			Ekkor \texttt{a} ekvivalens \texttt{b}-vel, és ha \texttt{a}-t módosítjuk, akkot \texttt{b} nem változik, és viszont.
 			\item másoló konstruktora, továbbá
 			\begin{lstlisting}
 T b;
-T a;
-a = b;
+T a = b;
 			\end{lstlisting}
 			Ekkor \texttt{a} ekvivalens \texttt{b}-vel, és ha \texttt{a}-t módosítjuk, akkot \texttt{b} nem változik, és viszont.
 			\item egyenlőségvizsgálat (\texttt{operator==}) (nem feltétlenül szükséges)
