@@ -503,7 +503,7 @@ void print(List &l)
 	std::cout << std::endl;
 }
 	\end{lstlisting}
-	Ez a függvény, csak úgy mint az \textit{STL} függvények is (majd lesz még boncolgatva az, hogy mi az az \textit{STL}), balról zárt, jobbról nyitott $[\ )$ intervallummal dolgoznak. Azaz az \texttt{end()} már nem eleme a listának, az az utolsó \textit{utáni} elem.
+	Ez a függvény, csak úgy mint az \textit{STL} függvények is (majd lesz még boncolgatva az, hogy mi az az \textit{STL}), balról zárt, jobbról nyitott $[\ )$ intervallummal dolgoznak. Azaz az \texttt{end()} már nem eleme a listának, az az utolsó \textit{utáni} elem (\texttt{past-the-end iterator}).
 	
 	\medskip
 	Megint nyertünk! Annyi \texttt{Iterator}-t hozunk létre, amennyit csak akarunk, nem vagyunk korlátozva egy darab \texttt{cursor} által. Továbbá, elég azt írni, hogy \texttt{.begin(), .end()}, nem kell tudnunk, mi van az implementáció mélyén, \textbf{sőt}, a belső implementáció változhat is, akkor se lesz baj. Két programozó így teljesen jól együtt tud dolgozni.
