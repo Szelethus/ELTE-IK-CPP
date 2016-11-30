@@ -102,9 +102,8 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
 	
-	\section{Érték szerinti átvétel.}
-	\begin{example}\
-		
+	\section{Érték szerinti paraméter átvétel}
+	Próbáljuk megvalósítani a swap függvényt!
 		\begin{lstlisting}
 #include <iostream>
 void swap(int a, int b)
@@ -118,10 +117,10 @@ int main()
 {
 	int c = 5, d = 8;
 	swap(c, d);
-	std::cout << c << d << std::endl;
+	std::cout << c << ' ' << d << std::endl;
 }
-		\end{lstlisting}	
-		A program kimenete \texttt{58} ment. Ez egy teljesen jól definiált viselkedés. Ez azért van, mert itt \textbf{érték} szerint vettük át \texttt{a} és \textbf{b} változót.
+		\end{lstlisting}		
+		A program kimenete \texttt{5 8} ment. Ez egy teljesen jól definiált viselkedés. Ez azért van, mert itt \textbf{érték} szerint vettük át \texttt{a} és \texttt{b} változót. A következő ábrán, mely egy stack-et ábrázol (amiben a c++ tárolja ezeket a változókat), megfigyelhetjük miért is nem. Képzeljük el, ahogy ebbe a verembe a kódunk elrakja a \texttt{c} és \texttt{d} változókat. Majd meghívja a \texttt{swap} függvényt, melyben létrehozott \texttt{a} és \texttt{b} változókat ismét behelyezi. Bár a függvényre lokális \texttt{a} és \texttt{b} változókat megcseréli, de a függvényhívás után ezeket ki is törli a stackből.
 		\begin{center}
 			\begin{tabular}{r|c|l}
 				&&\\
@@ -131,15 +130,15 @@ int main()
 				\cline{2-2}
 				a&5&\\
 				\cline{2-2}
+				\hline
+				\hline
 				d&8& Innentől jön a main fv.\\
 				\cline{2-2}
 				c&5&\\
 				\cline{2-2}
 			\end{tabular}
 		\end{center}
-		A c++ban alapértelmezett a paraméterátadás függvényeknek érték szerint történik. Ebben a példában az történik, hogy meghívjuk a \texttt{swap} függvényt, lemásoljuk \texttt{c}-d és \texttt{d}-t, megcseréljük a \textbf{másolatokat}, és kidobjuk őket. A \texttt{main}-ben lévő változókkal nem történik semmi.
-	\end{example}
-	\begin{example}\ 
+		C++ban alapértelmezett a paraméterátadás függvényeknél érték szerint történik.
 		
 		\begin{lstlisting}
 //...
@@ -150,10 +149,10 @@ int main()
 	int *p = &c;
 }
 		\end{lstlisting}
-		Itt most létrehoztunk egy \textbf{pointert}, aminek szintaktikája fent látható. Ahhoz, hogy értéket tudjunk adni egy pointernek, egy memóriacímet kell megadnunk neki, amire rá tud mutatni, erre való a \textbf{referáló operátor}, a \&. Ha a pointer által \textit{mutatott értéket} szeretnénk módosítani, akkor dereferálnunk kell a \textbf{dereferáló operátor}ral, ami a *.
+		Itt \texttt{p} egy mutató (\textit{pointer}), mely egy \texttt{int} típusra mutat. Ahhoz, hogy értéket tudjunk adni egy mutatónak, egy memóriacímet (\textit{referenciát}) kell neki értékül adni, amire rá tud mutatni, erre való a \textbf{referáló operátor}, a \&. Ha a mutató által \textit{mutatott értéket} szeretnénk módosítani, akkor dereferálnunk kell a \textbf{dereferáló operátor}ral, ami a *.
 		\begin{lstlisting}
-int *p = &c;
-*p = 4;
+int *p = &c; //referaljuk c-t
+*p = 4; //dereferaljuk p-t
 p = &d;
 *p = 7;
 		\end{lstlisting}
@@ -170,7 +169,7 @@ void swap(int *a, int *b)
 		Amennyiben ezt a függvényt hívjuk meg, minden oké lesz. De ehhez fontos, hogy ne simán \texttt{swap(c, d)}-t írjunk, az ugyanis nem fog működni, mert a \texttt{c} és \texttt{d} típusa \texttt{int}, és nem \texttt{int*}. Ahhoz, hogy értéket adjunk egy pointernek, a \texttt{c}-hez és \texttt{d}-hez tartozó memóriacímeket kell átadni, így \texttt{swap(\&c, \&d)} lesz a helyes.
 		\bigskip
 		
-		Mivel a függvény most konkrétan \texttt{c} és \texttt{d} memóriaterületéhez hozzáfér, így valóban meg fogja tudni cserélni őket. Azonban ez még mindig \textbf{érték szerinti} átadás, mert most nem konkrét értéket, hanem a memóriacímet másoltuk át.
+		Mivel a függvény most konkrétan a \texttt{c} és \texttt{d} változókkal dolgozik, így valóban meg fogja tudni cserélni az értéküket. Azonban ez még mindig \textbf{érték szerinti} átadás, mert most nem konkrét értéket, hanem a memóriacímet másoltuk át.
 		
 		\begin{lstlisting}
 void swapWrong2(int *a, int *b)
@@ -184,9 +183,7 @@ void swapWrong2(int *a, int *b)
 		
 		\medskip
 		\texttt{swap(\&a, 6)} nem fordul le, mert 6 konstans, ráadásul \texttt{int}, és nem egy memóriacím.
-	\end{example}
 	\section{Pointer aritmetika.}
-	\begin{example}
 		\begin{lstlisting}
 const int ci = 6;
 int *p = &ci;
@@ -206,16 +203,14 @@ std::cout << *p << std::endl;
 int c = 5;
 p = &c;
 		\end{lstlisting}
-		Ez teljesen szabályos, konstansra mutató pointerrel nem konstans értékre mutatunk. Viszont figyelem, \texttt{c} nem konstans, azt továbbra is tudjuk módosítani! (Csak nem \texttt{p}-n keresztül)
+		Ez teljesen szabályos, konstansra mutató pointerrel nem konstans értékre mutatunk. Viszont figyelem, \texttt{c} nem konstans, azt továbbra is tudjuk módosítani (Csak nem \texttt{p}-n keresztül)! Ez meglepetést okozhat, hogyha egy konstans pointer kezelése közben (mely által mutatott terület értékétől nem várnánk hogy változzon) a mutatott cím értéke megváltozik.
 		\begin{lstlisting}
 const int *p = &ci;
 int c = 5;
 p = &c;
 c = 5;
 		\end{lstlisting}
-	\end{example}
-	\begin{example}
-		Szintaktikailag a *-ot sok helyre írhatjuk
+		Szintaktikailag a *-ot sok helyre írhatjuk.
 		\begin{lstlisting}
 const int *p;
 int const *p;
@@ -227,28 +222,24 @@ const int * const p;
 int const * const p;
 		\end{lstlisting} 
 		Amennyiben a * után van a \texttt{const}, akkor egy \textbf{konstans pointert kapunk}, mely megváltoztathatja a mutatott értéket, de nem mutathat másra. (konstans pointer \quad $\not=$\quad konstanra mutató pointer)
-	\end{example}
-	\begin{example}
 		Mutatóra mutató mutatók is léteznek.
 		\begin{lstlisting}
 const int **pp = &p;
 const int *** const cppp = &pp;
-int *const * * const dsfdsf = NULL;
+int *const ** const dsfdsf = NULL;
 		\end{lstlisting}
-		integerre mutató const mutatóra mutató mutatóra mutató konstans mutató. (ebben nem vagyok biztos hogy jól írtam le)
-	\end{example}
+		Legalul egy integerre mutató const mutatóra mutató mutatóra mutató konstans mutatót látunk (ebben nem vagyok biztos hogy jól írtam le, gondolom nem meglepő miért).
 	\begin{note}
-		Mutatóra mutató mutató még előfordul, de komplikáltabb ritkán.
+		Mutatóra mutató mutató (**) még előfordul, de komplikáltabb ritkán.
 	\end{note}
-	\section{Tömbök.}
-	\begin{example}\ 
+	\section{Tömbök}
 		
 		\begin{lstlisting}
 #include <iostream>
 int main()
 {
 	int i = 5;
-	int t[] 7 {5,4,3,2,1};
+	int t[] = {5,4,3,2,1};
 }
 		\end{lstlisting}
 		Ez egy 5 elemű \textbf{tömb}. Nézzük meg, mekkora a mérete (figyelem, ez \textbf{implementációfüggő!})!
@@ -256,7 +247,7 @@ int main()
 std::cout << sizeof(i) << std::endl;
 std::cout << sizeof(t) << std::endl;
 		\end{lstlisting}
-		Azt látjuk, hogy mindig ötszöröse lesz a \texttt{t} az \texttt{i}-nek. Azaz a tömbök tiszta adatok.  Stacken:
+		Azt látjuk, hogy mindig ötszöröse lesz a \texttt{t} az \texttt{i}-nek. Azaz a tömbök tiszta adatok.  Stacken ábrázolja így képzeljük el:
 		\begin{center}
 			\begin{tabular}{r|c|l}
 				&&\\
@@ -280,7 +271,7 @@ for (int i = 0; i < 6; i++) //nem 6 elemes
 	std::cout << t[i] << std::endl;
 }
 		\end{lstlisting} 
-		Itt előre látható, hogy túl fogunk indexelni. Ez így egy \texttt{nem definiált viselkedés}hez vezet. Valamilyen random memóriaszemetet fog kiolvasni (vagy olvashat ki, lévén nem definiált), és sose tudhatjuk pontosan mit.
+		Itt előre látható, hogy túl fogunk indexelni. Ez így egy {nem definiált viselkedés}hez vezet. Várhatóan valamilyen random memóriaszemetet fog kiolvasni (vagy olvashat ki, lévén nem definiált), és sose tudhatjuk pontosan mit.
 		
 		Most növeljük meg az elemeket, és menjünk el egészen 100ig!
 		\begin{lstlisting}
@@ -290,7 +281,7 @@ for (int i = 0; i < 100; i++)
 }
 std::cout << "sajt" << std::endl;
 		\end{lstlisting} 
-		Ez szintén nem definiált. Mivel olyan memóriaterületeket szeretnénk módosítani, melyeket nem foglaltunk le a programunknak, bajba juthatunk. Azonban a \texttt{sajt} szöveg ki lehet írva, mire a programunk hibát jelezhet (szegmentálási hiba).
+		Ez szintén nem definiált. Mivel olyan memóriaterületeket szeretnénk módosítani, melyeket nem foglaltunk le a programunknak, bajba juthatunk. Itt az órán a {sajt} szöveg ki lehet írva, mégis kaptunk szegmentálási hiba (\textit{segmentation fault}) hibaüzenetet az oprendszertől.
 		
 		\begin{lstlisting}
 for (int i = 0; i < 100000; i++)
@@ -319,21 +310,20 @@ int main()
 	std::cout << "Admin?: " << (isAdmin != 0 ) << std::endl;
 }
 		\end{lstlisting}
-		Ha \texttt{pityu}t adunk meg neki, akkor minden a legnagyobb rendben. De mivel a forráskódot ismerjük, azért hogyha nagyon hosszú nevet adnánk (nagyobb mint 5), akkor a túlindexelés miatt ki tudjuk használni a nem definiált viselkedéseket, és az is előfordulhat, hogy az \texttt{isAdmin} memóriacímére írunk, és elérjük hogy akor is aminnak higgyen minekt, ha nem vagyunk azok.
+		Ha a programnak \texttt{pityu}-t adunk meg amikor be akarja olvasni \texttt{name}-et, akkor minden a legnagyobb rendben. De mivel a forráskódot ismerjük, azért hogyha nagyon hosszú nevet adnánk (nagyobb mint 5), akkor a túlindexelés miatt ki tudjuk használni a nem definiált viselkedéseket, és az is előfordulhat, hogy az \texttt{isAdmin} memóriacímére írunk, és elérjük hogy akkor is adminnak higgyen minket, ha nem vagyunk azok.
 		\medskip
 		
-		Hogyan lehet ezeket a hibákat elkerülni? Túl azon, hogy nagyon figyelni kell, vannak programok amik segítenek nekünk.
+		Hogyan lehet ezeket a hibákat elkerülni? Túl azon, hogy nagyon figyelni kell, vannak programok amik segítenek nekünk. Ehhez használhatunk \texttt{sanitizer}-eket. Ezek picit módosítanak a kódunkon, és amennyiben futási időben bizonyos nem definiált viselkedéseket követne el, pl. itt a túlindexelés, leütné a programunkat. Használatukhoz elég egy extra paranccsal fordítanunk:
 		
 		{\centering\texttt{g++ main.cpp -fsanitize=address}\par }
 		
-		Ez például segít nekünk abban, hogy úgy fordítsa le a programot, hogy betesz extra ellenőrzéseket. De sajnos ez is csak akkor tud segíteni, ha a probléma előfordul (azaz futási időben, nem fordítási időben ellenőriz). Amennyiben előfordul viszont, elég pontos leírást tudunk kapni arról, hogy merre van a probléma.
+		De sajnos ez is csak akkor tud segíteni, ha a probléma előfordul (azaz futási időben, nem fordítási időben ellenőriz). Amennyiben előfordul viszont, elég pontos leírást tudunk kapni arról, hogy merre van a probléma.
 		
 		{\centering \texttt{g++ main.cpp -Wall -Wextra} \par}
 		
 		Ez a 2 parancs szintén extra ellenőrzéseket vezet be, de nem változtatják meg a kódot, csak fordítási időben ellenőriznek.
-	\end{example}
 	\subsection{Függvény pointerek}
-	\begin{example}
+	C++ban lehetőségünk van arra is, hogy függvényeket adjunk át paraméternek.
 		\begin{lstlisting}
 int add(int a, int b)
 {
@@ -366,26 +356,11 @@ int main()
 		Itt \texttt{reduce} egy olyan paramétert is vár, mely igazából egy függvény, mely \texttt{int}-et ad vissza, és két \texttt{int}-et vár paraméterül.
 		\medskip
 		
-		Ami még magyarázatra szolgál, az az, hogy a \texttt{t} tömb egy \texttt{int}-re mutató mutatóvá fog konvertálni, ami az első elemre mutat. Ennek hatására értelemszerűen elvesztjük azt az információt, hogy mekkora volt a tömb. Így át kell adni ezt az információt is a \texttt{size} paraméter segítségével. Mellékesen, mivel a fordító tudja hogy függvényeket akarunk átadni, így a \texttt{\&} jel elhagyható függvényhíváskor, és amikor szeretnénk alkalmazni az \texttt{op} függvényt, ott is elhagyahtó a *.
+		A kódban feltűnhet, hogy a tömb mellé paraméterben elkértük annak méretét is. Ez azért van, mert a \texttt{t} tömb egy \texttt{int}-re mutató mutatóvá fog konvertálni, ami az első elemre mutat. Ennek hatására értelemszerűen elvesztjük azt az információt, hogy mekkora volt a tömb. Így át kell adni ezt az információt is. Mellékesen, függvényeket kezelni cska pointerekkel lehet, és mivel a fordító tudja hogy függvényeket akarunk átadni, így a \texttt{\&} jel elhagyható függvényhíváskor, és az\texttt{op} elől is elhagyható a * a paramétereknél.
 		\begin{lstlisting}
-int add(int a, int b)
-{
-	return a + b;
-}
-
-int mul(int a, int b)
-{
-	return a * b;
-}
-
 int reduce(int *start, int size, int initial, int op(int, int)))
 {
-	int ret = initial;
-	for (int i = 0; i < size; i++)
-	{
-		ret = op(ret, start[i]);
-	}
-	return ret;
+	//...
 }
 
 int main()
@@ -395,9 +370,7 @@ int main()
 	std::cout << reduce(t,5,0,mul) << std::endl;
 }
 		\end{lstlisting}
-	\end{example}
-	\subsection{Tömbökről bővebben.}
-	\begin{example}
+	\subsection{Tömbökről bővebben}
 		\begin{lstlisting}
 #include <iostream>
 
@@ -413,9 +386,9 @@ int main()
 		\end{lstlisting}
 		Könnyű azt hinni (hibásan) hogy a pointerek ugyanazok mint a tömbök. Ez  program jól mutatja, hogy ez nem igaz, mert a tömb tárolja annak méretét is. Számos más különbség is van, viszont egy tömb könnyen konvertálódik pointerré.
 		
+		Egy tömb adott elemét sokféleképpen le tudjuk kérdezni:
+		
 		{\centering \texttt{*(p + 3) == *(3 + p) == p[3] == 3[p]} \par}
-	\end{example}
-	\begin{example}
 		\
 		\begin{lstlisting}
 #include <iostream>
@@ -429,15 +402,23 @@ int main()
 		Ez egy alternatív módja egy tömb inicializálásának. Itt több dolog megfigyelendő: Az első \texttt{[]} operátorban nincs méret, mert a fordító az inicializáció alapján meg tudja állapítani, hogy a mátrix azon dimenziója mekkora, de annyira már nem okos, hogy a másodikat is abszolválja.
 		
 		\medskip
-		Fontos megjegyezni, hogy a mátrix egy adott elemére sokféleképpen tudunk hivatkozni:
+		Fontos megjegyezni, hogy a mátrix egy adott elemére még többféleképpen tudunk hivatkozni:
 		
 		{\centering \texttt{t[1][] == *(*(t+1)+0) == *(1[t]+0) == 0[1[t]] == 0[*(t+1)] == *(t+1)[0] == 1[t][0] } \par}
-	\end{example}
 	\begin{note}
-		Ahhoz, hogy egy olyan függvényt írjunk ami minden méretű tömböt elfogad paraméterül, a legegyszerűbb megoldás, ha hagyjuk, hogy a tömb átkonvertáljon egy olyan pointerré, ami az első elemre mutat, és átadjuk külön paraméterben a tömb méretét. Bár van megoldás arra is, hogy egy darab "rugalmas" függvényt írjunk, annak is komoly hátulütői lehetnek (lásd: template-ek).
+		Ahhoz, hogy egy olyan függvényt írjunk ami minden méretű tömböt elfogad paraméterül, a legegyszerűbb megoldás, ha hagyjuk, hogy a tömb átkonvertáljon egy olyan pointerré, ami az első elemre mutat, és átadjuk külön paraméterben a tömb méretét. Bár van megoldás arra is, hogy egy darab "rugalmas" függvényt írjunk, és az egész tömbhöz csak 1 paramétert vegyünk át, annak is komoly hátulütői lehetnek. Majd template-ekkel a 7-8. gyakorlaton lesz részletesen szó, de kb így nézne ki:
+		\begin{lstlisting}
+template <class T, int ArraySize>
+void ( T (&param)[ArraySize] )
+{
+	//...
+}
+		\end{lstlisting}
+		\smallskip
+		Ez később jobban ki lesz fejtve, de itt egy template paraméter dedukció fog létrejönni, és a fordító kitalálja \texttt{param} méretét. Csak nyilván, mindig amikor egy más méretű tömböt hozunk létre, a fordító példányosítja ezt a függvényt, ami csúnyán meg tudja dobni a bináris kódot (\textit{binary code}).
 		
 		\smallskip
-		Ez azért ilyen körülményes, mert egy tömbnek a méretét fordítási időben ismernünk kell. Ha változó méretű tömböt várnánk paraméterül, az szembemenne ezzel a követelménnyel.  
+		A tömbök átvétele paraméterként azért ilyen körülményes, mert egy tömbnek a méretét fordítási időben ismernünk kell. Ha változó méretű tömböt várnánk paraméterül, az szembemenne ezzel a követelménnyel.  
 	\end{note}
 	\begin{note}
 		Progalapon úgy tanultunk tömböket, hogy változó méretet adtunk meg nekik. Ezt a \texttt{gcc} compiler elfogadja, lefordítja, és jó kódot is csinál belőle, de nem garantált, hogy ezt minden fordító megteszi, ugyanis a c++ szabvány azt mondja ki, hogy a tömb méretének fordítási időben ismertnek kell lennie. Ez jól demonstrálja, hogy a compilerek nem feltételnül követik szorosan a szabványt.
