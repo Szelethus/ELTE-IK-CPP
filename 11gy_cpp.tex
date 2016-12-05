@@ -1,0 +1,316 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{
+	language=C++, 
+	basicstyle=\ttfamily, 
+	keywordstyle=\color{blue}\ttfamily, 
+	stringstyle=\color{red}\ttfamily,
+	tabsize = 4
+}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks = true	
+}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		11. óra.
+	\end{center}
+	A jegyzetet \textsc{Brunner} Tibor készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	\section{Objektum orientált programozás}
+	Objektum orientált programozásnál e hármat várjuk el:
+	\begin{itemize}
+		\item enkapszuláció
+		\item kód újrafelhasználás
+		\item adat elrejtés elve
+	\end{itemize}
+	Az, hogy egy adott nyelv ez hogyan valósítja meg, az a saját maga dolga. Vannak nyelvek, melyek jobban alkalmasan objektum orientált programozásra, mint mások. Példaképp, a C nyelvre is mondhatjuk, hogy objektum orientált, bár nincs benne örökölődés például, és nem igazán kézenfekvő az adatok elrejtése sem. Nyilvánvalóan ennél egyel praktikusabb nyelvek is léteznek, példaképp Java, és nyilván a c++ is, melyek sokkal erősebb nyelvi eszközökkel rendelkeznek ezek megvalósítására.
+	
+	Fontos, hogy az objektum orientáltság fogalmát ne csak az osztályokhoz kössük!
+	
+	Volt már szó \texttt{public} és \texttt{private} kulcsszavakról, ha ezek nem világosak, a 6. gyakorlaton volt róla részletesebben szó.
+	
+	\medskip
+	Tekintsük az alábbi kódot:
+	\begin{lstlisting}
+class Sikidom
+{
+	int x;
+	int y;
+public:
+	Sikidom(int x, int y) : x(x), y(y) {}
+	double terulet() const
+	{
+		//...
+	}
+};
+	\end{lstlisting}
+	Itt a célunk egy általános síkidom megadása, azonban bajban vagyunk, hisz nem tudjuk megmondani, hogy épp egy tetszőleges síkidomnak milyen lesz a területe. Próbáljuk ehhez hazsnálni az öröklődést: vegyünk át mindent, ami a Síkidomban van, és hozzunk létre ey kör típust!
+	
+	\begin{lstlisting}
+class Kor : public Sikidom
+{
+	double r;
+public:
+	double terulet() const
+	{
+		return r * r * 3.14;
+	}
+};
+	\end{lstlisting}
+	A \texttt{Kor} osztály \texttt{Sikidom} összes adattagját és metudást átveszi. Mondhatjuk azt is, hogy a \texttt{Kor} \textit{az egy} \texttt{Sikidom}.
+	\begin{note}
+		Nagyon fontos, hogy a 3,14-nél pontot és nem vesszpt használunk. Ha ezt írnánk:
+		
+		{\centering \texttt{int i = 1, 2, f(), g();} \par}
+		
+		Akkor rendre a vessző paraméter előtti tag mindig kiértékelődik, és utána értékeli ki a következőt. A végén az egész azzal lesz ekvivalens, mintha simán azt írnánk, hogy \texttt{int i = g();}
+		
+		Egy fél mondat erejéig jegyezzük meg azt is, hogy lebegőpontos számokat sose hasonlítsunk össze! Jusson eszünkbe, ami Numerikus Módszereken hangzik el: 
+		%TODO d=0, d+=0,1, 1ig
+	\end{note}
+	Az, hogy publikusan örököltem, azt jelenti, hogy egy {altípus}-t (\textit{subtype}) hoztunk létre. 
+	\begin{lstlisting}
+Kor k;
+Sikidom s;
+s = k; //ok
+	\end{lstlisting}
+	Ezt azt is jelenti, hogy minden helyre, ahol \texttt{Sikodom}-ot szeretnénk hazsnálni, \texttt{Kor}-t is használhatunk, mert a \texttt{Kor} \texttt{Sikidom} altípusa.
+	
+	A publikus örökölés azt jelenti, hogy minden, ami publikus volt a bázisosztályban az publikus marad, minden ami protected protected marad, minden ami privát, privát marad.
+	
+	Ezzel máris megállapíthatjuk, hogy egy picit defektes a küdunk, hisz mi \texttt{Kor}-t azért hoztuk létre, hogy speciálisabb feladatokat tudjuk végrehajtani \texttt{Sikidom} tulajdonságaival, azonban \texttt{x} és \texttt{y} privát, és csak \texttt{Sikidom} tud hozzáférni. Írjuk át ezt protectedre:
+\begin{lstlisting}
+class Sikidom
+{
+protected:
+	int x;
+	int y;
+public:
+	Sikidom(int x, int y) : x(x), y(y) {}
+	double terulet() const {}
+};
+\end{lstlisting}
+	A protected tagokhoz csak az adott osztály fér hozzá, és azon osztályok, melyek ebből örökölnek. Nem csak publikusan tudunk örökölni, protected-del, és private-el is. Az alábbi táblázat mutatja, hogy a bázisosztályban adott védettség
+	%TODO finish this
+	
+	Picit térjünk visza a fenti értékadáshoz, mert ott azért van még mit megbeszélni.
+	\begin{lstlisting}
+Kor k;
+Sikidom s;
+s = k; //ok
+	\end{lstlisting}
+	\texttt{Kor}-ben több információ van, mint \texttt{Sikidom}-ban. AMikor értékül adjuk, hogyan tudjuk egy kisebb, \texttt{Sikidom}-nyi területbe belezsőfolni \texttt{Kor}-t? Sehogy. Itt egy un. \textit{slicing} fog történni, és minden, ami \texttt{Kor}-re specifikus (pl a sugár), az elveszik. Gyakorlatilag ez történik (most tekintsünk el attól, hogy ezek az adattagok védettek):
+	\begin{lstlisting}
+s.x = k.x;
+s.y = k.y;
+	\end{lstlisting}
+	
+	Ezt a \textit{slicing} dolgot meg tudjuk kerülni, ha egy pointert hozunk létre: Hisz egy \texttt{Sikidom}-ra mutató pointer mutathat \texttt{Kor}-re is, és mivel az ''csak'' mutogat, nem fog levágni semmit. 
+	\begin{lstlisting}
+Kor k;
+Sikidom *sp = &k;
+	\end{lstlisting}
+	Bár ettől még igaz, hogy \texttt{sp}-n keresztül nem fogunk tudni hivatkozni olyan dolgokra, melyek \texttt{Sikidom}-ban nincsenek benne.
+	
+	Mi fog történni, ha lekérdezzük a területét?
+	\begin{lstlisting}
+Kor k;
+Sikidom *sp = &k;
+sp->terulet();
+	\end{lstlisting}
+	Itt azt fogjuk tapasztalni, hogy \texttt{Sikidom} függvénye fog megíhvódni. Ennek oka az, hogy \texttt{sp} statikus típusa (\textit{static type}) az \texttt{Sikidom}, így hatékonyság végett mindig a statikus típushoz tartozó függvényt hívja meg. Egy pointernek van un. dinamikus típusa is (\textit{dynamic type}), ami ebben az esetben \texttt{Kor} lesz. A dinamikus típust csak futaási időben lehet ismert, hisz azt megállapítani fordítási időben, hogy miylen típusú objektumra fog mutanti az \texttt{sp} pointer, lehetetlen megállapítani. Ha mindig a dinamikus típus szerint hívná meg mindig a nyelv függvényeket, annak nagy futási idejű költsége lenne. Ahhoz, hogy rákényszerítsük a fordítót arra, hogy a dinamikus típus szerint fordítson, használnunk kell a \texttt{virtual} kulcsszót.
+	%TODO miért szar a láncolt lista
+\begin{lstlisting}
+class Sikidom
+{
+protected:
+	int x;
+	int y;
+public:
+	Sikidom(int x, int y) : x(x), y(y) {}
+	virtual double terulet() const
+	{
+		//...
+	}
+};
+
+class Kor : public Sikidom
+{
+	double r;
+public:
+	double terulet() const
+	{
+		return r * r * 3.14;
+	}
+};
+\end{lstlisting}
+	Picit bánthat minket az, hogy hogyan jöhet elő ez a probléma, ugyanis picit úgy tánik, mintha sértenénk a \textit{one definition rule}-t: itt felüldefiniálás fog bekövetkezni, azaz a \texttt{Kor} leárnyákolja a \texttt{Sikidom} \texttt{terulet} függvényét. Viszont ez a leárnyékolás nem ér sokat, ha nincs \texttt{virtual} kulcsszó, és ha egy \texttt{Sikidom} típusú pointerrel akarjuk ezt használni.
+	
+	Próbáljunk megírni egy sítábor programot, melyben azt oldjuk meg, hogy a kétszobás égyakban vagy 2 fiú, vagy 2 lány aludjon!
+	
+	\begin{lstlisting}
+class Sielo
+{
+public:
+	virtual void szobatars(Sielo*)
+	{
+		std::cout << "sielo";
+	}
+};
+
+class Lany : public Sielo
+{
+public:
+	void szobatars(Sielo*)
+	{
+		std::cout << "lany sielo";
+	}
+	void szobatars(Lany*)
+	{
+		std::cout << "lany";
+	}
+};
+
+class Fiu : public Sielo
+{
+public:
+	void szobatars(Sielo*)
+	{
+		std::cout << "fiu sielo";
+	}
+	void szobatars(Fiu*)
+	{
+		std::cout << "fiu";
+	}
+};
+	\end{lstlisting}
+	Egy pillanatra menjünk vissza a körös példára is:
+	\begin{lstlisting}
+void f(Kor* k)
+{
+	//...
+}
+	\end{lstlisting}
+	Lehet, az implementáció egy pontján úgy döntünk, hogy ez várjon inkább síkidomokat.
+	\begin{lstlisting}
+void f(Sikidom* k)
+{
+	//...
+}
+	\end{lstlisting}
+	Ezt megtehetem, mert mi továbbra is köröket fogunk megadni, és minden kör \textit{az egy} síkidom. Ennek a tanulsága az, hogy paramétereknél \textbf{felfelé} az öröklődési láncon lehet haladni, lefelé nem, hiszen egy síkidomra mutató pointer mutathat körre, de fordítva nem. Azonban a visszatérési értéknél ha:
+	\begin{lstlisting}
+Sikidom f(...) {}
+	\end{lstlisting}
+	Úgy döntünk, inkább kört adunk vissza.
+	\begin{lstlisting}
+Kor f(...) {}
+	\end{lstlisting}
+	Ezzek semmi gond nem lesz, hisz itt is, minden kör \textit{az egy} síkidom.
+	\begin{lstlisting}
+Sikidom * sp = f(...);
+	\end{lstlisting}
+	%TODO ... paraméterek
+	\medskip
+	
+	Visszatérvén a síelőkre:
+	\begin{lstlisting}
+Lany * l, *l2;
+Fiu *f;
+std::cout << l->szobatars(l2) << std::endl; //lany
+
+Sielo *s = l;
+std::cout << s->szobatars(f) << std::endl; //lany sielo
+	\end{lstlisting} 
+	Itt sikerült elírni, hogy a fiúnak lány legyen a szobatársa. Figyeljük meg, hogy két különböző paraméterű \texttt{szobatars} metódust írtunk, de csak az virtuális, mely egy \texttt{Sielo}-t vár. Ezért, mivel minden \texttt{Fiu} \textit{az egy} \texttt{Sielo}, teljesen szabályos lesz a \texttt{szobatard(Sielo*)} függvényhívás.
+	
+	%TODO jobb struktúrálás
+\end{document}
