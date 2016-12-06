@@ -5,7 +5,8 @@
 \usepackage[T1]{fontenc}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
-\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+\usepackage{amsmath, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+\usepackage[table]{xcolor}
 %\usepackage{marvosym}
 
 \usepackage{listings}
@@ -109,13 +110,11 @@
 	\begin{itemize}
 		\item enkapszuláció
 		\item kód újrafelhasználás
-		\item adat elrejtés elve
+		\item adat elrejtés
 	\end{itemize}
-	Az, hogy egy adott nyelv ez hogyan valósítja meg, az a saját maga dolga. Vannak nyelvek, melyek jobban alkalmasan objektum orientált programozásra, mint mások. Példaképp, a C nyelvre is mondhatjuk, hogy objektum orientált, bár nincs benne örökölődés például, és nem igazán kézenfekvő az adatok elrejtése sem. Nyilvánvalóan ennél egyel praktikusabb nyelvek is léteznek, példaképp Java, és nyilván a c++ is, melyek sokkal erősebb nyelvi eszközökkel rendelkeznek ezek megvalósítására.
+	Az, hogy egy adott nyelv ezt hogyan valósítja meg, az a saját maga dolga. Vannak nyelvek, melyek jobban alkalmasan objektum orientált programozásra, mint mások. Példaképp, a C nyelvre is mondhatjuk, hogy objektum orientált, bár nincs benne örökölődés, és nem igazán kézenfekvő az adatok elrejtése sem (bár lehetséges). Nyilvánvalóan ennél egyel praktikusabb nyelvek is léteznek, példaképp Java, és nyilván a c++ is, melyek sokkal erősebb nyelvi eszközökkel rendelkeznek ezek megvalósítására.
 	
 	Fontos, hogy az objektum orientáltság fogalmát ne csak az osztályokhoz kössük!
-	
-	Volt már szó \texttt{public} és \texttt{private} kulcsszavakról, ha ezek nem világosak, a 6. gyakorlaton volt róla részletesebben szó.
 	
 	\medskip
 	Tekintsük az alábbi kódot:
@@ -132,7 +131,7 @@ public:
 	}
 };
 	\end{lstlisting}
-	Itt a célunk egy általános síkidom megadása, azonban bajban vagyunk, hisz nem tudjuk megmondani, hogy épp egy tetszőleges síkidomnak milyen lesz a területe. Próbáljuk ehhez hazsnálni az öröklődést: vegyünk át mindent, ami a Síkidomban van, és hozzunk létre ey kör típust!
+	Itt a célunk egy általános síkidom megadása, azonban bajban vagyunk, hisz nem tudjuk megmondani, hogy épp egy tetszőleges síkidomnak milyen lesz a területe. Hozzunk létre egy kört, hisz annak a területét meg tudjuk adni! Próbáljuk ehhez használni az öröklődést: vegyünk át mindent, ami a Síkidomban van, elvégre minden kör egy síkidom!
 	
 	\begin{lstlisting}
 class Kor : public Sikidom
@@ -145,28 +144,30 @@ public:
 	}
 };
 	\end{lstlisting}
-	A \texttt{Kor} osztály \texttt{Sikidom} összes adattagját és metudást átveszi. Mondhatjuk azt is, hogy a \texttt{Kor} \textit{az egy} \texttt{Sikidom}.
+	Az öröklődés következtében \texttt{Kor} osztály \texttt{Sikidom} összes adattagját és metódusát átveszi. Fentebb látható az öröklődés szintaktikája: kettőspont, és utána egy öröklődési típus (ez esetben \texttt{public}, erről nemsoká lesz bővebben szó). Mondhatjuk azt is, hogy a \texttt{Kor} \textit{az egy} \texttt{Sikidom}, hisz minden, a \texttt{Sikidom}ra jellemző tulajdonsággal rendelkezik.
 	\begin{note}
-		Nagyon fontos, hogy a 3,14-nél pontot és nem vesszpt használunk. Ha ezt írnánk:
-		
-		{\centering \texttt{int i = 1, 2, f(), g();} \par}
+		Nagyon fontos, hogy a 3,14-nél pontot és nem vesszőt használunk. Ha ezt írnánk:
+		\begin{lstlisting}
+int i = 1, 2, f(), g();
+		\end{lstlisting}
 		
 		Akkor rendre a vessző paraméter előtti tag mindig kiértékelődik, és utána értékeli ki a következőt. A végén az egész azzal lesz ekvivalens, mintha simán azt írnánk, hogy \texttt{int i = g();}
 		
-		Egy fél mondat erejéig jegyezzük meg azt is, hogy lebegőpontos számokat sose hasonlítsunk össze! Jusson eszünkbe, ami Numerikus Módszereken hangzik el: 
-		%TODO d=0, d+=0,1, 1ig
+		Egy fél mondat erejéig jegyezzük meg azt is, hogy lebegőpontos számokat sose hasonlítsunk össze! Jusson eszünkbe, ami Numerikus Módszereken hangzik el: minden lebegőpontos szám tartalmazhat egy kis pontatlanságot.
+		\begin{lstlisting}
+for (double d = 0; d != 1; d += 0.1)
+{
+	std::cout << d << std::endl;
+}
+		\end{lstlisting}
+		Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ...} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
 	\end{note}
-	Az, hogy publikusan örököltem, azt jelenti, hogy egy {altípus}-t (\textit{subtype}) hoztunk létre. 
-	\begin{lstlisting}
-Kor k;
-Sikidom s;
-s = k; //ok
-	\end{lstlisting}
-	Ezt azt is jelenti, hogy minden helyre, ahol \texttt{Sikodom}-ot szeretnénk hazsnálni, \texttt{Kor}-t is használhatunk, mert a \texttt{Kor} \texttt{Sikidom} altípusa.
+	Az, hogy publikusan örököltünk (erre volt a \texttt{public} kulcsszó), azt jelenti, hogy egy {altípus}-t (\textit{subtype}) hoztunk létre. 
+	Ezt azt is jelenti, hogy minden helyre, ahol \texttt{Sikidom}-ot szeretnénk használni, \texttt{Kor}-t is használhatunk.
 	
-	A publikus örökölés azt jelenti, hogy minden, ami publikus volt a bázisosztályban az publikus marad, minden ami protected protected marad, minden ami privát, privát marad.
+	Van egy apróbb probléma a fenti kóddal azonban: Az osztály azon adattagjai, melyek \texttt{private}-ként vannak deklarálva, csak az adott számára elérhetőek.
 	
-	Ezzel máris megállapíthatjuk, hogy egy picit defektes a küdunk, hisz mi \texttt{Kor}-t azért hoztuk létre, hogy speciálisabb feladatokat tudjuk végrehajtani \texttt{Sikidom} tulajdonságaival, azonban \texttt{x} és \texttt{y} privát, és csak \texttt{Sikidom} tud hozzáférni. Írjuk át ezt protectedre:
+	Ez probléma hisz mi \texttt{Kor}-t azért hoztuk létre, hogy speciálisabb feladatokat tudjuk végrehajtani \texttt{Sikidom} tulajdonságaival, azonban \texttt{x} és \texttt{y} privát, és csak \texttt{Sikidom} tud hozzáférni. Írjuk át ezt protectedre:
 \begin{lstlisting}
 class Sikidom
 {
@@ -178,16 +179,49 @@ public:
 	double terulet() const {}
 };
 \end{lstlisting}
-	A protected tagokhoz csak az adott osztály fér hozzá, és azon osztályok, melyek ebből örökölnek. Nem csak publikusan tudunk örökölni, protected-del, és private-el is. Az alábbi táblázat mutatja, hogy a bázisosztályban adott védettség
-	%TODO finish this
-	
+	A \texttt{protected} tagokhoz csak az adott osztály fér hozzá, és azon osztályok, melyek ebből örökölnek. Nem csak publikusan tudunk örökölni, \texttt{protected}-del, és \texttt{private}-el is. Az alábbi táblázat mutatja, hogy az származott osztály (\textit{derived class}) milyen adattagokhoz fér hozzá a bázisosztályból (\textit{base class}) különböző öröklődési típusok esetén:
+	\begin{center}
+		\begin{tabular}{|c||c|c|c|}
+			\hline
+			Öröklődés típusa:&public&protected&private\\
+			\hline
+			\hline
+			Saját adatok/metódusok& \cellcolor{green!20}igen&\cellcolor{green!20}igen&\cellcolor{green!20}igen\\
+			\hline
+			Örökölt adatok/metódusok (public)&\cellcolor{green!20}igen&\cellcolor{green!20}igen&\cellcolor{green!20}igen\\
+			\hline
+			Örökölt adatok/metódusok (protected)&\cellcolor{green!20}igen&\cellcolor{green!20}igen&\cellcolor{green!20}igen\\
+			\hline
+			Örökölt adatok/metódusok (private)&\cellcolor{red!20}nem&\cellcolor{red!20}nem&\cellcolor{red!20}nem\\
+			\hline
+		\end{tabular}
+	\end{center}
+	Ez pedig mutatja egy adott adattag/metódus védettségét öröklődés után:
+	\begin{center}
+		\begin{tabular}{|c||c|c|c|}
+			\hline
+			Öröklődés típusa:&public&protected&private\\
+			\hline
+			\hline
+			Örökölt adatok/metódusok (public)&\cellcolor{green!20}public&\cellcolor{orange!20}protected&\cellcolor{red!20}private\\
+			\hline
+			Örökölt adatok/metódusok (protected)&\cellcolor{orange!20}protected&\cellcolor{orange!20}protected&\cellcolor{red!20}private\\
+			\hline
+			Örökölt adatok/metódusok (private)&\cellcolor{red!20}private&\cellcolor{red!20}private&\cellcolor{red!20}private\\
+			\hline
+		\end{tabular}
+	\end{center}
 	Picit térjünk visza a fenti értékadáshoz, mert ott azért van még mit megbeszélni.
 	\begin{lstlisting}
 Kor k;
 Sikidom s;
 s = k; //ok
 	\end{lstlisting}
-	\texttt{Kor}-ben több információ van, mint \texttt{Sikidom}-ban. AMikor értékül adjuk, hogyan tudjuk egy kisebb, \texttt{Sikidom}-nyi területbe belezsőfolni \texttt{Kor}-t? Sehogy. Itt egy un. \textit{slicing} fog történni, és minden, ami \texttt{Kor}-re specifikus (pl a sugár), az elveszik. Gyakorlatilag ez történik (most tekintsünk el attól, hogy ezek az adattagok védettek):
+	Azt már letisztáztuk, hogy \texttt{Kor} \texttt{Sikidom} altípusa, de azonban ez akkor is két különbötő típus, hogyan lehet, hogy nem kapunk fordítási idejű hibát?
+	
+	A válasz az, hogy a fordító meg tudja oldani e két típus közötti értékadást. Mivel \texttt{Kor}-ben benne van maga \texttt{Sikidom} is, ezért meghívja az ahhoz tartozó értékadó operátort, és a \texttt{Kor}-ben lévő \texttt{Sikidom}-ot adja majd értékül.
+	
+	Ez azonban magával hordozza azt is, hogy minden információ, ami \texttt{Kor}-respecifikus (pl. sugár (\texttt{r})) elveszik. Ez az un. \textit{slicing}. Ebben az esetben, lévén a fordító generálta nekünk az értékadó operátort, és az alapértelmezetten minden adattagra meghívja az arra definiált értékadó operátort, gyakorlatilag ez fog történni:
 	\begin{lstlisting}
 s.x = k.x;
 s.y = k.y;
@@ -198,16 +232,16 @@ s.y = k.y;
 Kor k;
 Sikidom *sp = &k;
 	\end{lstlisting}
-	Bár ettől még igaz, hogy \texttt{sp}-n keresztül nem fogunk tudni hivatkozni olyan dolgokra, melyek \texttt{Sikidom}-ban nincsenek benne.
+	Így minden adathoz, ami \texttt{Kor}-ben \texttt{Sikidom}-tól lett örökölve, hozzá tudunk férni \texttt{sp}-n keresztül. Fontos megjegyeznünk azonban, hogy egy \texttt{Sikidom} típusú pointer csak ''\texttt{Sikidom}nyi'' adattagokat/metódusokat tud kezelni.
 	
-	Mi fog történni, ha lekérdezzük a területét?
+	Mi fog történni, ha meghívjuk a \texttt{terulet} metódust?
 	\begin{lstlisting}
 Kor k;
 Sikidom *sp = &k;
 sp->terulet();
 	\end{lstlisting}
-	Itt azt fogjuk tapasztalni, hogy \texttt{Sikidom} függvénye fog megíhvódni. Ennek oka az, hogy \texttt{sp} statikus típusa (\textit{static type}) az \texttt{Sikidom}, így hatékonyság végett mindig a statikus típushoz tartozó függvényt hívja meg. Egy pointernek van un. dinamikus típusa is (\textit{dynamic type}), ami ebben az esetben \texttt{Kor} lesz. A dinamikus típust csak futaási időben lehet ismert, hisz azt megállapítani fordítási időben, hogy miylen típusú objektumra fog mutanti az \texttt{sp} pointer, lehetetlen megállapítani. Ha mindig a dinamikus típus szerint hívná meg mindig a nyelv függvényeket, annak nagy futási idejű költsége lenne. Ahhoz, hogy rákényszerítsük a fordítót arra, hogy a dinamikus típus szerint fordítson, használnunk kell a \texttt{virtual} kulcsszót.
-	%TODO miért szar a láncolt lista
+	Itt azt fogjuk tapasztalni, hogy \texttt{Sikidom} függvénye fog meghívódni. Ennek oka az, hogy \texttt{sp} statikus típusa (\textit{static type}) az \texttt{Sikidom}, és hatékonyság végett alapértelmezetten mindig a statikus típushoz tartozó függvényt hívódik meg. Egy pointernek azonban van un. dinamikus típusa is (\textit{dynamic type}), ami ebben az esetben \texttt{Kor} lesz. A dinamikus típust csak futási időben lehet ismert, hisz lehetetlen azt megállapítani fordítási időben, hogy milyen típusú objektumra fog mutatni az \texttt{sp}. Ha mindig a dinamikus típus szerint hívná meg a program függvényeket, annak nagy futási idejű költsége lenne. Ahhoz, hogy rákényszerítsük a fordítót arra, hogy a dinamikus típus szerint fordítson, használnunk kell a \texttt{virtual} kulcsszót.
+	%TODO miért szar a láncolt lista: túl költséges a processzorba pakolás ...
 \begin{lstlisting}
 class Sikidom
 {
@@ -216,7 +250,7 @@ protected:
 	int y;
 public:
 	Sikidom(int x, int y) : x(x), y(y) {}
-	virtual double terulet() const
+	virtual double terulet() const //virtualis!
 	{
 		//...
 	}
@@ -232,47 +266,65 @@ public:
 	}
 };
 \end{lstlisting}
-	Picit bánthat minket az, hogy hogyan jöhet elő ez a probléma, ugyanis picit úgy tánik, mintha sértenénk a \textit{one definition rule}-t: itt felüldefiniálás fog bekövetkezni, azaz a \texttt{Kor} leárnyákolja a \texttt{Sikidom} \texttt{terulet} függvényét. Viszont ez a leárnyékolás nem ér sokat, ha nincs \texttt{virtual} kulcsszó, és ha egy \texttt{Sikidom} típusú pointerrel akarjuk ezt használni.
+	Picit bánthat minket az, hogy hogyan jöhet elő ez a probléma, ugyanis úgy tűnik, mintha sértenénk a \textit{one definition rule}-t, hisz létrehoztunk két függvényt azonos visszatérési értékkel és paraméterlistával: a kiút az, hogy itt felüldefiniálás (\textit{override}) fog bekövetkezni, azaz a \texttt{Kor}-béli \texttt{terulet} le fogja árnyákolni a \texttt{Sikidom} \texttt{terulet} függvényét. Viszont ez a leárnyékolás nem ér sokat, ha nincs \texttt{virtual} kulcsszó, és ha egy \texttt{Sikidom} típusú pointerrel akarjuk ezt használni.
+%TODO this is a complete mess. Számomra teljesen érthetetlen ezzel a kódrészlettel mi volt a cél, és pciit úgy tűnt, Tibor is elvesztette a fonalat vele.
+%	Próbáljunk megírni egy sítábor programot, melyben azt oldjuk meg, hogy a kétszobás ágyakban vagy 2 fiú, vagy 2 lány aludjon!
+%\begin{lstlisting}
+%#include <iostream>
+%
+%class Sielo
+%{
+%public:
+%	virtual void szobatars(Sielo*)
+%	{
+%		std::cout << "sielo";
+%	}
+%};
+%
+%class Lany : public Sielo
+%{
+%public:
+%	void szobatars(Sielo*)
+%	{
+%		std::cout << "valamilyen sielo";
+%	}
+%	void szobatars(Lany*)
+%	{
+%		std::cout << "lany sielo";
+%	}
+%};
+%
+%class Fiu : public Sielo
+%{
+%public:
+%	void szobatars(Sielo*)
+%	{
+%		std::cout << "valamilyen sielo";
+%	}
+%	void szobatars(Fiu*)
+%	{
+%		std::cout << "fiu sielo";
+%	}
+%};
+%
+%int main()
+%{
+%	Lany l1, *l2;
+%	Fiu *f;
+%	l1.szobatars(l2); //lany sielo
+%	endl(std::cout);
+%	Sielo *s = &l1;
+%	s->szobatars(f); //lany sielo
+%}
+%\end{lstlisting}
+%	Itt sikerült elírni, hogy a fiúnak lány legyen a szobatársa. Figyeljük meg, hogy két különböző paraméterű \texttt{szobatars} metódust írtunk, de csak az virtuális, mely egy \texttt{Sielo}-t vár. Ezért, mivel minden \texttt{Fiu} \textit{az egy} \texttt{Sielo}, teljesen szabályos lesz a \texttt{szobatars(Sielo*)} függvényhívás.
 	
-	Próbáljunk megírni egy sítábor programot, melyben azt oldjuk meg, hogy a kétszobás égyakban vagy 2 fiú, vagy 2 lány aludjon!
+	\begin{note}
+		Egy függvény öröklődés után nem marad virtuális. Azaz, ha \texttt{Kor}-ből örökölnénk, és szintén felül szeretnénk írni \texttt{terulet}-et, \texttt{Kor}-ben is virtuálisnak kell deklarálnunk a függvényt.
+	\end{note}
 	
-	\begin{lstlisting}
-class Sielo
-{
-public:
-	virtual void szobatars(Sielo*)
-	{
-		std::cout << "sielo";
-	}
-};
-
-class Lany : public Sielo
-{
-public:
-	void szobatars(Sielo*)
-	{
-		std::cout << "lany sielo";
-	}
-	void szobatars(Lany*)
-	{
-		std::cout << "lany";
-	}
-};
-
-class Fiu : public Sielo
-{
-public:
-	void szobatars(Sielo*)
-	{
-		std::cout << "fiu sielo";
-	}
-	void szobatars(Fiu*)
-	{
-		std::cout << "fiu";
-	}
-};
-	\end{lstlisting}
-	Egy pillanatra menjünk vissza a körös példára is:
+	\smallskip
+	Szánjunk pár szót meglévő kód módosításáról, ha polimorfizmusról is van szó.
 	\begin{lstlisting}
 void f(Kor* k)
 {
@@ -286,31 +338,83 @@ void f(Sikidom* k)
 	//...
 }
 	\end{lstlisting}
-	Ezt megtehetem, mert mi továbbra is köröket fogunk megadni, és minden kör \textit{az egy} síkidom. Ennek a tanulsága az, hogy paramétereknél \textbf{felfelé} az öröklődési láncon lehet haladni, lefelé nem, hiszen egy síkidomra mutató pointer mutathat körre, de fordítva nem. Azonban a visszatérési értéknél ha:
+	Ezzel semmi gond nem lesz, ugyanis ha mi \texttt{f}-nek továbbra is \texttt{Kor}öket fogunk adni, egy \texttt{Sikidom} típusú pointer tud még mutatni \texttt{Kor} típusra. Ennek a tanulsága az, hogy paramétereknél \textbf{felfelé} az öröklődési láncon lehet haladni, lefelé nem, hiszen egy síkidomra mutató pointer mutathat körre, de fordítva nem. Továbbá, ha visszatérési értéknél:
 	\begin{lstlisting}
 Sikidom f(...) {}
 	\end{lstlisting}
-	Úgy döntünk, inkább kört adunk vissza.
+	úgy döntünk, inkább kört adunk vissza:
 	\begin{lstlisting}
 Kor f(...) {}
 	\end{lstlisting}
-	Ezzek semmi gond nem lesz, hisz itt is, minden kör \textit{az egy} síkidom.
+	nem lesz semmi gond, hisz itt is, minden kör \textit{az egy} síkidom. Azaz ha módosítjuk egy függvény visszatérési értékét, \textbf{lefelé} haladjunk az öröklődési ágon.
 	\begin{lstlisting}
-Sikidom * sp = f(...);
+Kor *k;
+Sikidom * sp = f(k);
 	\end{lstlisting}
-	%TODO ... paraméterek
+	Bajban lennénk, ha \texttt{Sikidom}-nál egy általánosabb osztályt adna vissza \texttt{f}.
 	\medskip
 	
-	Visszatérvén a síelőkre:
-	\begin{lstlisting}
-Lany * l, *l2;
-Fiu *f;
-std::cout << l->szobatars(l2) << std::endl; //lany
-
-Sielo *s = l;
-std::cout << s->szobatars(f) << std::endl; //lany sielo
-	\end{lstlisting} 
-	Itt sikerült elírni, hogy a fiúnak lány legyen a szobatársa. Figyeljük meg, hogy két különböző paraméterű \texttt{szobatars} metódust írtunk, de csak az virtuális, mely egy \texttt{Sielo}-t vár. Ezért, mivel minden \texttt{Fiu} \textit{az egy} \texttt{Sielo}, teljesen szabályos lesz a \texttt{szobatard(Sielo*)} függvényhívás.
+	\subsection{Cast-ok}
 	
-	%TODO jobb struktúrálás
+	Néha abba a kellemetlen helyzetbe kerülhetünk, hogy van egy adott pointerünk/referenciák, és a dinamikus típusa \texttt{Kor}, azonban statikus típusa \texttt{Sikidom}, de mégis fontos, hogy \texttt{Kor}-re vonatkozó dolgokat használjunk. Ilyenkor segíthetnek a \textit{cast}ok:
+	\begin{lstlisting}
+void f(Sikidom *s)
+{
+	Kor *k = dynamic_cast<Kor*>(s); //korkent szerentenk hasznalni
+	if (k == NULL)
+	{
+		//ha nem volt sikeres a castolas...
+	}
+}
+	\end{lstlisting}
+	Ebben a kódrészletben megpróbáljuk \texttt{s}-t átkonvertálni \texttt{Kor} pointer típusra.
+	
+	A \texttt{dynamic\_cast} futási időben ellenőriz, és ha a cast nem sikeres, nullpointert ad vissza. Azonban nem hatékony, hisz futási időben kell végigjárnia az öröklődési láncot. Ha nem vagyunk biztosak benne, hogy garantáltan lehetséges a castolás, akor \texttt{dynamic\_cast}-ot érdemes használni, ha azonban biztosak vagyunk benne hogy az lehetséges, akkor \texttt{static\_cast} a jobb, mely fordítási időben végzi el ezt, hatékonyabb, azonban kevésbé biztonságos, ugyanis ha a cast sikertelen, akkor nem nullpointert ad vissza, hanem egy nem definiált viselkedés fog bekövetkezni (leggyakrabban elszáll).
+	
+	Konstruktorokról még beszélnünk kéne: a szemfüleseknek feltűnhetett, hogy a fenti kód le se fordul! (tekintsünk el attól, hogy a \texttt{terulet} metódus hiányzik)
+	\begin{lstlisting}
+class Sikidom
+{
+protected:
+	int x, y;
+public:
+	Sikidom(int x, int y) : x(x), y(y) {}
+};
+
+class Kor : public Sikidom
+{
+	double r;
+};
+	\end{lstlisting}
+	Mivel konstruktort nem írtunk \texttt{Kor}-nek, így a fordító generál nekünk egyet, melyben megpróbálja \texttt{Sikidom}-hoz tartozó adattagokat \texttt{Sikidom} paraméter nélküli konstruktorával meghívni. Azonban mivel nincs neki ilyen, fordítási idejű hibát kapunk. Ilyenkor csak egy lehetőségünk van \texttt{Sikidom} módosítása nélkül, írnunk kell \texttt{Kor}-nek egy konstruktort, melynek inicializációs listájában meghívjuk \texttt{Sikidom} egyetlen, két \texttt{int}-et váró konstruktorát.
+\begin{lstlisting}
+class Sikidom
+{
+protected:
+	int x, y;
+public:
+	Sikidom(int x, int y) : x(x), y(y) {}
+};
+
+class Kor : public Sikidom
+{
+	double r;
+public:
+	Kor(int x, int y, int r) : Sikidom(x,y), r(r) {}
+};
+\end{lstlisting}
+	Ezzel \texttt{Sikidom} konstruktorát meg tudtuk hívni. Mi lesz a copy konstruktorokkal? Hasonló helyzetben, ha egy kört másolunk, a síkidom default copy konstrukora fog meghívódni, kivéve, ha az felül van definiálva. Azaz rendre másolásnál ellőször meghívódik a síkidom copy konstruktora, és utána jön a \texttt{Kor} copy konstruktora. Ebben a sorrendben haladnak konstruktorok is, azonban a destruktorok nem: ott a hívási sorrend pont fordítva van, azaz felfelé halad az öröklődési láncon.
+	
+	\begin{lstlisting}
+class A {};
+class B : public A {};
+class C : public B {};
+class D : public C {};
+	\end{lstlisting}
+	Konstruktorok hívási sorrendje: \texttt{A -> B -> C -> D}
+	
+	Azonban itt van egy nagy veszélyforrás, hiszen a destruktor is csak akkor hívódik meg jól, ha az virtuális.
+	%TODO virtuális destruktorok
+	
+	Rossz ötlet az STL konténereiből örökölni, hisz azon destruktora nem virtuális. 
 \end{document}
