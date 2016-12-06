@@ -104,7 +104,7 @@
 		
 		11. óra.
 	\end{center}
-	A jegyzetet \textsc{Brunner} Tibor készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor  előadásán. (\today)
 	\section{Objektum orientált programozás}
 	Objektum orientált programozásnál e hármat várjuk el:
 	\begin{itemize}
@@ -267,7 +267,7 @@ public:
 };
 \end{lstlisting}
 	Picit bánthat minket az, hogy hogyan jöhet elő ez a probléma, ugyanis úgy tűnik, mintha sértenénk a \textit{one definition rule}-t, hisz létrehoztunk két függvényt azonos visszatérési értékkel és paraméterlistával: a kiút az, hogy itt felüldefiniálás (\textit{override}) fog bekövetkezni, azaz a \texttt{Kor}-béli \texttt{terulet} le fogja árnyákolni a \texttt{Sikidom} \texttt{terulet} függvényét. Viszont ez a leárnyékolás nem ér sokat, ha nincs \texttt{virtual} kulcsszó, és ha egy \texttt{Sikidom} típusú pointerrel akarjuk ezt használni.
-%TODO this is a complete mess. Számomra teljesen érthetetlen ezzel a kódrészlettel mi volt a cél, és pciit úgy tűnt, Tibor is elvesztette a fonalat vele.
+%TODO this is a complete mess. Számomra teljesen érthetetlen ezzel a kódrészlettel mi volt a cél.
 %	Próbáljunk megírni egy sítábor programot, melyben azt oldjuk meg, hogy a kétszobás ágyakban vagy 2 fiú, vagy 2 lány aludjon!
 %\begin{lstlisting}
 %#include <iostream>
@@ -318,7 +318,7 @@ public:
 %}
 %\end{lstlisting}
 %	Itt sikerült elírni, hogy a fiúnak lány legyen a szobatársa. Figyeljük meg, hogy két különböző paraméterű \texttt{szobatars} metódust írtunk, de csak az virtuális, mely egy \texttt{Sielo}-t vár. Ezért, mivel minden \texttt{Fiu} \textit{az egy} \texttt{Sielo}, teljesen szabályos lesz a \texttt{szobatars(Sielo*)} függvényhívás.
-	
+	%TODO ezt még Roberto mondta, de nem mernék megesküdni rá.
 	\begin{note}
 		Egy függvény öröklődés után nem marad virtuális. Azaz, ha \texttt{Kor}-ből örökölnénk, és szintén felül szeretnénk írni \texttt{terulet}-et, \texttt{Kor}-ben is virtuálisnak kell deklarálnunk a függvényt.
 	\end{note}
@@ -417,4 +417,15 @@ class D : public C {};
 	%TODO virtuális destruktorok
 	
 	Rossz ötlet az STL konténereiből örökölni, hisz azon destruktora nem virtuális. 
+	
+	%TODO többszörös örkölődés
+	%TODO virtuális öröklődés
+	%TODO explicit névfeloldás többszörös öröklődésnél
+	%TODO polimorfizmusról van szó, de definiálva nincs
+	%TODO c++11: override
+	%TODO figyelemfelhívás a slicing veszélyeire
+	%TODO tisztán virtuális függvények
+	%TODO ,,virtuális konstruktorok''
+	%TODO privát adattagok használata leszármazotban
+	%TODO linkek
 \end{document}
