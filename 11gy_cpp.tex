@@ -5,7 +5,7 @@
 \usepackage[T1]{fontenc}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
-\usepackage{amsmath, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+\usepackage{amsmath, amsthm,amssymb,paralist,array, ellipsis, graphicx, multirow}
 \usepackage[table]{xcolor}
 %\usepackage{marvosym}
 
@@ -105,6 +105,9 @@
 		11. óra.
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor  előadásán. (\today)
+	\medskip
+	
+	Számos dolgot én írtam meg extrába, így pontatlanságok előfordulhatnak. Ez azt is jelenti, hogy pár blokk garantáltan nem fog szerepelni $+/-$ban, például a tisztán virtuális függvények, többszörös öröklődés, öröklődés típusainak részletei, és az utolsó szekció.
 	\section{Objektum orientált programozás}
 	Objektum orientált programozásnál e hármat várjuk el:
 	\begin{itemize}
@@ -116,7 +119,7 @@
 	
 	Fontos, hogy az objektum orientáltság fogalmát ne csak az osztályokhoz kössük!
 	
-	\medskip
+	\subsection{Öröklődés (\textit{inheritance})}
 	Tekintsük az alábbi kódot:
 	\begin{lstlisting}
 class Sikidom
@@ -151,16 +154,16 @@ public:
 int i = 1, 2, f(), g();
 		\end{lstlisting}
 		
-		Akkor rendre a vessző paraméter előtti tag mindig kiértékelődik, és utána értékeli ki a következőt. A végén az egész azzal lesz ekvivalens, mintha simán azt írnánk, hogy \texttt{int i = g();}
+		Akkor rendre a vessző paraméter előtti tag mindig kiértékelődik, és utána értékeli ki a következőt, a korábbi eredményt meg elhajítja. A végén az egész azzal lesz ekvivalens, mintha simán azt írnánk, hogy \texttt{int i = g();}.
 		
 		Egy fél mondat erejéig jegyezzük meg azt is, hogy lebegőpontos számokat sose hasonlítsunk össze! Jusson eszünkbe, ami Numerikus Módszereken hangzik el: minden lebegőpontos szám tartalmazhat egy kis pontatlanságot.
 		\begin{lstlisting}
 for (double d = 0; d != 1; d += 0.1)
 {
-	std::cout << d << std::endl;
+	std::cout << d << ' ';
 }
 		\end{lstlisting}
-		Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ...} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
+		Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ... 1.0} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
 	\end{note}
 	Az, hogy publikusan örököltünk (erre volt a \texttt{public} kulcsszó), azt jelenti, hogy egy {altípus}-t (\textit{subtype}) hoztunk létre. 
 	Ezt azt is jelenti, hogy minden helyre, ahol \texttt{Sikidom}-ot szeretnénk használni, \texttt{Kor}-t is használhatunk.
@@ -211,6 +214,10 @@ public:
 			\hline
 		\end{tabular}
 	\end{center}
+	Az öröklődés típusa ha \texttt{class}ból öröklünk \texttt{private}, ha \texttt{struct}ból akkor \texttt{public.}
+	\begin{note}
+		A publikus öröklődést szokás {az egy} (\textit{is a}), privátot \texttt{van egy} (\textit{has a}) kapcsolatnak is hívni.
+	\end{note}
 	Picit térjünk visza a fenti értékadáshoz, mert ott azért van még mit megbeszélni.
 	\begin{lstlisting}
 Kor k;
@@ -227,10 +234,11 @@ s.x = k.x;
 s.y = k.y;
 	\end{lstlisting}
 	
-	Ezt a \textit{slicing} dolgot meg tudjuk kerülni, ha egy pointert hozunk létre: Hisz egy \texttt{Sikidom}-ra mutató pointer mutathat \texttt{Kor}-re is, és mivel az ''csak'' mutogat, nem fog levágni semmit. 
+	Ezt a \textit{slicing} dolgot meg tudjuk kerülni, ha egy pointert hozunk létre: Hisz egy \texttt{Sikidom}-ra mutató pointer mutathat \texttt{Kor}-re is, és mivel az ''csak'' mutogat, nem fog levágni semmit (referenciák szintén!). 
 	\begin{lstlisting}
 Kor k;
-Sikidom *sp = &k;
+Sikidom *sp = &k; 
+Sikidom &sr = k;
 	\end{lstlisting}
 	Így minden adathoz, ami \texttt{Kor}-ben \texttt{Sikidom}-tól lett örökölve, hozzá tudunk férni \texttt{sp}-n keresztül. Fontos megjegyeznünk azonban, hogy egy \texttt{Sikidom} típusú pointer csak ''\texttt{Sikidom}nyi'' adattagokat/metódusokat tud kezelni.
 	
@@ -242,6 +250,8 @@ sp->terulet();
 	\end{lstlisting}
 	Itt azt fogjuk tapasztalni, hogy \texttt{Sikidom} függvénye fog meghívódni. Ennek oka az, hogy \texttt{sp} statikus típusa (\textit{static type}) az \texttt{Sikidom}, és hatékonyság végett alapértelmezetten mindig a statikus típushoz tartozó függvényt hívódik meg. Egy pointernek azonban van un. dinamikus típusa is (\textit{dynamic type}), ami ebben az esetben \texttt{Kor} lesz. A dinamikus típust csak futási időben lehet ismert, hisz lehetetlen azt megállapítani fordítási időben, hogy milyen típusú objektumra fog mutatni az \texttt{sp}. Ha mindig a dinamikus típus szerint hívná meg a program függvényeket, annak nagy futási idejű költsége lenne. Ahhoz, hogy rákényszerítsük a fordítót arra, hogy a dinamikus típus szerint fordítson, használnunk kell a \texttt{virtual} kulcsszót.
 	%TODO miért szar a láncolt lista: túl költséges a processzorba pakolás ...
+	\subsection{Virtuális függvények}
+	Azokat az osztályokat, melyek legalább egy virtuális függvénnyel rendelkeznek, polimorfikus osztálynak (\textit{polymorphic class}) nevezzük.
 \begin{lstlisting}
 class Sikidom
 {
@@ -266,63 +276,90 @@ public:
 	}
 };
 \end{lstlisting}
-	Picit bánthat minket az, hogy hogyan jöhet elő ez a probléma, ugyanis úgy tűnik, mintha sértenénk a \textit{one definition rule}-t, hisz létrehoztunk két függvényt azonos visszatérési értékkel és paraméterlistával: a kiút az, hogy itt felüldefiniálás (\textit{override}) fog bekövetkezni, azaz a \texttt{Kor}-béli \texttt{terulet} le fogja árnyákolni a \texttt{Sikidom} \texttt{terulet} függvényét. Viszont ez a leárnyékolás nem ér sokat, ha nincs \texttt{virtual} kulcsszó, és ha egy \texttt{Sikidom} típusú pointerrel akarjuk ezt használni.
-%TODO this is a complete mess. Számomra teljesen érthetetlen ezzel a kódrészlettel mi volt a cél.
-%	Próbáljunk megírni egy sítábor programot, melyben azt oldjuk meg, hogy a kétszobás ágyakban vagy 2 fiú, vagy 2 lány aludjon!
-%\begin{lstlisting}
-%#include <iostream>
-%
-%class Sielo
-%{
-%public:
-%	virtual void szobatars(Sielo*)
-%	{
-%		std::cout << "sielo";
-%	}
-%};
-%
-%class Lany : public Sielo
-%{
-%public:
-%	void szobatars(Sielo*)
-%	{
-%		std::cout << "valamilyen sielo";
-%	}
-%	void szobatars(Lany*)
-%	{
-%		std::cout << "lany sielo";
-%	}
-%};
-%
-%class Fiu : public Sielo
-%{
-%public:
-%	void szobatars(Sielo*)
-%	{
-%		std::cout << "valamilyen sielo";
-%	}
-%	void szobatars(Fiu*)
-%	{
-%		std::cout << "fiu sielo";
-%	}
-%};
-%
-%int main()
-%{
-%	Lany l1, *l2;
-%	Fiu *f;
-%	l1.szobatars(l2); //lany sielo
-%	endl(std::cout);
-%	Sielo *s = &l1;
-%	s->szobatars(f); //lany sielo
-%}
-%\end{lstlisting}
-%	Itt sikerült elírni, hogy a fiúnak lány legyen a szobatársa. Figyeljük meg, hogy két különböző paraméterű \texttt{szobatars} metódust írtunk, de csak az virtuális, mely egy \texttt{Sielo}-t vár. Ezért, mivel minden \texttt{Fiu} \textit{az egy} \texttt{Sielo}, teljesen szabályos lesz a \texttt{szobatars(Sielo*)} függvényhívás.
-	%TODO ezt még Roberto mondta, de nem mernék megesküdni rá.
-	\begin{note}
-		Egy függvény öröklődés után nem marad virtuális. Azaz, ha \texttt{Kor}-ből örökölnénk, és szintén felül szeretnénk írni \texttt{terulet}-et, \texttt{Kor}-ben is virtuálisnak kell deklarálnunk a függvényt.
-	\end{note}
+	Picit bánthat minket az, hogy hogyan jöhet elő ez a probléma, ugyanis úgy tűnik, mintha sértenénk a \textit{one definition rule}-t, hisz létrehoztunk két függvényt azonos visszatérési értékkel és paraméterlistával: a kiút az, hogy itt felüldefiniálás (\textit{override}) fog bekövetkezni, azaz a \texttt{Kor}-béli \texttt{terulet} le fogja árnyékolni a \texttt{Sikidom} \texttt{terulet} függvényét. Viszont ez a leárnyékolás nem ér sokat, ha nincs \texttt{virtual} kulcsszó, és ha egy \texttt{Sikidom} típusú pointerrel akarjuk ezt használni.
 	
+	A bázisosztály függvényének leárnyékolása azonban nem azt jelenti, hogy azt a függvényt nem lehet meghívni. Ha explicit módon jelezzük a fordítónak, hogy a bázisosztályban definiált metódust szeretnénk meghívni, akkor minden virtualitás ellenére is az lesz meghívva:
+	\begin{lstlisting}
+int main()
+{
+	Kor k;
+	std::cout << k.Sikidom::terulet();
+}
+	\end{lstlisting}
+	Ezt explicit névfeloldásnak (\textit{explicit scope resolution}) nevezzük.
+	\begin{note}
+		Minden metódus, mely öröklődésnél a bázisosztály egy virtuális metódusával megegyező visszatérési értékkel, paraméterlistával és konstanssággla rendelkezik, implicit módon virtuális lesz. (pl.: \texttt{Kor}-ben \texttt{terulet} implicit módon virtuális lesz, mert \texttt{Sikidom}-ban is az volt)
+	\end{note}
+	Konstruktor sose lehet virtuális.
+	\subsection{Tisztán virtuális függvények}
+	Bár ha háromszögekre felvágunk egy síkidomot, meg tudjuk mondani a területét, azért látjuk, hogy iszonyatos szenvedés nélkül egy általános síkidom területének megadása aligha lehetséges. Ezért gyakran úgy dönthetünk, hogy egy adott függvénynek csak a felületét (\textit{interface}) örököltetjük, de implementációját nem.
+	
+	A fenti osztálynál azonban probléma, hogyha valaki létrehoz egy \texttt{Sikidom} típusú objektumot, és meghívja a \texttt{terulet} függvényt, jogosan várja, hogy az ki is számítsa neki. Ennek megkerülésére alkalmazahtunk egy trükköt: \texttt{Sikidom}ban \texttt{terulet}-et tisztán virtuálissá tesszük:
+	
+\begin{lstlisting}
+class Sikidom
+{
+protected:
+	int x;
+	int y;
+public:
+	Sikidom(int x, int y) : x(x), y(y) {}
+	virtual double terulet() const = 0;
+};
+\end{lstlisting}
+	Mostmár \texttt{terulet} tisztán virtuális (\textit{pure virtual}) \texttt{Sikidom}-ban. Az olyan osztályokat, melyekből nem lehet objektumot létrehozni, absztraktnak nevezzük. Az olyan osztályokból, melyek tartalmaznak tisztán virtuális metódusokat, nem tudunk objektumot létrehozni.
+	\begin{note}
+		Egy osztály úgy is lehet absztrakt, hogy \texttt{protected}-dé tesszük a konstruktorait (erről majd később). Az egyszerűség kedvéért, ha absztrakt osztályról beszélünk, gondoljunk egy tisztán virtuális metódussal rendelkező osztályra.
+	\end{note}
+	Egy olyan osztály, mely egy absztrakt osztályból örököl, ahhoz, hogy példányosítható legyen (lehessen olyan típusú objektumokat létrehozni), felül kell írnia az összes abban található tisztán virtuális függvényt.
+	\begin{lstlisting}
+int main()
+{
+	Sikidom s; //nem ok, forditasi ideju hiba
+	Kor k; //ok
+	Sikidom *sp = &k;
+	Sikidom &sr = k;
+	
+	sp->terulet();
+	sr.terulet();
+}
+	\end{lstlisting}
+	Mint láthatjuk, absztrakt típusú pointert és referenciát lehet létrehozni, így a polimorfizmus összes előnyével élhetünk, továbbá mindenkit sikerült rákényszeríteni a \texttt{terulet} függvény definiálására, aki \texttt{Sikidom}-ból örököl.
+	
+	Persze, ettől mi még írhatunk definíciót egy tisztán virtuális függvényhez:
+\begin{lstlisting}
+class Sikidom
+{
+protected:
+	int x;
+	int y;
+public:
+	Sikidom(int x, int y) : x(x), y(y) {}
+	virtual double terulet() const = 0;
+};
+
+double Sikidom::terulet()
+{
+	return 0;
+}
+\end{lstlisting}
+	Figyeljük meg, hogy egy tisztán virtuális függvényt csak a deklarációtól külön tudunk definiálni. 
+	
+	Ez a trükk például akkor hasznosítható, ha egy van egy absztrakt bázisosztályunk, melynek szeretnénk, hogy öröklés után egy függvényét mindenki definiáljon felül, de akarunk adni hozzá egy alap implementációt.
+\begin{lstlisting}
+class Kor : public Sikidom
+{
+	double r;
+	public:
+	double terulet() const
+	{
+		return Sikidom::terulet();
+	}
+};
+\end{lstlisting}
+	
+	A későbbiekben tekintsünk \texttt{Sikidom}-ra úgy, mintha nem lenne tisztán virtuális függvénye.
+	\subsection{Kód módosítása polimorfizmusnál}
 	\smallskip
 	Szánjunk pár szót meglévő kód módosításáról, ha polimorfizmusról is van szó.
 	\begin{lstlisting}
@@ -354,6 +391,166 @@ Sikidom * sp = f(k);
 	Bajban lennénk, ha \texttt{Sikidom}-nál egy általánosabb osztályt adna vissza \texttt{f}.
 	\medskip
 	
+	Legyen adott egy osztályhierarchia, melyben \texttt{B} publikusan örököl \texttt{A}-ból, \texttt{C} osztály \texttt{B}-ből, és végül \texttt{D} osztály \texttt{C}-ből. Ilyenkor \texttt{A} a ,,legáltalánosabb'' osztály, és \texttt{D} a ,,legspeciálisabb''.
+	
+	Az alábbi táblázat jól összefoglalja az itt megállapítottakat (piros: a módosítás nem megfelelő, zöld: a módosítás jó lesz):
+	\begin{center}
+		\begin{tabular}{|l||c|c|c|c|}
+			\hline
+			&Eredeti típus&\multicolumn{3}{c|}{Módosított típus}\\
+			\hline
+			\hline
+			\multirow{4}{*}{Paraméterek}&A*&\cellcolor{red!20}B*&\cellcolor{red!20}C*&\cellcolor{red!20}D*\\
+			\cline{2-5}
+			&B*&\cellcolor{green!20}A*&\cellcolor{red!20}C*&\cellcolor{red!20}D*\\
+			\cline{2-5}
+			&C*&\cellcolor{green!20}A*&\cellcolor{green!20}B*&\cellcolor{red!20}D*\\
+			\cline{2-5}
+			&D*&\cellcolor{green!20}A*&\cellcolor{green!20}B*&\cellcolor{green!20}C*\\
+			\hline
+			\hline
+			\multirow{4}{*}{Visszatérési érték}&A*&\cellcolor{green!20}B*&\cellcolor{green!20}C*&\cellcolor{green!20}D*\\
+			\cline{2-5}
+			&B*&\cellcolor{red!20}A*&\cellcolor{green!20}C*&\cellcolor{green!20}D*\\
+			\cline{2-5}
+			&C*&\cellcolor{red!20}A*&\cellcolor{red!20}B*&\cellcolor{green!20}D*\\
+			\cline{2-5}
+			&D*&\cellcolor{red!20}A*&\cellcolor{red!20}B*&\cellcolor{red!20}C*\\
+			\hline
+		\end{tabular}
+	\end{center}
+	\subsection{Többszörös öröklődés}
+	C++ban lehetőségünk van többszörösen örökölni. Ez azt jelenti, hogy egyszerre több osztályból is öröklünk.
+	\begin{lstlisting}
+class BaseOne {};
+class BaseTwo {};
+
+class Derived : public BaseOne, public BaseTwo {};
+	\end{lstlisting}
+	Általában igaz az, hogy a többszörös öröklődésnél több a galiba mint a haszon, így hacsak nincs nagyon jó okunk rá, ne erőltessük. Nehezen lesz velük átlátható, hogy milyen lesz egy pointer dinamikus típusa, rászorulhatunk side cast-okra (erről később), és egyéb nem elegáns módszerekre.
+	\begin{lstlisting}
+class Negyszog 
+{
+protected:
+	double x;
+public:
+	double terulet() = 0;
+};
+
+class Rombusz : public Negyszog
+{
+public:
+	double terulet() = 0; 
+	//nem jut eszembe a keplet, igy legyen ez is tisztan virtualis.
+};
+
+class Deltoid : public Negyszog
+{
+public:
+	double terulet() = 0;
+};
+
+class Negyzet : public Deltoid, public Rombusz
+{
+public:
+	double terulet()
+	{
+		return x * x;
+	}
+};
+	\end{lstlisting}
+	A legutóbbi osztály természetesnek tűnhet, hisz egy négyzet deltoid is, meg rombusz is, így szeretnénk, ha minden függvény, ami \texttt{Deltoid}-ot vagy \texttt{Rombusz}-t vár, \texttt{Negyzet}-et is elfogadjon. Azonban a fenti kód nem fordul le, hisz mind \texttt{Rombusz}-ban, mind \texttt{Deltoid}-ban van egy teljes \texttt{Negyszog} is. Így \texttt{Negyzet} kétszer fogja tartalmazni annak összes adattagját, így \texttt{x}-et is, és a fordító nem tudja kitalálni, mi épp melyikre gondolunk. 2 kézenfekvő megoldás lehet:
+	\begin{lstlisting}
+class Negyzet : public Deltoid, public Rombusz
+{
+public:
+	double terulet()
+	{
+		return Deltoid::x * Deltoid::x;
+	}
+};
+	\end{lstlisting}
+	Azonban egyel szerencsésebb lenne, ha csak 1 darab \texttt{Negyszog} szerepelne \texttt{Negyzet}-ben. Erre megoldás lehet a virtuális öröklődés.
+\begin{lstlisting}
+class Negyzet : virtual public Deltoid, virtual public Rombusz
+{
+public:
+	double terulet()
+	{
+		return x * x;
+	}
+};
+\end{lstlisting}
+	Ezzel garantáltuk is ezt, de milyen áron? A virtuális öröklődésnek, csak úgy mint a virtuális metódusoknak futási idejű költsége van, így ha egy mód van rá, kerüljük.
+	
+	%TODO uml
+	Annak ellenére, hogy a többszörös öröklődés erősen ellenjavallott dolog, van kivétel a standard könyvtáron belül is, mely él vele: az \texttt{iostream}. A beolvasó és kiírató stream-ek közös tulajdonságait tartalmazza \texttt{iosbase}, melyből örököl \texttt{istream} és \texttt{ostream} is, és mindkettőből az \texttt{iostream}.
+	\subsection{Túlterhelés és felüldefiniálás}
+	Próbáljunk megírni egy sítábor programot, melyben azt oldjuk meg, hogy a kétszobás ágyakban vagy 2 fiú, vagy 2 lány aludjon!
+\begin{lstlisting}
+#include <iostream>
+
+class Sielo
+{
+public:
+	virtual void szobatars(Sielo*)
+	{
+		std::cout << "sielo";
+	}
+};
+
+class Lany : public Sielo
+{
+public:
+	void szobatars(Sielo*)
+	{
+		std::cout << "valamilyen sielo";
+	}
+	void szobatars(Lany*)
+	{
+		std::cout << "lany sielo";
+	}
+};
+
+class Fiu : public Sielo
+{
+public:
+	void szobatars(Sielo*)
+	{
+		std::cout << "valamilyen sielo";
+	}
+	void szobatars(Fiu*)
+	{
+		std::cout << "fiu sielo";
+	}
+};
+
+int main()
+{
+	Lany *lany = new Lany;
+	Fiu *fiu = new Fiu;
+	Sielo *sielo = lany;
+	
+	sielo->szobatars(fiu); //valamilyen sielo
+	lany->szobatars(fiu); //valamilyen sielo
+	lany->szobatars(lany); //lany sielo
+	sielo->szobatars(lany); //valamilyen sielo
+	
+	delete lany; delete fiu;
+}
+\end{lstlisting}
+	Figyeljük meg, hogy bár megöröklik mind \texttt{Fiu}, mind \texttt{Lany} a \texttt{szobatars(Sielo*)} függvényt, de azt még felül is írják (\textit{override}), ezen kívül még a függvényt túl is terhelik (\textit{overload}) rendre \texttt{szobatars(Fiu*)} és \texttt{szobatars(Lany*)} függvénnyel. 
+	
+	Feltűnhet, hogy sajnos ezzel a kóddal nem sikerül elérnünk, hogy a lányok és fiúk szeparálva maradjanak. Ennek oka az, hogy a harmadik eset kivételével felüldefiniálás következik be, és csupán a harmadik esetben lesz függvénytúlterhelés. Az, hogy ott miért nem felüldefiniálás következik be, a korábbi szekció magyarázza: a paraméter úgy változott, hogy az öröklődési ág szerint speciálisabb típusra váltottunk, mi meg megállapítottuk fent, hogy csak általánosabb típusra váltás eredményezhet továbbra is jól forduló kódot.
+	
+	A másik három esetben \texttt{fiu} is és \texttt{lany} is a \texttt{szobatars(Sielo*)} függvénybe fog menni.
+	
+	\medskip
+	Ha kitörölnénk rendre mindkét leszármazott osztályból a \texttt{szobatars(Sielo*)} metódust, még mindig bajban lennénk, hisz egy \texttt{Sielo} típusú pointer dinamikus típusa lehet \texttt{Lany}, és minden probléma nélkül meg tudnánk adni neki paraméterül egy \texttt{Fiu} típusú objektumot, hisz minden \texttt{Fiu} \textit{az egy} \texttt{Sielo}.  Ez az eset annyival lenne jobb, hogy \texttt{lany} pointeren keresztül a \texttt{szobatars} függvénynek nem adhatjuk meg \texttt{fiu}-t paraméterül.
+	
+	\medskip
+	Forrás: \url{http://bruntib.web.elte.hu/read.php?3,52} (\textsc{Brunner} Tibor honlapja)
+	
 	\subsection{Cast-ok}
 	
 	Néha abba a kellemetlen helyzetbe kerülhetünk, hogy van egy adott pointerünk/referenciák, és a dinamikus típusa \texttt{Kor}, azonban statikus típusa \texttt{Sikidom}, de mégis fontos, hogy \texttt{Kor}-re vonatkozó dolgokat használjunk. Ilyenkor segíthetnek a \textit{cast}ok:
@@ -369,8 +566,32 @@ void f(Sikidom *s)
 	\end{lstlisting}
 	Ebben a kódrészletben megpróbáljuk \texttt{s}-t átkonvertálni \texttt{Kor} pointer típusra.
 	
-	A \texttt{dynamic\_cast} futási időben ellenőriz, és ha a cast nem sikeres, nullpointert ad vissza. Azonban nem hatékony, hisz futási időben kell végigjárnia az öröklődési láncot. Ha nem vagyunk biztosak benne, hogy garantáltan lehetséges a castolás, akor \texttt{dynamic\_cast}-ot érdemes használni, ha azonban biztosak vagyunk benne hogy az lehetséges, akkor \texttt{static\_cast} a jobb, mely fordítási időben végzi el ezt, hatékonyabb, azonban kevésbé biztonságos, ugyanis ha a cast sikertelen, akkor nem nullpointert ad vissza, hanem egy nem definiált viselkedés fog bekövetkezni (leggyakrabban elszáll).
+	A \texttt{dynamic\_cast} futási időben ellenőriz, és ha a cast nem sikeres, nullpointert ad vissza. Működését úgy képzelhetjük el, hogy megnézi a paraméterként adott objektum típusát, és végighaladván az öröklődési ágon, megpróbál egy helyes típuskonverziót csinálni. (A következő példában tekintsünk el attól, hogy a konstruktoroknak nem adtunk paramétert)
 	
+	A \texttt{dynamic\_cast} csak polimorfikus osztályoknál használható. 
+	%TODO referenciák castolása
+	%TODO sidecast
+	\begin{lstlisting}
+int main()
+{
+	Kor k, *kp;
+	Sikidom s, *sp;
+	
+	sp = &k; //ok
+	sp = dynamic_cast<Sikidom*>(&k); //folosleges, de ok
+	
+	kp = &s; //nem ok
+	kp = dynamic_cast<Kor*>(&s); //ok, kp most nullpointer
+	
+	kp = dynamic_cast<Kor*>(sp); //ok, kp k-ra mutat
+}
+	\end{lstlisting}
+	\begin{note}
+		A \texttt{dynamic\_cast} előtt nincs \texttt{std}. Ennek oka, az, hogy a \texttt{dynamic\_cast} egy operátor, és nem egy standard függvény.
+	\end{note}
+	
+	Ez azonban nem hatékony, hisz futási időben kell végigjárnia az öröklődési láncot. Ha nem vagyunk biztosak benne, hogy garantáltan lehetséges a castolás, akkor \texttt{dynamic\_cast}-ot érdemes használni, ha azonban biztosak vagyunk benne hogy az lehetséges, akkor \texttt{static\_cast} a jobb, mely fordítási időben végzi el ezt, hatékonyabb, azonban kevésbé biztonságos, ugyanis ha a cast sikertelen, akkor nem nullpointert ad vissza, hanem egy nem definiált viselkedés fog bekövetkezni (leggyakrabban elszáll).
+	\subsection{Konstruktorok és destruktorok öröklődésnél}
 	Konstruktorokról még beszélnünk kéne: a szemfüleseknek feltűnhetett, hogy a fenti kód le se fordul! (tekintsünk el attól, hogy a \texttt{terulet} metódus hiányzik)
 	\begin{lstlisting}
 class Sikidom
@@ -413,19 +634,161 @@ class D : public C {};
 	\end{lstlisting}
 	Konstruktorok hívási sorrendje: \texttt{A -> B -> C -> D}
 	
-	Azonban itt van egy nagy veszélyforrás, hiszen a destruktor is csak akkor hívódik meg jól, ha az virtuális.
-	%TODO virtuális destruktorok
+	\medskip
+	Előfordulhat olyan helyzet, mikor nem akarjuk, hogy az adott osztályt példányosítsák. Például a fent erre egy módszer volt a tisztán virtuális metódusok használata. Egy másik módszer az, ha az összes konstruktort védetté tesszük.
+	\begin{lstlisting}
+class Base
+{
+protected:
+	Base() {}
+};
+
+class Derived : public Base {};
+	\end{lstlisting}
+	Ebben az esetben \texttt{Derived} meg tudja hívni \texttt{Base} konstruktorát, így példányosítható lesz, de önmagában \texttt{Base} nem.
+	\bigskip
 	
-	Rossz ötlet az STL konténereiből örökölni, hisz azon destruktora nem virtuális. 
+	Azonban itt van egy nagy veszélyforrás, hiszen a destruktor is csak akkor hívódik meg jól, ha az virtuális. Amennyiben a destruktorunkat nem tesszük virtuálissá, egy nem definiált viselkedés áldozatai leszünk, azonban közel biztosan az fog bekövetkezi, hogy a bázisosztályok destruktorai nem futnak le.
 	
-	%TODO többszörös örkölődés
-	%TODO virtuális öröklődés
-	%TODO explicit névfeloldás többszörös öröklődésnél
-	%TODO polimorfizmusról van szó, de definiálva nincs
-	%TODO c++11: override
-	%TODO figyelemfelhívás a slicing veszélyeire
-	%TODO tisztán virtuális függvények
-	%TODO ,,virtuális konstruktorok''
-	%TODO privát adattagok használata leszármazotban
-	%TODO linkek
+	\smallskip
+	Javítsuk is ezt gyorsan:
+\begin{lstlisting}
+class Sikidom
+{
+protected:
+	int x;
+	int y;
+public:
+	Sikidom(int x, int y) : x(x), y(y) {}
+	virtual ~Sikidom() {}
+	virtual double terulet() const;
+};
+\end{lstlisting}
+	Bár örökölni közel minden osztályból lehet (ezalól kivétel lehet egy osztályon belüli privátként deklarált inline class-ok, vagy azok, melyek c++11ben \texttt{final}-ként vannak deklarálva), ettől még nem mindig bölcs döntés az. Példaképp örökölni STL konténerekből nagy galibát okozhat, hisz azon destruktora nem virtuális.
+	
+	\medskip
+	Ha biztosra akarunk menni, deklaráljunk minden destruktort virtuálisnak. Azonban tartsuk észben, hogy csakúgy mint minden virtuális függvény, ez futási idejű költséggel párosul. Ha 100\%, hogy az osztályunkból nem fognak örökölni, bátran hagyjuk annak destruktorát \texttt{virtual} kulcsszó nélkül.
+	
+	\medskip
+	A fenti \texttt{A, B, C, D} osztályokat tekintvén, a destruktorok lefutási sorrendje ellentétes:  \texttt{D -> C -> B -> A}
+	%TODO Sikidom konstruktorát meg kéne írni rendesen, hogy ne gyak végére jöjjön a pofon hogy az mégse jó.
+	
+	\bigskip
+	
+	Forrásként felhasználtam \textsc{Brunner} Tibor honlapján talált információkat: \url{http://bruntib.web.elte.hu/read.php?3,52}.
+	
+	\subsection{C++11, privát öröklődés, privát adattagok használata, slicing}
+	Ez szekció inkább veszélyekre hívja fel a figyelmet. Ez nem órán hangzott el, magamtól írtam, így is tekintsünk rá!
+	
+	\medskip
+	C++11-ben lehetőségünk van picit kényelmesebbé tenni az életünket, például az \texttt{override} kulcsszóval, mely garantálja, hogy az adott függvény felülír egy másikat.
+	\begin{lstlisting}
+class Base
+{
+public:
+	virtual void f();
+};
+
+class Derived : public Base
+{
+public:
+	virtual void f() override {}
+};
+	\end{lstlisting}
+	Amennyiben a felülírás mégse sikerült (\texttt{f} nem virtuális, nem egyezik a paraméterlista/konstansság), fordítási idejű hibát kapunk, mely mindig sokkal jobb, mint a futási idejű.
+	
+	\smallskip
+	Hasonlóan hasznol kulcsszó a \texttt{final}, mely megtiltja az öröklődést, így bátran használhatunk nem virtuális destruktorokat.
+	
+	\begin{lstlisting}
+class Base final
+{
+	public:
+	virtual void f();
+};
+
+class Derived : public Base {}; //forditasi ideju hiba
+	\end{lstlisting}
+	Amennyiben örököltünk egy osztályból, mely privát adattagokat tartalmaz, azokhoz nem fogunk tudni hozzáférni. Ilyenkor rá vagyunk kényszerülve get/set függvények alkalmazására, így ezért is érdemes lehet őket megírni.
+	
+	\medskip
+	Tartsuk észben, hogy örökölni nem minden második sorban fogunk, így ha alapértelmezett öröklődést is szeretnénk használni, \textbf{mindig írjuk ki azt explicit módon}! Nem csak számunkra, de más számára is jobban érthető lesz így a kód.
+	
+	\medskip
+	A privát öröklődés egy módszere lehet annak, hogy egy tartalmazásos (\textit{has a}) relációt állítsunk fel két osztály között. Privát öröklődés hatására minden metódus és adattag, melyhez hozzáfértünk volna alapból is, továbbra is hozzáférhető marad, azonban a leszármazott osztályból ha öröklünk, később már nem.
+	\begin{lstlisting}
+class Base
+{
+public:
+	int x;
+};
+
+class Derived : private Base
+{
+public:
+	int f() {x = 2;} //ok
+};
+
+class Derived2 : private Derived
+{
+public:
+	int f() {x = 2;} //forditasi ideju hiba
+};
+	\end{lstlisting}
+	Továbbá ha az öröklődési láncban privát öröklődés van, akkor már a bázis pointerével nem lehet a leszármazottra hivatkozni (\texttt{Base *b = Derived} fordítási idejű hibát ad).
+	\medskip
+	
+	A slicing-ről már volt szó, azonban veszélyesebb az talán, mint elsőre gondolnánk. EMlékeztetőként, akkor fordul ez elő, ha egy objektumot egy, a bázisosztály objektuménak adjuk \textbf{értékül}. Ilyenkor minden speciális adat elveszik, nem fogunk tudni hivatkozni specifikus metódusokra, de ami még veszélyesebb, hogy a virtuális függvényeket uyganőgy meg fogjuk tudni hívni, azonban azok mást fognak cisnálni, mint amire számítunk.
+	\begin{lstlisting}
+struct Base
+{
+	virtual void print() const
+	{
+		std::cout << "Base!" << std::endl;
+	}	
+};
+
+struct Derived : public Base
+{
+	void print() cosnt
+	{
+		std::cout << "Derived!" << std::endl;
+	}	
+};
+
+void printRef(const Base& b)
+{
+	b.print();
+}
+
+void printVal(const Base b)
+{
+	b.print();
+}
+
+int main()
+{
+	Base b;
+	Derived d;
+	printRef(b); //Base!
+	printRef(d); //Derived!
+	printVal(b); //Base!
+	printVal(d); //Base!
+}
+	\end{lstlisting}
+	Láthatjuk, ebbe a problémába belefutni könnyebb mint gondolnánk. Ez is plusz egy indok, miért preferáljuk a referencia szerinti átvételt, és érték szerint csak akkor veszünk át, ha nagyon indokolt. E téren a kivételezésnél is jobb ha figyelünk!
+	\begin{lstlisting}
+int main()
+{
+	try
+	{
+		throw Derived();
+	}
+	catch(const Base& b) //referencia!
+	{
+		b.print(); //Derived!
+	}
+}
+	\end{lstlisting}
+	Az öröklődés és a kivételkezelés kapcsolatárólról még sokat lehetne beszélni, de ez egy későbbi lecke témája lesz.
 \end{document}
