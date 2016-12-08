@@ -12,7 +12,6 @@ http://people.inf.elte.hu/szelethus/LaTeX/cpp/03gy/03gy_cpp.pdf
 http://people.inf.elte.hu/szelethus/LaTeX/cpp/04gy/04gy.pdf
 http://people.inf.elte.hu/szelethus/LaTeX/cpp/05gy/05gy.pdf
 http://people.inf.elte.hu/szelethus/LaTeX/cpp/06gy/06gy.pdf
-hiányoztam (majd valamikor megírom)
 http://people.inf.elte.hu/szelethus/LaTeX/cpp/08gy/08gy_cpp.pdf
 http://people.inf.elte.hu/szelethus/LaTeX/cpp/09gy/09gy_cpp.pdf
 http://people.inf.elte.hu/szelethus/LaTeX/cpp/10gy/10gy_cpp.pdf
