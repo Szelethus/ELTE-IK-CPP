@@ -434,7 +434,7 @@ class Negyszog
 protected:
 	double x;
 public:
-	double terulet() = 0;
+	virtual double terulet() = 0;
 };
 
 class Rombusz : public Negyszog
@@ -472,7 +472,27 @@ public:
 	\end{lstlisting}
 	Azonban egyel szerencsésebb lenne, ha csak 1 darab \texttt{Negyszog} szerepelne \texttt{Negyzet}-ben. Erre megoldás lehet a virtuális öröklődés.
 \begin{lstlisting}
-class Negyzet : virtual public Deltoid, virtual public Rombusz
+class Negyszog 
+{
+protected:
+	double x;
+public:
+	virtual double terulet() = 0;
+};
+
+class Rombusz : virtual public Negyszog //virtualis!
+{
+public:
+	double terulet() = 0; 
+};
+
+class Deltoid : virtual public Negyszog
+{
+public:
+	double terulet() = 0;
+};
+
+class Negyzet : public Deltoid, public Rombusz
 {
 public:
 	double terulet()
@@ -558,39 +578,56 @@ int main()
 void f(Sikidom *s)
 {
 	Kor *k = dynamic_cast<Kor*>(s); //korkent szerentenk hasznalni
-	if (k == NULL)
-	{
-		//ha nem volt sikeres a castolas...
-	}
 }
 	\end{lstlisting}
-	Ebben a kódrészletben megpróbáljuk \texttt{s}-t átkonvertálni \texttt{Kor} pointer típusra.
+	Ebben a kódrészletben megpróbáljuk \texttt{s}-t átkonvertálni \texttt{Kor} pointer típusra. Megfigyelhető, hogy kacsacsőrbe írtuk azt a típust, amelyre konvertálunk, és utána gömbölyű zárójelbe azt, melyből konvertálnánk.
 	
-	A \texttt{dynamic\_cast} futási időben ellenőriz, és ha a cast nem sikeres, nullpointert ad vissza. Működését úgy képzelhetjük el, hogy megnézi a paraméterként adott objektum típusát, és végighaladván az öröklődési ágon, megpróbál egy helyes típuskonverziót csinálni. (A következő példában tekintsünk el attól, hogy a konstruktoroknak nem adtunk paramétert)
+	A \texttt{dynamic\_cast} át tud konvertálni el pointert vagy referenciát egy másik típusú pointerre vagy refenciára. Ezt a kasztot csak polimorfikus osztályoknál használhatjuk. Leginkább 3 dologra jó, leszármazott típusról bázis típusra konvertálásra (\textit{upcast}), bázisról leszármazottra (\textit{downcast}), valamint többszörös öröklődésnél bázisok közötti váltásra (\textit{sidecast}) (és nyilván mind a 3 esetben pointerekkel vagy referenciákkal).
 	
-	A \texttt{dynamic\_cast} csak polimorfikus osztályoknál használható. 
-	%TODO referenciák castolása
-	%TODO sidecast
+	A \texttt{dynamic\_cast} futási időben ellenőriz, és ha a cast nem sikeres, jelzi azt. Sikertelen lehet úgy, ha pl. ilyet csinálunk:
 	\begin{lstlisting}
+Sikidom *s = new Sikidom;
+Kor *k = dynamic_cast<Kor*>(*s);
+	\end{lstlisting}
+	Ebben az esetben egy hibás downcast-ot csináltunk, hisz \texttt{s}-nek a dinamikus típusa is \texttt{Sikidom}. Mivel minden \texttt{Kor} \textit{az egy} \texttt{Sikidom}, de ez fordítva nem igaz, így a konverzió nem lehetséges. Ilyenkor a \texttt{dynamic\_cast} nullpointert ad vissza. Ha referenciákkal jutunk ilyen helyzetbe, akkor egy \texttt{std::bad\_cast} típusú kivételt fog dobni.
+	\begin{lstlisting}
+class Base 
+{
+	virtual int f(){} //polimorfizmus szukseges
+};
+class DerivedOne : virtual public Base {};
+class DerivedTwo : virtual public Base {};
+class DerivedLast : public DerivedOne, public DerivedTwo {};
+
 int main()
 {
-	Kor k, *kp;
-	Sikidom s, *sp;
+	DerivedLast *dlp = new DerivedLast;
+	Base *bp = dynamic_cast<Base*>(dlp); //upcast, dynamic_cast folosleges
+	DerivedOne *dop = dynamic_cast<DerivedOne*>(bp); //downcast
+	DerivedTwo *dtp = dynamic_cast<DerivedTwo*>(dop); //sidecast
+	delete dlp;
 	
-	sp = &k; //ok
-	sp = dynamic_cast<Sikidom*>(&k); //folosleges, de ok
+	bp = new Base;
+	dop = dynamic_cast<DerivedOne*>(bp);  //dop nullpointer
+	delete bp;
 	
-	kp = &s; //nem ok
-	kp = dynamic_cast<Kor*>(&s); //ok, kp most nullpointer
-	
-	kp = dynamic_cast<Kor*>(sp); //ok, kp k-ra mutat
+	Base b;
+	try
+	{
+		DerivedOne &dor = dynamic_cast<DerivedOne&>(b); 
+		//std::bad_cast-ot fog dobni
+	}
+	catch (std::bad_cast &exc)
+	{
+		std::cout << exc.what() << std::endl;
+	}
 }
-	\end{lstlisting}
+	\end{lstlisting}	
 	\begin{note}
 		A \texttt{dynamic\_cast} előtt nincs \texttt{std}. Ennek oka, az, hogy a \texttt{dynamic\_cast} egy operátor, és nem egy standard függvény.
 	\end{note}
 	
-	Ez azonban nem hatékony, hisz futási időben kell végigjárnia az öröklődési láncot. Ha nem vagyunk biztosak benne, hogy garantáltan lehetséges a castolás, akkor \texttt{dynamic\_cast}-ot érdemes használni, ha azonban biztosak vagyunk benne hogy az lehetséges, akkor \texttt{static\_cast} a jobb, mely fordítási időben végzi el ezt, hatékonyabb, azonban kevésbé biztonságos, ugyanis ha a cast sikertelen, akkor nem nullpointert ad vissza, hanem egy nem definiált viselkedés fog bekövetkezni (leggyakrabban elszáll).
+	Ez azonban nem hatékony, hisz a \texttt{dynamic\_cast} futási időben járja végig az öröklődési láncot. Ha nem vagyunk biztosak benne, hogy garantáltan lehetséges a castolás, akkor \texttt{dynamic\_cast}-ot érdemes használni, ha azonban biztosak vagyunk benne hogy az lehetséges, akkor \texttt{static\_cast} a jobb, mely fordítási időben végzi el ezt, hatékonyabb, azonban kevésbé biztonságos, ugyanis ha a cast sikertelen, akkor nem nullpointert ad vissza, és az így kapott pointert ha dereferáljuk, nem definiált viselkedés áldozatai leszünk.
 	\subsection{Konstruktorok és destruktorok öröklődésnél}
 	Konstruktorokról még beszélnünk kéne: a szemfüleseknek feltűnhetett, hogy a fenti kód le se fordul! (tekintsünk el attól, hogy a \texttt{terulet} metódus hiányzik)
 	\begin{lstlisting}
@@ -698,7 +735,7 @@ public:
 	Amennyiben a felülírás mégse sikerült (\texttt{f} nem virtuális, nem egyezik a paraméterlista/konstansság), fordítási idejű hibát kapunk, mely mindig sokkal jobb, mint a futási idejű.
 	
 	\smallskip
-	Hasonlóan hasznol kulcsszó a \texttt{final}, mely megtiltja az öröklődést, így bátran használhatunk nem virtuális destruktorokat.
+	Hasonlóan hasonló kulcsszó a \texttt{final}, mely megtiltja az öröklődést, így bátran használhatunk nem virtuális destruktorokat.
 	
 	\begin{lstlisting}
 class Base final
@@ -709,7 +746,7 @@ class Base final
 
 class Derived : public Base {}; //forditasi ideju hiba
 	\end{lstlisting}
-	Amennyiben örököltünk egy osztályból, mely privát adattagokat tartalmaz, azokhoz nem fogunk tudni hozzáférni. Ilyenkor rá vagyunk kényszerülve get/set függvények alkalmazására, így ezért is érdemes lehet őket megírni.
+	Amennyiben örököltünk egy osztályból, mely privát adattagokat tartalmaz, azokhoz nem fogunk tudni hozzáférni. Ilyenkor rá vagyunk kényszerülve get/set függvények alkalmazására, ha azok meg vannak írva (szempont lehet megírásuk szempontjából ez is).
 	
 	\medskip
 	Tartsuk észben, hogy örökölni nem minden második sorban fogunk, így ha alapértelmezett öröklődést is szeretnénk használni, \textbf{mindig írjuk ki azt explicit módon}! Nem csak számunkra, de más számára is jobban érthető lesz így a kód.
@@ -738,7 +775,7 @@ public:
 	Továbbá ha az öröklődési láncban privát öröklődés van, akkor már a bázis pointerével nem lehet a leszármazottra hivatkozni (\texttt{Base *b = Derived} fordítási idejű hibát ad).
 	\medskip
 	
-	A slicing-ről már volt szó, azonban veszélyesebb az talán, mint elsőre gondolnánk. EMlékeztetőként, akkor fordul ez elő, ha egy objektumot egy, a bázisosztály objektuménak adjuk \textbf{értékül}. Ilyenkor minden speciális adat elveszik, nem fogunk tudni hivatkozni specifikus metódusokra, de ami még veszélyesebb, hogy a virtuális függvényeket uyganőgy meg fogjuk tudni hívni, azonban azok mást fognak cisnálni, mint amire számítunk.
+	A slicing-ról már volt szó, azonban veszélyesebb az talán, mint elsőre gondolnánk. Emlékeztetőként, akkor fordul ez elő, ha egy objektumot egy, a bázisosztály objektuménak adjuk \textbf{értékül}. Ilyenkor minden speciális adat elveszik, nem fogunk tudni hivatkozni specifikus metódusokra, de ami még veszélyesebb, hogy a virtuális függvényeket ugyanúgy meg fogjuk tudni hívni, azonban azok mást fognak csinálni, mint amire számítunk.
 	\begin{lstlisting}
 struct Base
 {
