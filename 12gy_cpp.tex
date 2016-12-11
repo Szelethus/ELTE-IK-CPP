@@ -1,0 +1,479 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, amsthm,amssymb,paralist,array, ellipsis, graphicx, multirow}
+\usepackage[table]{xcolor}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{
+	language=C++, 
+	basicstyle=\ttfamily, 
+	keywordstyle=\color{blue}\ttfamily, 
+	stringstyle=\color{red}\ttfamily,
+	tabsize = 4
+}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks = true	
+}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		12. óra.
+	\end{center}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor  előadásán. (\today)
+	\medskip
+	
+	\section{$+/-$ megoldás}
+	\begin{enumerate}
+		\item  Helyes-e az elábbi kód?
+		
+		\begin{lstlisting}
+struct X
+{
+	virtual a();
+};
+
+struct Y : public X {/* ... */};
+
+int main()
+{
+	X *x = new Y;
+	delete x;
+}
+		\end{lstlisting}
+		
+		A válasz az hogy nem, mert itt egy \texttt{Y} típusú objektumot polimorfikusan használunk, és amikor egy \texttt{X} típusú objektummal hivatkozunk rá, törléskor felmerül a kérdés: Most a dinamikus vagy a statikus destruktor szerint töröljünk? Első esetben a fordító gondoskodna arról, hogy az öröklődési ágnak megfelelően lefussanak a destruktorok, azonban mivel ebben az esetben \texttt{X} destruktora \textbf{nem virtuális}, így a statikus destruktor hívódik meg. 
+		
+		Ez egy mondatban azt jeleni, hogy egy \texttt{Y} típusú objektumra \texttt{X} destrukora hívódik meg, ami nem definiált viselkedés.
+		
+		\item Soroljuk fel a standard szekvenciális konténereket!
+		
+		\texttt{std::vector, std::list, std::deque}
+		\item Írjunk egy funktort mely két string hosszát hasonlítja össze!
+		\begin{lstlisting}
+struct PlusMinusFunctor
+{
+	bool operator()(const std::string &lhs, const std::string &rhs) const
+	{
+		return lhs.size() < rhs.size();
+	}
+};
+		\end{lstlisting}
+	\end{enumerate}
+	%TODO 023 beugro pdf
+	%TODO magyarázatok
+	\section{Beugró kérdések}
+	EZek sose fordulhatnak már elő.
+	\begin{enumerate}
+		\item Implementációfüggő
+		\item \texttt{bool == char}
+		\item 10 (8as számrendszer miatt)
+		\item \texttt{\#elseif}
+		\item \texttt{public}, ugyanis a register azt jelenti, hogy a változót a \texttt{register}be tárolja, azonabn ezt jobban tudja a fordító, így nem érdemes kiírni. az \texttt{auto} azt jelenti hogy a változó stacken legyen, ez régebben implicit módon mindehol ott volt, de mostmár nem, sőt, c++11ben msát is jelent.
+		\item 5
+		\item Az első az igaz, továbbá sok egyéb dolgot is generál még.
+		\item nem definiált, mert y még nem volt inicializálva.
+		\item \texttt{std::list}
+		\item 1
+		\item AZ objektumnak csak a konstans tagfüggvényei hívhatók meg
+		\item polimorf osztályra van szükség, mert csak mutatókon tudjuk használni. Ha referencián használnánk, és null-t adna vissza, akkor kivételt dob, mert a referencia nem leht null
+		\item második
+		\item harmadik a jó, mert lehet egy függvényen kívüli függvény, és az uccsó szintaktikusan rosszz.
+		\item utolsó.
+	\end{enumerate}
+	\section{Mintaviszga megoldás}
+	Írjunk header fájlt, mely ezzel jól fordul:
+\begin{lstlisting}
+#include <iostream>
+#include "lineedit.h"
+#include <string>
+#include <algorithm>
+#include <iterator>
+#include "lineedit.h"
+#include <list>
+#include <vector>
+
+const int max = 1000;
+
+int main()
+{
+	int your_mark = 1;
+	
+	//2-es
+	
+	line_editor<std::vector<int>, int> lev;
+	for( int i = 0; i < max; ++i )
+	{
+		lev.press( i );
+		lev.home();
+		lev.press( i );
+	}
+	std::vector<int> v = lev.enter();
+	
+	line_editor<std::list<double>, double> lel;
+	lel.press( 4.8 );
+	lel.home();
+	lel.press( 1.1 );
+	std::list<double> c = lel.enter();
+	
+	line_editor<std::string, char> les;
+	les.press( 'W' );
+	les.press( 'o' );
+	les.press( 'r' );
+	les.press( 'l' );
+	les.press( 'd' );
+	les.home();
+	les.press( 'H' );
+	les.press( 'e' );
+	les.press( 'l' );
+	les.press( 'l' );
+	les.press( 'o' );
+	
+	std::string s = les.enter();
+	if ( "HelloWorld" == s && "" == les.enter() && 2.2 > *(c.begin()) &&
+	2 * max == v.size() && max - 1 == v[ 0 ] )
+	{
+		your_mark = c.size();
+	}
+	
+	//3-as
+	
+	les.press( 'H' );
+	les.press( 'e' );
+	les.press( 'l' );
+	les.press( 'l' );
+	les.press( 'o' );
+	les.home();
+	les.insert();
+	les.press( 'H' );
+	les.press( 'a' );
+	s = les.enter();
+	
+	
+	for( int i = 0; i < max; ++i )
+	{
+		lev.press( 2 );
+	}
+	lev.home();
+	lev.insert();
+	for( int i = 0; i < max; ++i )
+	{
+		lev.press( 1 );
+	}
+	v = lev.enter();
+	
+	lel.press( 7.9 );
+	lel.press( 1.2 );
+	lel.home();
+	lel.insert();
+	lel.press( 1.5 );
+	lel.insert();
+	lel.press( 3.7 );
+	c = lel.enter();
+	
+	if ( 1.7 > c.front() && 1.3 < c.front() && v[ max / 2 ] == v[ max / 5 ] &&
+	1.4 > c.back() && 1U * max == v.size() && "Hallo" == s && 1 == v[ max / 4 ] )
+	{
+		your_mark = c.size();
+	}
+	
+	//4-es
+	
+	line_editor<std::vector<int> > llev;
+	llev.press( 3.3 );
+	llev.press( 1.1 );
+	llev.home();
+	llev.del();
+	std::vector<int> lv = llev.enter();
+	
+	line_editor<std::string> lles;
+	lles.press( 'J' );
+	lles.press( 'a' );
+	lles.press( 'v' );
+	lles.press( 'a' );
+	lles.backspace();
+	lles.backspace();
+	std::string f = lles.enter();
+	
+	if ( "Ja" == f && lv[ 0 ] < 1.3 )
+	{
+		your_mark += lv.size();
+	}
+	
+	//5-os
+	
+	line_editor<std::list<int> > lle;
+	lle.press( 3 );
+	lle.home();
+	lle.insert();
+	
+	llev.press( 8 );
+	llev.press( 2 );
+	llev.home();
+	
+	lle.swap( llev );
+	lle.press( 1 );
+	std::list<int> cl = lle.enter();
+	v = llev.enter();
+	if ( 1 == cl.front() && cl.size() > v.size() && 3 == v[ 0 ] )
+	{
+		your_mark += v.size();
+	}
+	
+	
+	std::cout << "Your mark is " << your_mark;
+	std::endl( std::cout );
+}
+\end{lstlisting}
+
+	Én most kiszedtem a kommenteket, de minden blokk (tehát pl. a 2-es és 3as közötti) ki van kommentezve.
+	
+	A feladat az, hogy egy billentyűzetet szimuláljon. TUdjuk hogy \texttt{line\_editor} a konténer neve, és látjuk, hogy 2 template paraméterrel rendelkezik. Ezen kívül van egy \texttt{press} függvény, mely egy billentyt rak be, \texttt{home()} a sor elejére ugrik, és \texttt{enter} új sort kezd.
+	\subsection{2-es}
+	Hozzuk létre a szükséges header fájlt, melyet MINDIG a header guard-dal kezdünk. Lévén az osztály neve és template paraméterei adottak:
+	\begin{lstlisting}
+#ifndef LINE_EDIT_H
+#define LINE_EDIT_H
+
+template <typename Cont, typename CharT>
+class line_editor
+{
+
+};
+
+#endif 
+	\end{lstlisting}
+	Kéne egy konténert választani, melyben eltároljuk a karaktereket. Itt logikus választás az \texttt{std::list}, mert gyakran kell majd szúrnunk a sor közepébe.
+	\begin{note}
+		Hazsnálhatnánk vectort is, sőt bármit, melyet védéskor kellőképpen meg tudunk indokolni.
+	\end{note}
+\begin{lstlisting}
+#include <list>
+
+template <typename Cont, typename CharT>
+class line_editor
+{
+	std::list<CharT> line;
+};
+\end{lstlisting}
+	A következő kérdés, hogyan reprezentáljuk a kurzort, mely jelzi hova kell beszúrni. Erre praktikus megoldás lehet egy iterátor használata.
+
+\begin{lstlisting}
+template <typename Cont, typename CharT>
+class line_editor
+{
+	std::list<CharT> line;
+	typename std::list<CharT>::iterator cursor;
+};
+\end{lstlisting}
+
+	Írjuk fel a szükséges függvényeket.
+	
+\begin{lstlisting}
+template <typename Cont, typename CharT>
+class line_editor
+{
+	std::list<CharT> line;
+	typename std::list<CharT>::iterator cursor;
+public:
+	line_editor() : cursor(line.end()) {}
+	
+	void press(CharT c)
+	{
+	}
+	
+	void home()
+	{
+		cursor = line.begin();
+	}
+	Cont enter()
+	{
+	}
+};
+\end{lstlisting}
+	Mivel az iterátor könnyen invalidálódhat ha új elemt szúrunk be, így az \texttt{insert} az \texttt{std::list}-nél visszaad egy iterátort az új elemre, így érdemes a \texttt{cursor}-t erre beállítani, és egyel előrébb vinni, hgoy a sor végén leghyünk.
+	\begin{lstlisting}
+void press(CharT c)
+{
+	cursor = line.insert(cursor, c);
+	cursor++;
+}
+	\end{lstlisting}
+	Az enternél vissza kell adnunk egy, a tempalte paraméterként megadott konténer típususával megyező kontért, mert tartalmazza az eddig begépelt elemeket, majd törli a listát. Mivel minden STL konténer rendelkezik olyan konstruktorral, mely egy iterátor párt vár, és ez alapján a két iterátor közti elemeket beszúrja, így ezt bátran írhatjuk:
+	\begin{lstlisting}
+Cont enter()
+{
+	Cont tmp(line.begin(), line.end());
+	line.clear();
+	cursor = line.end();
+	return tmp;
+}
+	\end{lstlisting}
+	%TODO google dat
+
+	Azt, hgoy mi szerint (érték, referencia) veszünk át, szintén meg kell indokolni.
+	
+	Ez a típus reguláris, így nem kell egyéb függvényeket megírnom.
+	%TODO példál
+	
+	\subsection{3-as}
+	Szükségünk lesz egy \texttt{insert} metódusra, mely ki be kapcsolja az \texttt{insert} billentyűt.
+\begin{lstlisting}
+template <typename Cont, typename CharT>
+class line_editor
+{
+	std::list<CharT> line;
+	typename std::list<CharT>::iterator cursor;
+	
+	bool isInsert;
+public:
+	void insert()
+	{
+		isInsert = !isInsert;
+	}
+	void press(CharT c)
+	{
+		if(isInsert && cursor != line.end())
+			*cursor = c;
+		else
+			cursor = line.insert(cursor, c);
+		cursor++;
+	}
+	//...
+};
+\end{lstlisting}
+	\subsection{4-es}
+	Megfigyelhetjük, hogy itt már csak 1 template paraméter kell. EZ azt jelenti, hogy default template arguemntumotkéne alklamaznunk, mely megegyezik a konténer által tárolt típussal.
+\begin{lstlisting}
+template <typename Cont, typename CharT = Cont::value_type>
+class line_editor
+{
+	//...
+};
+\end{lstlisting}
+	 Mivel guglizni lehet, nem kell megijedni, ha nem tudjuk mit kéne csinálni. ELőfordulhat olyan, hogy olyan dologgal tlaálkozunk szembe, amit se EA-n, se GY-n nem mondtak el, ez azért van ,mert ennek a tárgynak vélja az, hogy ezekkel is meg tudjunk közdeni.
+	 
+	Ezen kívül két új metódust is meg kéne írnunk.
+\begin{lstlisting}
+template <typename Cont, typename CharT = Cont::value_type>
+class line_editor
+{
+	//...
+public:	
+	void backspace() //kitorol egy karaktert
+	{
+		cursor--;
+		del();
+	}
+	void del() //kovetkezo elem torlese
+	{
+		cursor = line.erase(cursor);
+	}
+	//...
+};
+\end{lstlisting}
+	\subsection{5-ös}
+	Meg kell írnunk egy swap függvényt, mely 2, különböző template paraméterrel rendelkező line\_editort megcserél.
+	\begin{lstlisting}
+#include <algorithm>
+	
+template <class T, class U>
+void swap(line_editor<T,U> &le)
+{
+	std::swap(line, le.line);
+	std::swap(cursor, le.cursor);
+	std::swap(isInsert, le.isInsert);
+}
+	\end{lstlisting}
+	Itt hibát kapunk, mivel ezek más típusok, így private-ok az adattagok egymás felé.
+	\begin{lstlisting}
+template <class T, class U>
+friend class line_editor;
+	\end{lstlisting}
+	Ezzel elértük, hogy bármilyen template paraméterre, minden line editor haver legyen
+%TODO linkek
+\end{document}
