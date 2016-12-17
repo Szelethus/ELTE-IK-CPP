@@ -120,7 +120,7 @@ int main()
 	std::cout << c << ' ' << d << std::endl;
 }
 		\end{lstlisting}		
-		A program kimenete \texttt{5 8} ment. Ez egy teljesen jól definiált viselkedés. Ez azért van, mert itt \textbf{érték} szerint vettük át \texttt{a} és \texttt{b} változót. A következő ábrán, mely egy stack-et ábrázol (amiben a c++ tárolja ezeket a változókat), megfigyelhetjük miért is nem. Képzeljük el, ahogy ebbe a verembe a kódunk elrakja a \texttt{c} és \texttt{d} változókat. Majd meghívja a \texttt{swap} függvényt, melyben létrehozott \texttt{a} és \texttt{b} változókat ismét behelyezi. Bár a függvényre lokális \texttt{a} és \texttt{b} változókat megcseréli, de a függvényhívás után ezeket ki is törli a stackből.
+		A program kimenete \texttt{5 8} ment. Ez egy teljesen jól definiált viselkedés. Ez azért van, mert itt \textbf{érték} szerint vettük át (\textit{pass by value}) \texttt{a} és \texttt{b} változót. A következő ábrán, mely egy stack-et ábrázol (amiben a c++ tárolja ezeket a változókat), megfigyelhetjük miért is nem. Képzeljük el, ahogy ebbe a verembe a kódunk elrakja a \texttt{c} és \texttt{d} változókat. Majd meghívja a \texttt{swap} függvényt, melyben létrehozott \texttt{a} és \texttt{b} változókat ismét behelyezi. Bár a függvényre lokális \texttt{a} és \texttt{b} változókat megcseréli, de a függvényhívás után ezeket ki is törli a stackből.
 		\begin{center}
 			\begin{tabular}{r|c|l}
 				&&\\
