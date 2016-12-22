@@ -157,6 +157,15 @@ p = &d;
 *p = 7;
 		\end{lstlisting}
 		Rendre: pointer inicializálása, pointer által mutatott érték módosítása, pointer átállítása másik memóriacíme, és a mutatott érték módosítása.
+		
+		Egy mutató mutathat változóra, másik mutatóra, saját magára, és sehova is. Azok a mutatókak, melyek sehová sem mutatnak, nullpointernek nevezzük, és így hozhatjuk létre őket:
+		
+		{\centering \texttt{p = 0;\quad \quad p = NULL;\quad \quad p = nullptr;} \par}
+		
+		\begin{note}
+			Ez a három értékadás (közel) ekvivalens, azonban a \texttt{nullptr} kulcsszó csak c++11ben érhető el.
+		\end{note}
+		
 		\begin{lstlisting}
 void swap(int *a, int *b)
 {
@@ -183,7 +192,7 @@ void swapWrong2(int *a, int *b)
 		
 		\medskip
 		\texttt{swap(\&a, 6)} nem fordul le, mert 6 konstans, ráadásul \texttt{int}, és nem egy memóriacím.
-	\section{Pointer aritmetika.}
+	\section{Pointer aritmetika}
 		\begin{lstlisting}
 const int ci = 6;
 int *p = &ci;
