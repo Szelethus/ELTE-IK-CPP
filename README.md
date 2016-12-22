@@ -9,8 +9,12 @@ A második előadás nagyon kiesik az összes többi témájából, így én abb
 
 * Láthatóság és élettartam
 * Implicit konverziók
-* Globális változókról átláthatóbb leírás
+* Globális változókról átláthatóbb leírás, static kulcsszó
 * Template-ekről rendesebb leírás 
+* sizeof-ról bővebben (pl. sizeof(unsigned) == sizeof(int))
+* using namespace std;
+* ábrák a swap-os függvényekhez
+* UML diagramok 11 gyakhoz
 
 ## Linkek
 
