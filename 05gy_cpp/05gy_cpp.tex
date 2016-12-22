@@ -192,23 +192,26 @@ int main()
 	
 	Ezt a címet a \texttt{delete} operátorral tudjuk felszabadítani.
 	\begin{center}
+		\begin{tikzpicture}
+		\tikzstyle{Heap} = [rectangle, minimum width=4cm, minimum height=2cm, text centered, draw=black, fill=white]
+		\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
+		\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
-		\begin{tabular}{|c|}
-			\\
-			\\
-			\quad \quad \quad \quad \quad \\
-			p\\
-			\\
-			\\
-			\hline
-		\end{tabular}\quad*nyilacska \texttt{p}-ből a benti négyzetre*
-		\begin{tabular}{|c|}
-			\hline
-			\quad \quad\quad \quad \quad \quad  \\
-			\quad \quad \fbox{5}\\
-			\\
-			\hline
-		\end{tabular}
+		%\foreach \x in {-2,-1,0,1,2,3,4}
+		%	\draw (\x cm,1pt) -- (\x cm,-1pt) node[anchor=north] {$\x$};
+		%\foreach \y in {-2,-1,0,1,2,3,4}
+		%	\draw (1pt,\y cm) -- (-1pt,\y cm) node[anchor=east] {$\y$};
+		%\draw[step=5mm,gray,very thin] (-2,-2) grid (6,6);
+		
+		\draw [thick, black] (-3, 0) -- (-1, 0);
+		\draw [thick, black] (-3, 0) -- (-3, 2);
+		\draw [thick, black] (-1, 0) -- (-1, 2);
+		\node[Heap] at (3,1){};
+		\node (2) [ListNode] at (3.2,1.25) {2};
+		\node (p) [ListNode] at (-2,0.25) {p};
+		\draw[arrow] (p) -- (2);
+		\end{tikzpicture}
 	\end{center}
 	
 	A heapen nincs a változóknak nevük, így mindig szükségünk lesz egy mutatóra, hogy tudjunk rá hivatkozni. \textbf{Ha egyszer létrehozunk valamit a heap-en, nekünk is kell gondoskodni arról, hogy felszabadítsuk.} Az egyik leggyakoribb hiba a dinamikus memóriakezelésnél, ha a memóriát nem szabadítjuk fel, ilyenkor a lefoglalt memóriaterületre hivatkozni már nem lehet de lefoglalva marad, mondhatni elszivárog (\textit{memory leak}). 
