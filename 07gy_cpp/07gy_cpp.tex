@@ -1,0 +1,360 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{
+	language=C++, 
+	basicstyle=\ttfamily, 
+	keywordstyle=\color{blue}\ttfamily, 
+	stringstyle=\color{red}\ttfamily,
+	tabsize = 4
+}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		7. óra.
+	\end{center}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	
+	\section{Template}
+	\subsection{Függvény template-ek}
+	Térjünk vissza a régebben megírt swap függvényünkhöz.
+	\begin{lstlisting}
+void swap(int &a, int &b)
+{
+	int tmp = a;
+	a = b;
+	b = tmp;
+}
+	\end{lstlisting}
+	Ez a függvény mind addig jó is, amíg csak \texttt{int}-eket szeretnénk megcserélni, de mi van, ha \texttt{std::string}-eket kéne? A megoldás egyszerű, \textbf{túlterheljük} (\textit{overload}) a \texttt{swap} függvényt.
+	\begin{lstlisting}
+void swap(std::string &a, std::string &b)
+{
+	int tmp = a;
+	a = b;
+	b = tmp;
+}
+	\end{lstlisting}
+	Túlterhelésnek azt nevezzük, amikor két vagy több függvénynek a neve azonos, de a paramétereik különböznek. Tagfüggvényeknél különböző konstansság is számít.
+	\begin{lstlisting}
+class A
+{
+public:
+	void print() 
+	{
+		std::cout << "Not const" << std::endl;
+	}
+	void print() const //overload
+	{
+		std::cout << "Const" << std::endl;
+	}
+};
+
+int main()
+{
+	A a;
+	a.print(); //Not const
+	
+	const A ca;
+	ca.print(); //const
+}
+	\end{lstlisting}
+	Azonban gyorsan megállapítható, hogy állandóan egy újabb overloadot létrehozni nem épp ideális megoldás. Ez a kisebb gond, a nagyobb az, hogy a kódismétlés áldozatai leszünk: ha bármi miatt egváltozna a \texttt{swap} belső implementáció, az összes létező swap süggvényben meg kéne ejteni a változtatást. Erre egy megoldás lehet, ha létrehozunk egy sablont, melynek mintájára a fordító maga tud generálni egy megfelelő függvényt.
+	\begin{lstlisting}
+template <typename T>
+void swap(T &a, T &b)
+{
+	T tmp = a;
+	a = b;
+	b = tmp;
+}
+	\end{lstlisting}
+	Az így implementált \texttt{swap} függvény egy \textit{template}, és a template paramétere egy típus. Ez alapján a fordító már létre tud hozni hozni megfelelő függvényeket:
+	\begin{lstlisting}
+int main()
+{
+	int a = 2, b = 3;
+	swap<int>(a, b);
+	
+	double c = 1.3, d = 7.8;
+	swap<double>(c, d);
+}
+	\end{lstlisting}
+	A fordítónak csak annyi dolga van, hogy minden \texttt{T}-t lecseréljen \texttt{int}-re, és már kész is a függvény. A fenti példában mi explicit megmondtuk a fordítónak, hogy \texttt{swap}-ot milyen template paraméterrel {példányosítsa} (\textit{instantiate}), azonban függvényeknél erre nem feltétlenül van szükség: a fordító tudja \texttt{a} és \texttt{b} típusát, így ki tudja találni hogy mit kell behelyettesítenie.
+	\begin{lstlisting}
+int main()
+{
+	int a = 2, b = 3;
+	swap(a, b);
+	
+	double c = 1.3, d = 7.8;
+	swap(c, d);
+}
+	\end{lstlisting}
+	Ezt a folyamatot (amikor a fordító kitalálja a tempalte paramétert) \textbf{template paraméter dedukciónak} (\textit{template parameter deduction}) hívjuk.
+	
+	\medskip
+	Nem csak típus lehet template paraméter -- bármi ami \textbf{nem} karakterlánc literál vagy lebegőpontos szám.
+	\begin{lstlisting}
+template <typename T, int ArraySize>
+int arraySize(const T (&array)[ArraySize])
+{
+	return ArraySize;
+}
+
+int main()
+{
+	int i[10];
+	std::cout << arraySize(i) << std::endl; //10
+}
+	\end{lstlisting}
+	A fenti kód a 3. gyakorlat végén tett megjegyzésből lehet ismerős. Jól demonstrálja a template paraméter dedukciót.
+	\section{Osztály template-ek}
+	Nem csak függvények, osztályok is lehentek template-ek melyen nagyon hasonlóan működnek.
+	\begin{lstlisting}
+#include <iostream>
+
+template <typename T>
+class X
+{
+	void f()
+	{
+		T t;
+		t.foo();
+	}
+};
+class Y
+{
+	void bar() {}
+};
+int main()
+{
+	
+}
+	\end{lstlisting}
+	Ez a kód nagyon úgy tűnhet, hogy nem fog lefordulni, lvén mi soha semmilyen \texttt{foo} tagfüggvényt nem írtunk, de mégis le fog. Ez azért van, mert a template osztályok (és függvények) gyakorlatilag sablonok, amiből mi létrehozhatunk egy konkrét osztályt, és mivel sose példányosítottuk, ez olyan fordítás után, mintha benne se lenne a kódban. Szintaktikus ellenőrzést végez a fordító, pl. zárójelek be vannak-e zárva, pontosvessző nem hiányzik-e stb., de azt, hogy van-e olyan \texttt{T} típus, ami rendelkezik \texttt{foo()} függvénnyel, nem nézi.
+\begin{lstlisting}
+#include <iostream>
+
+template <typename T>
+class X
+{
+	void f()
+	{
+		T t;
+		t.foo();
+	}
+};
+class Y
+{
+	void bar() {}
+};
+int main()
+{
+	X<Y> x;
+}
+\end{lstlisting}
+	Ekkor már azt várnánk hogy valóban nem fordul le, hisz \texttt{Y}-nak nincs \texttt{foo()} metódusa. Azonban lefordul, mivel az \texttt{f()} függvényt nem hívtuk meg, így nem is példányosult az osztályon belül.
+	\begin{lstlisting}
+int main()
+{
+	X<Y> x;
+	x.f();
+}
+	\end{lstlisting}
+	Itt már végre kapunk fordítási hibát, mert példányosul \texttt{f()}. Ez jól mutatja, hogy a template-ek lusták, és csak akkor példányosulnak, ha nagyon muszáj.
+	\medskip
+	
+	A template-eknek adhatunk meg alapértelmezett értéket.
+
+\begin{lstlisting}
+template <typename T = void> //alapertelmezett parameter
+class X
+{
+	void f()
+	{
+		T t;
+		t.foo();
+	}
+};
+class Y
+{
+	void bar() {}
+};
+int main()
+{
+	X<Y> x;
+	X<> x2;
+}
+\end{lstlisting}
+	Ilyenkor nem szükséges megadni template paramétert. Továbbá lehet olyan template osztályunk is, mely egy template-et vár.
+
+\begin{lstlisting}
+template <typename T>
+class X
+{
+	void f()
+	{
+		T t;
+		t.foo();
+	}
+};
+
+template <template <typename> class Templ>
+class Z
+{
+	Templ<int> t;
+};
+
+int main()
+{
+	X<Y> x;
+	Z<X> z;
+}
+\end{lstlisting}
+	Ez a \texttt{Templ} egy olyan template, aminek a template paramétere egy típus. Így \texttt{Z}-nek a template paramétere egy olyan template, aminek a template paramétere egy típus. Mivel \texttt{X} egy template, így megadható \texttt{Z}-nek template paraméterként.
+	\medskip
+	
+	A fenti példákban mindig egy default konstruktort használunk. Helyes lenne-e ez?
+\begin{lstlisting}
+int main()
+{
+	X<Y> x();
+	X<> y2();
+	Z<X> z();
+}
+\end{lstlisting}
+	A kód helyesen lefordul, de nem ugyanaz, mintha nem lenne ott a zárójel. Mivel a c++ nyelvtana nem egyértelmű, más kontextusban ugyanaz a kódrészlet mást jelenthet (egyik legegyszerűbb példa a \texttt{static} kulcsszó), így meg kellett alkotni egy olyan szabályt, miszerint amit deklarációként lehet értelmezni, azt deklarációként \textbf{kell} értelmezni. Itt ezek gyakorlatilag függvénydeklarációk lesznek: Az első esetben például egy olyan függvényt deklarálunk, melynek neve \texttt{x}, \texttt{X<Y>}-al tér vissza és nem vár paramétert. 
+	
+	Így ha default konstruktort szeretnék meghívni, semmilyen zárójelt nem szabad használni.
+	\begin{note}
+		C++11ben lehet gömbölyű helyett \{\} zárójelet alkalmazni, melynél ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
+	\end{note}
+	
+	A template-ek paramérének ismertnek kell lennie fordítási időben.
+	\begin{lstlisting}
+template <int N>
+void f() {}
+
+int main()
+{
+	int n;
+	std::cin >> n;
+	f<n>(); //hiba, n nem ismert
+}
+	\end{lstlisting}
+	Ez nyilvánvaló, hisz a template-eknek az a funkciója, hogy a fordító generáljon pélkányokat azok alapján, és a fordítási idő végeztével erre nincs lehetőség.
+	
+	\medskip
+	Fontos még, hogy a template-ek nagyon megnövelik a fordítási időt, így nem mindig éri meg egy olyan függvényt is template-ként megírni, melyet nem feltétlenül muszáj.
+	\subsection{Template specializáció}
+	Néha szeretnénk, hogy bizonyos speciális behelyettesítéseknél más legyen az implementáció mint az alap sablonban. Ilyenkor szokás \textbf{specializációkat} (\textit{template specialization}) létrehozni:
+	\begin{lstlisting}
+template<int N>                           
+struct Fact 
+{                             
+	static const int val = N*Fact<N-1>::val;
+};
+
+template<>                                
+struct Fact<0> //specializacio
+{                          
+	static const int val = 1;               
+};               
+
+int main() 
+{                                          
+	std::cout << Fact<5>::val << std::endl; 
+}
+	\end{lstlisting}
+	A fenti kódban \texttt{Fact} 4szer példányosul: \texttt{Fact<5>, \ldots, Fact<1>, } majd a legvégén az általunk specializált \texttt{Fact<0>}-t hívja meg.
+	
+	
+\end{document}
