@@ -287,6 +287,8 @@ std::ostream& operator<<(std::ostream& os, const List &l)
 	\end{lstlisting}
 	Azért kell visszaadni, hogy tudjuk a kiíratást láncolni. Mivel itt még nem tudjuk, mi az az \texttt{ostream}, így kell valamit include-olni. Ilyenkor a header fájlba inkább érdemes az \texttt{iosfwd} headert berakni, mert ez minden beolvaással és kiíraátssal kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység méretét. (azonban a cpp fájlban muszáj \texttt{iostream}-et használni)
 	
+	\section{Névterek}
+	
 	A probléma csak az, hogy nagyon sok hasznos nevet elhasználtunk, pl. több \texttt{Iterator} nevű osztályt nem hozhatunk létre (az un. \textit{global namespace}-be kerültek), pedig várhatóan nem csak ennek az egy konténernek szeretnék iterátort írni. Megoldás lehet, hogyha az iterátorainkat egy namespace-ebe rakjuk.
 \begin{lstlisting}
 namespace detail
@@ -325,6 +327,7 @@ public:
 	//...
 };
 \end{lstlisting}
+	\section{Nem template osztály átírása template osztályra}
 	Már csak az a probléma, hogy ez az osztály csak \texttt{int}-ekre működik. Így csináljunk belőle inkább egy template osztályt! Feladatunk csupán annyi, hogy az osztály elé írjunk egy \texttt{tempalte <typename T>}-t, és minden \texttt{List}-et \texttt{List<T>}-re cseréljünk, és minden \texttt{int}-et \texttt{T}-re. Ehhez nyilván az iterátorainkat is módosítani kell, így azokat is így kell módosítani.
 	
 	\medskip
@@ -487,7 +490,7 @@ std::ostream &operator<<(std::ostream& os, const List<T> &l)
 	return os;
 }
 \end{lstlisting}
-	Itt a kiírató operátorunk miatt nem fog fordulni a kódunk! A \texttt{ConstIterator} egy un. \textbf{dependent scope}-ban lesz, így meg kell ígérnünk a fordítónak, hogy a scope operátor (::) előtt garantáltan típus lesz. Ezt a typename kulcsszóval tudjuk megtenni.
+	Itt a kiírató operátorunk miatt nem fog fordulni a kódunk! A \texttt{ConstIterator} egy un. \textbf{dependent scope}-ban lesz (ld. 7. gyakorlat).
 	
 	\begin{lstlisting}
 template<typename T>

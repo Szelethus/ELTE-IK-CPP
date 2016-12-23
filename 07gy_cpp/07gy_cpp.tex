@@ -300,7 +300,9 @@ int main()
 }
 \end{lstlisting}
 	Ez a \texttt{Templ} egy olyan template, aminek a template paramétere egy típus. Így \texttt{Z}-nek a template paramétere egy olyan template, aminek a template paramétere egy típus. Mivel \texttt{X} egy template, így megadható \texttt{Z}-nek template paraméterként.
-	\medskip
+	\begin{note}
+		Fent a template paraméter listában \texttt{typename} helyett \texttt{class} szerepel. Ezek gyakorlatilag ekvivalensek, mind a kettő azt jelenti, hogy az adott paraméter típus (bár a \texttt{typename} beszédesebb).
+	\end{note}
 	
 	A fenti példákban mindig egy default konstruktort használunk. Helyes lenne-e ez?
 \begin{lstlisting}
@@ -327,7 +329,7 @@ int main()
 {
 	int n;
 	std::cin >> n;
-	f<n>(); //hiba, n nem ismert
+	f<n>(); //hiba, n nem ismert forditasi idoben
 }
 	\end{lstlisting}
 	Ez nyilvánvaló, hisz a template-eknek az a funkciója, hogy a fordító generáljon pélkányokat azok alapján, és a fordítási idő végeztével erre nincs lehetőség.
@@ -336,6 +338,41 @@ int main()
 	Fontos még, hogy a template-ek nagyon megnövelik a fordítási időt, így nem mindig éri meg egy olyan függvényt is template-ként megírni, melyet nem feltétlenül muszáj.
 	\subsection{Template specializáció}
 	Néha szeretnénk, hogy bizonyos speciális behelyettesítéseknél más legyen az implementáció mint az alap sablonban. Ilyenkor szokás \textbf{specializációkat} (\textit{template specialization}) létrehozni:
+	
+	\begin{lstlisting}
+template <class T>
+class A
+{
+	public:
+	A()	{ std::cout << "general A" << std::endl; }
+};
+
+template <>
+class A<int>
+{
+	public:
+	A() { std::cout << "special A" << std::endl; }
+};
+
+template <class T>
+void f() { std::cout << "general f" << std::endl; }
+
+template<>
+void f<int>() { std::cout << "special f" << std::endl; }
+
+int main() 
+{
+	A<std::string> a1; //general A
+	f<std::string>(); //general f
+	A<int> a2; //special A
+	f<int>(); //special f
+}
+	\end{lstlisting}
+	Mind \texttt{A} osztályhoz, mind \texttt{f} függvényhez látrehoztunk egy speciális esetet, amikor a template paraméter \texttt{int}. Számos okunk lehet arra hogy ezt tegyük: a standark könyvtár megfényesebb példája az \texttt{std::vector} osztály, mely egy template, és van template specializációja \texttt{bool} esetre.
+	\begin{note}
+		Az \texttt{std::vector<bool>} számos optimalizációkat tartalmazhat (persze nem feltétlenül, hisz ez implementáció függő), általában nem \texttt{bool}-okban tárolja az adatokat, hanem bitekben. Sajnos azonban ez hátrányokkal is jár, például hogy a \texttt{[]} operátor érték és nem referencia szerint ad vissza -- bár valóban hatékonyabb, sok szempontból fejfájást okozhat a használata, így c++17-ben ez a specializáció nem fogja a szabvány részét képezni.
+	\end{note}
+	Írjunk faktoriális számoló algoritmus template-ek segítségével!
 	\begin{lstlisting}
 template<int N>                           
 struct Fact 
@@ -344,17 +381,123 @@ struct Fact
 };
 
 template<>                                
-struct Fact<0> //specializacio
+struct Fact<0>
 {                          
 	static const int val = 1;               
 };               
 
 int main() 
 {                                          
-	std::cout << Fact<5>::val << std::endl; 
+	std::cout << Fact<5>::val << std::endl; //120
 }
 	\end{lstlisting}
-	A fenti kódban \texttt{Fact} 4szer példányosul: \texttt{Fact<5>, \ldots, Fact<1>, } majd a legvégén az általunk specializált \texttt{Fact<0>}-t hívja meg.
+	\texttt{Fact} 4szer példányosul: \texttt{Fact<5>, \ldots, Fact<1>,} majd a legvégén az általunk specializált \texttt{Fact<0>}-t hívja meg.
 	
+	\smallskip
+	Ez fel is hívja a figyelmet a template-ek veszélyeit statikus változók használatakor.
 	
+	\begin{lstlisting}
+template <class T>
+class A
+{
+	static int count;
+	public:
+	A()
+	{
+		std::cout << ++count << ' ';
+	}
+};
+
+template <class T>
+int A<T>::count = 0;
+
+int main() 
+{
+	for(int i = 0; i<5; i++)
+	{
+		A<int> a;
+		A<double> b;
+	}
+}
+	\end{lstlisting}
+	Kimenet: \texttt{1 1 2 2 3 3 4 4 5 5}
+	
+	Bár arra számítanánk, hogy 1-től 10ig lesznek a számok kiírva, ne felejtsük, hogy itt két telejsen különböző osztály fog létrejönni: \texttt{A<int>} és \texttt{A<double>}, így a \texttt{count} adattag hiába osztályszintű, 2 teljesen különböző példánya lesz ennek is: \texttt{A<int>::count} és \texttt{A<double>::count}.
+	
+	\subsection{Dependent scope}
+	
+	Lehetőségünk van arra hogy osztályon belül deklaráljunk még egy osztályt. Bár erről bővebben a következő órai jegyzetben lesz szó, egy igen fontos problémát vet fel.
+	\begin{lstlisting}
+class A
+{
+public:
+	class X {};
+};
+
+void f(A a)
+{
+	A::X x;
+}
+
+int main()
+{
+	A a;
+	f(a);
+}
+	\end{lstlisting}
+	Ezzel semmi probléma nincs. Legyen A egy template osztály!
+	\begin{lstlisting}
+template <class T>
+class A
+{
+	public:
+	class X {};
+};
+
+template <class T>
+void f(A<T> a)
+{
+	A<T>::X x;
+}
+
+int main()
+{
+	A<int> a;
+	f(a);
+}
+	\end{lstlisting}
+	Itt máris bajba jutottunk, a fordító azt a hibát fogja jelezni hogy \texttt{X} egy un. \textbf{dependent scope}-ban van. Ez azt jelenti, hogy attól függően, milyen template paraméterrel példányosítjuk \texttt{A}-t, \texttt{X}-nek lehet más a jelentése. Az alábbi kód ezt jól demonstrálja:
+	\begin{lstlisting}
+template <typename T>
+struct A
+{
+	class X{};
+};
+
+template <>
+struct A <int>
+{
+	static int X;
+};
+
+int A<int>::X = 0;
+
+template <typename T>
+void f()
+{
+	A<T>::X;
+}
+	\end{lstlisting}
+	Itt az \texttt{f} függvényben vajon mi lesz \texttt{A<T>::X}? A válasz az hogy nem tudni, hisz ha \texttt{int}-el példányosítunk akkor statikus adattag, ha bármi mással, akkor meg egy típus. Ezért kell a fordítónak biztosítani, hogy a template paramétertől függetlenül garantáltan típust fog oda kerülni. Ezt a \texttt{typename} kulcssszóval tehetjük meg.
+	\begin{lstlisting}
+template <typename T>
+void f()
+{
+	typename A<T>::X;
+}
+	\end{lstlisting}
+	A \texttt{typename} garantálja a fordítónak, hogy bármi is lesz \texttt{T}, \texttt{A<T>::X} mindenképpen típus lesz. Ha mégis olyan template paramétert adunk meg, aminél ez nem teljesülne (ez esetben \texttt{T = int}) akkor fordítási idejű hibát kapunk.
+	\begin{note}
+		A fordító általában szokott szólni, hogy a \texttt{typename} kulcsszó hiányzik.
+	\end{note}
 \end{document}

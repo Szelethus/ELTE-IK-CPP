@@ -267,7 +267,7 @@ It find(It &first, It &last, const T &a)
 	Figyeljük meg, hogy a visszatérési érték is megváltozott: keresünk egy \texttt{a} értékű elemű, és ha megtaláljuk, egy arra mutató iterátort adunk vissza. Ha nem találunk, akkor az utolsó utáni elemet adjuk vissza. Ez már egy egész jó kereső algoritmust.
 	
 	\medskip
-	Javítsuk ki a fenti függvényt, ahonnét hiányzik ez \texttt{typename}.
+	Javítsuk ki a fenti függvényt, ahonnét hiányzik a \texttt{typename}.
 \begin{lstlisting}
 template <typename T>
 bool tartalmaz(const std::set<T> &s, int x)
@@ -280,30 +280,6 @@ bool tartalmaz(const std::set<T> &s, int x)
 	return false;
 }
 \end{lstlisting}
-
-	Érdemes lehet talán egy picit újra szóba hozni a dependent scope fogalmát. Vegyük az alábbi példát, ami jól demonstrálja, miért is lehet bajos.
-\begin{lstlisting}
-template <typename T>
-struct A
-{
-	typedef int x;
-};
-
-template <>
-struct A <int>
-{
-	static int x;
-};
-
-int A<int>::x = 0;
-
-template <typename T>
-void f()
-{
-	A<T>::x;
-}
-\end{lstlisting}
-	Itt az \texttt{f} függvényben vajon mi lesz \texttt{A<T>::x}? A válasz az hogy nem tudni, hisz ha \texttt{int}-el helyettesítunk be akkor statikus adattag, ha bármi mással, akkor meg egy típus. Ezért kell a fordítónak biztosítani, hogy a template paramétertől függetlenül garantáltan típust fog oda kerülni.
 	
 	\medskip
 	Kérdés, tudunk-e ilyet tenni?:
