@@ -105,7 +105,11 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
 	\section{Header fájlra és fordításra egységre szétbontás}
-	Visszatérve a korábban írt láncolt listánkhoz, Mely meglehetősen jó már. Gyakorlatilag mindent tud, amit szeretnénk. Már csak nagyon apró dolgokat kéne javítani rajtuk: szét kéne szednünk őket header fájlra és fordítási egységre. 
+	Visszatérve a korábban írt láncolt listánkhoz, bátran állíthatjuk, hogy mindennel rendelkezik ami számunkra fontos. Azonban ha egy darab header fájlban tárolnánk mindent, számos problémába ütköznénk. Ha több fordítási egységbe illesztenénk be a headert, fordítási idejű hibát kapnánk, hogy számos függvényt többször próbáltunk definiálni (sértenénk az ODR-t). Erre megoldás lehet, hogy a definíciókat és deklarációkat elválasztjuk: az osztályban lévő függvények deklarációit hagyjuk meg a header fájlban, és a definíciókat egy külön fordítási egységbe tegyük!
+	
+	\begin{note}
+		Feltűnhet majd, hogy pár definíció bent maradt. Erre később lesz magyarázat.
+	\end{note}
 	
 	\medskip
 	\fbox{\textbf{list.hpp:}}
@@ -254,7 +258,10 @@ int main() {
 
 \end{lstlisting}
 	
-	Ez így sokkal jobb, mert a \texttt{List}-hez tartozó információk sokkal kisebb helyen elférnek. Azonban valami érdekes még mindig bent maradt: a list.hpp továbbá is tartalmaz definíciókat! Tekintsük azt a példát, amikor a \texttt{void f() {}} függvényt is beillesztjük a headerbe: több fordítási egység esetén linkelési hibát fog okozni. Ekkor használatos az \textbf{inline} kulcsszót: Ez megakadályozza a linker hibát: minden fordítási egységbe kerül egy \texttt{f()} definíció, és azok közül egyet kiválaszt. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
+	Ez a szétválasztás sok egyéb előnnyel is jár: a \texttt{List}-hez tartozó információk sokkal kisebb helyen elférnek. Azonban ahogy a fenti megjegyzés is felhívta rá a figyelmet, a list.hpp továbbá is tartalmaz definíciókat! Ennek ellenére azt tapasztaljuk, hogyha több fordítási egységbe illesztjük be a headert, még akkor sem kapunk fordítási idejű hibát. Ennek a magyarázatához tegyünk egy kisebb kitérőt.
+	\subsection{Inline függvények}
+	
+	Tekintsük azt a példát, amikor a \texttt{void f() {}} függvényt is beillesztjük a headerbe: több fordítási egység esetén linkelési hibát fog okozni. Ekkor használatos az \textbf{inline} kulcsszó: Ez megakadályozza a linker hibát: minden fordítási egységbe kerül egy \texttt{f()} definíció, és azok közül egyet kiválaszt. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
 	
 	\begin{center}
 		$\begin{matrix}
