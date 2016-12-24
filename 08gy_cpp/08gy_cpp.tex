@@ -261,7 +261,7 @@ int main() {
 	Ez a szétválasztás sok egyéb előnnyel is jár: a \texttt{List}-hez tartozó információk sokkal kisebb helyen elférnek. Azonban ahogy a fenti megjegyzés is felhívta rá a figyelmet, a list.hpp továbbá is tartalmaz definíciókat! Ennek ellenére azt tapasztaljuk, hogyha több fordítási egységbe illesztjük be a headert, még akkor sem kapunk fordítási idejű hibát. Ennek a magyarázatához tegyünk egy kisebb kitérőt.
 	\subsection{Inline függvények}
 	
-	Tekintsük azt a példát, amikor a \texttt{void f() {}} függvényt is beillesztjük a headerbe: több fordítási egység esetén linkelési hibát fog okozni. Ekkor használatos az \textbf{inline} kulcsszó: Ez megakadályozza a linker hibát: minden fordítási egységbe kerül egy \texttt{f()} definíció, és azok közül egyet kiválaszt. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
+	Tekintsük azt a példát, amikor a \texttt{void f() \{\}} függvényt is beillesztjük a headerbe: több fordítási egység esetén linkelési hibát fog okozni, mert sértjük az ODR-t. Ez azonban megkerülhető az \texttt{inline} kulcsszó használatával, ez ugyanis megszünteti a linker hibát: minden inline-ként definiált függvény beilleszthető több fordítási egységbe, ahol linkelés folyamán a definíciók közül egy tetszőlegesen kiválasztásra kerül. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
 	
 	\begin{center}
 		$\begin{matrix}
@@ -274,14 +274,46 @@ int main() {
 		&&\fbox{exe}&&
 		\end{matrix}$
 	\end{center}
-	Az \texttt{f()} egy úgynevezett strong reference-el jön létre ha nem inline, így a linker hibát dob. Ha azonban inline-ként adjuk meg, akkor un. weak reference-ként értelmezi, és csak simán kiválaszt egyet. Ez kicsit ellentmond az ODR-nek. Ez azzal oldódik meg, hogy minden \texttt{f()}-nek ugyanolyannak kell lennie, különben nem definiált viselkedést okoz.
+	Az \texttt{f()} egy un. \textit{strong reference}-el jön létre ha nem inline, így a linker hibát dob ha több fordítási egységben definiálva van. Ha azonban inline-ként adjuk meg, akkor  \textit{weak reference}-ként értelmezi, a meglevő definíciók közül tetszőlegesen kerül egy kiválasztásra. Ez nyilván azt is jelenti, hogy minden ilyen függvény definíciójának meg kell egyeznie, hisz kellemetlen meglepetés érhet minket, ha különböző definíciók közül olyat választ a fordító, melyre nem számítanánk (és ez egyben nem definiált viselkedés is).
 	\begin{note}
 		A legtöbb fordítónál lehet egy LTO (\textit{link time optimalization}) funkciót bekapcsolni, mely a linkelésnél optimalizál, többek között ott végzi el az inlineolást.
 	\end{note}
-	Az első pár függvényt azonban átemeltük egy cpp fájlba, így azok mégse lesznek inline-ok. Így az osztályban minden definiált függvény inline lesz, és minden nem definiált függvény out-of-line.
-	
+	\begin{note}
+		Az inline függvények hajlamosak erősen megnövelni a bináris kódot, így az erőltetett használatuk nem javallott.
+	\end{note}
+	\begin{note}
+		Az inline kulcsszó egy javaslat a fordítónak, de nem parancs. Nem inline függvények lehetnek inline-ok, és inlineként definiált függvények lehet mégsem lesznek azok.
+	\end{note}
+	Azok a tagfüggvények, melyek nem az osztály törzsében vannak definiálva, nem lesznek inline-ok, ezért volt az, hogy mielőtt szétszedtük a listánkat header fájlra és fordítási egységre, linkelési hibát kaptunk (\texttt{Iterator} és \texttt{ConstIterator} pár tagfüggvénye külön volt véve).
+	\subsection{Operátor túlterhelés}
+	%TODO ez a szekció a 7. gyakorlat elején talán jobb lenne.
 	\medskip
-	Írjuk meg a \texttt{print} függvényt értelmesebben:
+	Írjuk meg a \texttt{print} függvényt értelmesebben! Ahogy láttuk a 7. gyakorlat elején, lehetőségünk van függvényeket túlterhelni, és ez operátorokra is igaz. Ha példaként vesszük a lineáris algebrából tanult rendezett valós számhármasokat ($\R^3$), lehetőségünk van arra, hogy a tanultak alapján definiáljuk a köztük értelmezett összeadást.
+	%TODO temporális változók
+	\begin{lstlisting}
+struct LinAlgVector
+{
+	double x1, x2, x3;
+	
+	LinAlgVector(double _x1, double _x2, double _x3) : 
+											x1(_x1), x2(_x2), x3(_x3) {}
+};
+
+LinAlgVector operator+(const LinAlgVector &lhs, const LinAlgVector &rhs)
+{
+	return LinAlgVector(lhs.x1 + rhs.x1, lhs.x2 + rhs.x2, lhs.x3 + rhs.x3);
+}
+
+int main()
+{
+	LinAlgVector a(1,2,3), b(1,1,1), c = a + b;
+}
+	\end{lstlisting}
+	A \texttt{main} függvényben lévő értékadás ezzel ekvivalens: \texttt{c = operator+(a, b)}, így láthatjuk, hogy az operátorok túlterhelése gyakorlatilag a függvénytúlterhelés speciális esete. 
+	\smallskip 
+	
+	A gyakran beolvasáshoz használt jobb shift operátor (\texttt{right shift operator}), a $<<$ is túlterhelhető, mely kihasználható egy általunk létrehozott objektum kiíratásának definiálására. Mivel mi at \texttt{std::cout} változóval szeretnénk majd kiíratni, melynek típusa \texttt{std::ostream}, így a függvényünk első paramétere egy ilyen típus lesz, a második meg egy \texttt{List} típus.
+	
 	\begin{lstlisting}
 std::ostream& operator<<(std::ostream& os, const List &l)
 {
@@ -292,11 +324,12 @@ std::ostream& operator<<(std::ostream& os, const List &l)
 	return os;
 }
 	\end{lstlisting}
-	Azért kell visszaadni, hogy tudjuk a kiíratást láncolni. Mivel itt még nem tudjuk, mi az az \texttt{ostream}, így kell valamit include-olni. Ilyenkor a header fájlba inkább érdemes az \texttt{iosfwd} headert berakni, mert ez minden beolvaással és kiíraátssal kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység méretét. (azonban a cpp fájlban muszáj \texttt{iostream}-et használni)
+	
+	Feltűnhet, hogy a kiírató változót a függvény végén vissza is adjuk, melynek oka az, hogy tudjuk a kiíratást láncolni. Sajnos fordítási hibát kapunk, hisz a fordító nem tudja mi az az \texttt{ostream}, így kell valamit include-olni. Ilyenkor a header fájlba inkább érdemes az \texttt{iosfwd} headert berakni \texttt{iostream} helyett, mert ez minden beolvasással és kiíratással kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység méretéte (azonban a cpp fájlban muszáj \texttt{iostream}-et használni, hogy a definíciók meglegyenek).
 	
 	\section{Névterek}
 	
-	A probléma csak az, hogy nagyon sok hasznos nevet elhasználtunk, pl. több \texttt{Iterator} nevű osztályt nem hozhatunk létre (az un. \textit{global namespace}-be kerültek), pedig várhatóan nem csak ennek az egy konténernek szeretnék iterátort írni. Megoldás lehet, hogyha az iterátorainkat egy namespace-ebe rakjuk.
+	A probléma csak az, hogy nagyon sok hasznos nevet elhasználtunk, pl. több \texttt{Iterator} nevű osztályt nem hozhatunk létre (az un. \textit{global namespace}-be kerültek), különben a névütközés áldozatai leszünk. Pedig várhatóan nem csak ennek az egy konténernek szeretnék iterátort írni. Megoldás lehet, hogyha az iterátorainkat egy névtérbe (\textit{namesspace}) rakjuk.
 \begin{lstlisting}
 namespace detail
 {
@@ -310,7 +343,12 @@ namespace detail
 	};
 }
 \end{lstlisting}
-	Már csak az a baj, hogy így a \texttt{List} nem tudja, mi az az \texttt{Iterator}, hisz az egy \texttt{datail} nevű namespace-ben van, így ezt meg kell mondanunk neki pl. így: \texttt{detail::Iterator}, vagy pedig létrehozunk egy typedef-et az osztályon belül:
+	A névterek segíthetnek abba, hogy logikai egységebre rendezzük a programunkat. Az egyik legnagyobb ilyen egység az \texttt{std} névtér, mely tartalmaz minden függvényt, változót, stb, ami a standard részét alkotja. 
+	
+	Lehet névtereket egymásba is ágyazni, erre lehet példa a c++11-es \texttt{chrono} könyvtár, mely az \texttt{std} névteren belül számos dolgot a \texttt{chrono} alnévtérben tárol.
+
+	\subsection{Typedef}
+	Már csak az a baj, hogy így a \texttt{List} nem tudja, mi az az \texttt{Iterator}, hisz az egy \texttt{datail} nevű namespace-ben van, ezért vagy minden \texttt{Iterator}-t lecserélünk \texttt{detail::Iterator}-ra, vagy pedig létrehozunk egy szinonimát, melyet a \texttt{typedef} kulcsszóval tehetünk meg.
 \begin{lstlisting}
 class List
 {
@@ -320,8 +358,8 @@ public:
 	//...
 };
 \end{lstlisting}
-	Így a \texttt{List}-en belül (és csak ott!) elegendő lehet \texttt{Iterator}t írni. Ennek segítségével (mivel ezek a tpyedef-ek publikusak) így is lehet hivatkozni a \texttt{List} iterátorára: \texttt{List::Iterator}.
-	
+	Ezzel a trükkel \texttt{List}-en belül (és csak ott!) elegendő lehet \texttt{Iterator}t írni. Ennek segítségével (mivel ezek a tpyedef-ek publikusak) így is lehet hivatkozni a \texttt{List} iterátorára: \texttt{List::Iterator}.
+	\subsection{Inline classok}
 	Erre másik megoldás lehet, hogyha inline class-t hozunk létre, azaz az iterátor teljes deklarációját beillesztjük a \texttt{List}-be.
 \begin{lstlisting}
 class List
@@ -335,10 +373,13 @@ public:
 };
 \end{lstlisting}
 	\section{Nem template osztály átírása template osztályra}
-	Már csak az a probléma, hogy ez az osztály csak \texttt{int}-ekre működik. Így csináljunk belőle inkább egy template osztályt! Feladatunk csupán annyi, hogy az osztály elé írjunk egy \texttt{tempalte <typename T>}-t, és minden \texttt{List}-et \texttt{List<T>}-re cseréljünk, és minden \texttt{int}-et \texttt{T}-re. Ehhez nyilván az iterátorainkat is módosítani kell, így azokat is így kell módosítani.
+	Már csak az a probléma, hogy ez az osztály csak \texttt{int}-ekre működik. Csináljunk belőle inkább egy template osztályt! Feladatunk csupán annyi, hogy az osztály elé írjunk egy \texttt{template <typename T>}-t, és minden \texttt{List}-et \texttt{List<T>}-re cseréljünk, és minden \texttt{int}-et \texttt{T}-re. Ehhez nyilván az iterátorainkat is módosítani kell.
 	
 	\medskip
-	Időközben felmerül a hatékonyság kérdése is. A listánkban eddig minden érték szerint vettünk át, ami \texttt{int}-nél hatékonyabb, mint a referencia szerinti, azonban template-eknél nem garantáljuk, hogy ilyen alap osztállyal fogják példányosítani az osztályunkat, így konstans referenciával szokás átvenni átvenni a \texttt{T} típusokat. Sőt, még a \texttt{ConstIterator} dereferáló operátora is inkább konstans referenciát adjon vissza!
+	Időközben felmerül a hatékonyság kérdése is. A listánkban eddig minden érték szerint vettünk át, ami \texttt{int}-nél (általában) hatékonyabb, mint a referencia szerinti, azonban template-eknél nem garantáljuk, hogy ilyen alap típussal fogják példányosítani az osztályunkat, és ilyenkor úgy szokás hozzáállni, hogy a leendő template paraméter egy nagyon nagy mérettel rendelkező típus lesz, melynél érték helyett konstans referenciával szokás átvenni minden paramétert hatékonyság végett. Sőt, még a \texttt{ConstIterator} dereferáló operátora is inkább konstans referenciát adjon vissza!
+	\begin{note}
+		Általában egy primitív típus, mint pl. az \texttt{int} vagy \texttt{char}, kisebb mérettel rendelkezik mint a hozzá tartozó pointer vagy referencia típus, így hatákonyabb ezeket a típusokat inkább érték szerint átvenni.
+	\end{note}
 	
 	\fbox{\textbf{list.hpp:}}
 \begin{lstlisting}
@@ -352,7 +393,6 @@ class List;
 
 namespace detail 
 {
-	
 	template<typename T>
 	class Iterator
 	{
@@ -389,8 +429,7 @@ class List
 public:
 	typedef detail::Iterator<T> Iterator;
 	typedef detail::ConstIterator<T> ConstIterator;
-	explicit List(const T &data_, List *next = 0) :
-	data(data_), next(next) {}
+	explicit List(const T &data_, List *next = 0) : data(data_), next(next) {}
 	~List() { delete next; }
 	List(const List &other);
 	List &operator=(const List &other);
@@ -458,7 +497,6 @@ void List<T>::add(const T &data)
 
 namespace detail 
 {
-	
 	template <typename T>
 	Iterator<T> Iterator<T>::operator++() 
 	{
@@ -497,7 +535,7 @@ std::ostream &operator<<(std::ostream& os, const List<T> &l)
 	return os;
 }
 \end{lstlisting}
-	Itt a kiírató operátorunk miatt nem fog fordulni a kódunk! A \texttt{ConstIterator} egy un. \textbf{dependent scope}-ban lesz (ld. 7. gyakorlat).
+	Itt a kiírató operátorunk miatt nem fog fordulni a kódunk! A \texttt{ConstIterator} {dependent scope}-ban lesz (ld. 7. gyakorlat).
 	
 	\begin{lstlisting}
 template<typename T>
