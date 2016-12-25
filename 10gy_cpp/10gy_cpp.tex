@@ -103,104 +103,188 @@
 		
 		10. óra.
 	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
-	\section{STL (folytatás)}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor és \textsc{Horváth} Gábor előadásán. (\today)
+	\section{STL algoritmusok}\section{Iterátor típusok}
+	No, próbáljuk meg alkalmazni a listánkat! Példaképp eresszük rá az alapból megírt algoritmusok egyikét:
 	\begin{lstlisting}
-#include <iostream>
-#include <set>
-
-struct strlen
-{
-	bool operator()(const std::string &lhs, const std::string &rhs) const
+	#include <algorithm>
+	#include <iostream>
+	#include "list.hpp"
+	
+	int main()
 	{
-		return lhs.length() < rhs.length();
+	List<int> head(5);
+	head.add(8);
+	head.add(10);
+	head.add(8);
+	List<int>::Iteratorit = std::find(head.begin(), head.end(), 8);
 	}
-};
-
-int main()
+	\end{lstlisting}
+	Azonban ez a kód nem fog lefordulni.
+	
+	\url{http://en.cppreference.com/w/cpp/iterator}
+	
+	Mivel netet mindig lehet használni, célszerű lehet a cppreference-t böngészni. Ezen a linken láthatjuk, hogy több iterátor típus is létezik.
+	
+	Láthatjuk, hogy több iterátor kategória is létezik, egyesek többet tudnak mint mások: erre a legfényesebb példa a listánk forward iterátora és egy tömb random access iterátora. A mi listánkon kizárólag az első elemtől az utolsóig tudunk sorban menni, míg egy tömb bármelyik elemére bármikor hivatkozhatunk. Világos, hogy egy flexibilisebb iterátorral több mindent meg tudunk tenni, vagy ugyanazt a funkciót hatékonyabban is meg tudjuk valósítani. Emiatt minden STL algoritmusnak (mint pl. az \texttt{std::find}) tudnia kell a template paraméterként kapott iterátor kategóriáját.
+	
+	Egy iterátornak úgy tudjuk a legegyszerűbben megadni a típusát, ha származunk az \texttt{std::iterator} típusból.
+	
+	\url{http://en.cppreference.com/w/cpp/iterator/iterator}
+	
+	\begin{lstlisting}
+	class Iterator : public std::iterator<std::forward_iterator_tag, T>
+	{
+	//..
+	};
+	class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
+	{
+	//..
+	};
+	\end{lstlisting}
+	Ezzel a módosítással már lefordul a kódunk! Így már tudjuk majd használni az \texttt{STL} algoritmusokat is a konténereinken. Ez egy baromi nagy dolog: létrehoztunk egy új adatszerkezetet, és ez tök jól együttműködik az eddigi algoritmusokkal.
+	
+	\medskip
+	Írjunk egy függvény mely a második adott értékű elemet adja vissza.
+	\begin{lstlisting}
+	template <class It, class Val>
+	It find2(It begin, It end, const Val &v)
+	{
+	It first = std::find(begin, end, v);
+	if(first == end)
+	return end;
+	++first;
+	return std::find(first, end, v);
+	}
+	\end{lstlisting}
+	Azaz még viszonylag egyszerűen egy új függvényt is létre tudunk hozni, ami minden adatszerkezettel működni fog! C++ban az algoritmusok nem a konténereken működnek: lévén úgy szokás konténereket létrehozni, hogy írunk hozzá iterátort is, így elegendő egy algirtmusnak azt tudnia, hogy hogyan kell használni azt az iterátort. Emiatt várja el egy STL algoritmus, hogy közöüljük, milyen típusú iterátorunk van. Igaz, a konténereinkkel többet kell dolgoznunk, mert ezt az iterátort egyszer meg kell írni, de hosszú távon még így is rengeteg munkát tudunk megspórolni.
+	
+	
+	Az algoritmusok a iterátorokkal dolgoznak. Ahogy megállapítottuk az előző óra végén, nagyon könnyű egy új függvényt írnunk már meglévő konténerekhez, és egy új konténert is könny írni a meglevő függvényekhez. Jó példát adnak itt az STL konténerek, hisz az összeshez van írva iterátor.
+	
+	Ha mi szeretnénk új algoritmust írni, például így dolgozhatunk iterátorokkal:
+	\begin{lstlisting}
+for (std::set<int>::iterator i = s.begin(); i != s.end(); ++i)
 {
-	std::set<std::string, strlen> s;
-	s.insert("C++");
-	s.insert("Java");
-	s.insert("Haskell");
-	std::cout << s.count("ADA") << std::endl;
+	std::cout << *i;
 }
 	\end{lstlisting}
-	A \texttt{count} tagfüggvény megszámolja, hány \texttt{ADA}-val \textbf{ekvivalens} elem van a \texttt{set}ben. Mivel a funktorunk úgy hasonlít össze két elemet, hogy megnézi, melyik string hossza nagyobb,  \texttt{C++} és az \texttt{ADA} ekvivalens lesz, így legnagyobb meglepődésünkre 1-et fog ez a program kiírni!
-	%miért pocakos a dékán úr? mert has kell
-\begin{lstlisting}
-
-int main()
-{
-	std::set<std::string, strlen> s;
-	s.insert("C++");
-	s.insert("Java");
-	s.insert("Haskell");
-	s.insert("ADA");
-	std::cout << s.size() << std::endl;
-}
-\end{lstlisting}
-	Most értelemszerűen azt várnánk, hogy a méret 4 legyen, de mégis 3at ír ki, mert az \texttt{insert} függvény nem teszi be az \texttt{ADA}-t, mert az a \texttt{C++}al ekvivalens.
-\begin{lstlisting}
-#include <iostream>
-#include <set>
-
-struct strlenWrong
-{
-	bool operator()(const std::string &lhs, const std::string &rhs) const
-	{
-		return lhs.length() <= rhs.length(); //ekvivalensek is lehetnek
-	}
-};
-
-int main()
-{
-	std::set<std::string, strlenWrong> s;
-	s.insert("C++");
-	s.insert("Java");
-	s.insert("Haskell");
-	s.insert("ADA");
-	std::cout << s.count("ADA") << std::endl;
-	std::cout << s.size() << std::endl;
-}
-\end{lstlisting}
-	Most figyeljük meg (emlékezzünk vissza dimatra), hogy egy szigorú rendezés helyett egy gyenge rendezést definiáltunk! Miért lehet ez problémás?
+	Azt, hogy az iterátor hogyan oldja meg az iterálást, nem szükséget tudnunk, elég annyi, hogy az első elemtől az utolsóig megy.
 	
 	\smallskip
-	Helyettesítsünk be a rendezésünkbe.
-	\[ \neg(a.length() \leq b.length())\quad \wedge \quad \neg(b.length() \leq a.length()) \]
-	Itt ha Ha a \texttt{C++}t és az \texttt{ADA}t behelyettesítsük, látjuk, hogy ez a formula hamisat ad, így nem bizonyulnak majd ekvivalensnek.
-	
-	Ha nem szigorú részben rendezést használunk, hanem gyengét, akkor a reflexivitást is elvesztjük. Ez azt jelenti, hogy egy elem nem lehet ekvivalens önmagával!
-	
-	Ha lefordítjuk és futtatjuk ezt a programot, 0-t és 4-et fogunk kapni. Picikét hülye a rendezésünk, mivel ha ekvivalenciát vizsgálunk, sose fog igazat adni, sose tudjuk meg, egy adott benne van-e, az elemek törlése se teljesen jó így.
-	\subsection{map}
-	Előző órán volt erről szó, ez egy asszociatív kulcs-érték párokat tartalmazó konténer. Vannak azonban kellemetlen meglepetések, amelyek bajba juttathatnak:
-\begin{lstlisting}
-#include <iostream>
-#include <map>
-
-int main()
-{
-	std::map<std::string, int> m;
-	std::cout << m.size() << std::endl;
-	if(m["c++"] != 0)
-	{
-		std::cout << "nem 0" << std::endl;
-	}
-	std::cout << m.size() << std::endl;
-}
-\end{lstlisting}
-	Itt a kapott kimenet \texttt{0 1} lesz. Ha visszamelékszünk, a \texttt{[]} operátor úgy működik, hogy ha a \texttt{map} nem tartalmazza a paraméterként kapott kulcsot, akkor létrehozza és beszúrja, ha benne van, visszaadja az értékét. Bár mi nem tettük bele azt hogy \texttt{c++} szándékosan, de pusztán azzal, hogy rákérdeztünk, akaratlanul is megtettük. (Figyeljük meg, hogy akkor tudnánk új elemet hozzátenni, ha azt írnánk pl. hogy \texttt{m["C++"] = 3}; azonban mi nem adtunk meg ehhez a kulcshoz értéket. Ilyenkor a map alapértelmezett értéket rendel a kulcshoz, szám típusoknál 0-t, így be fog szúrni egy \texttt{(c++, 0)} párt.)
+	Írjunk példaképp egy ilyen algoritmust:
 	\begin{lstlisting}
-bool f(const std::map<std::string, int> &m)
+bool tartalmaz(const std::set<int> &s, int x)
 {
-	//m["c++"] forditasi hiba: [] operator nem konstans fuggveny.
-	
-	return m.find("C++") != m.end();
+	for(std::set<int>::iterator i = s.begin(); i != s.end(); ++i)
+	{
+		if(*i == x)
+			return true;
+	}
+	return false;
 }
 	\end{lstlisting}
-	Ez a függvény helyesen vizsgálja, hogy a \texttt{c++} benne van-e. (Ha cppreference-en rákeresünk, a \texttt{map} \texttt{find} tagfüggvénye egy iterátort ad vissza a talált elemre, illetve visszaadja a past-the-end iterátort ha nem találja meg.)
+	
+	Ez egy nagyon nem általános függvény, mert csak \texttt{std::set}-et fogadunk el, és csak akCircle, ha ezek \texttt{int}éel vannak példányosítva. Csináljunk ebből egy egyel általánosabbat:
+\begin{lstlisting}
+template <typename T>
+bool tartalmaz(const std::set<T> &s, int x)
+{
+	for(std::set<T>::iterator i = s.begin(); i != s.end(); ++i)
+	{
+		if(*i == x)
+		return true;
+	}
+	return false;
+}
+\end{lstlisting}
+	Ez persze nem biztos hogy működni fog, ugyanis senki nem garantálja, hogy a \texttt{T} típusnak van van \texttt{==} operátora. (és ez a kód amúgy is még vérzik pár sebből)
+	
+	\medskip
+	Mellékesen, milyen jó lenne, ha nem csak \texttt{std::set}-re működne ez, hanem bármilyen itárorral rendelkező konténerre!
+\begin{lstlisting}
+template <typename It, typename T>
+It find(It &first, It &last, const T &a)
+{
+	while (first != last)
+	{
+		if (*first == a)
+			return first;
+		++first;
+	}
+	return last;
+}
+\end{lstlisting}
+	Figyeljük meg, hogy a visszatérési érték is megváltozott: keresünk egy \texttt{a} értékű elemű, és ha megtaláljuk, egy arra mutató iterátort adunk vissza. Ha nem találunk, akCircle az utolsó utáni elemet adjuk vissza. Ez már egy egész jó kereső algoritmust.
+	
+	\medskip
+	Javítsuk ki a fenti függvényt, ahonnét hiányzik a \texttt{typename}.
+\begin{lstlisting}
+template <typename T>
+bool tartalmaz(const std::set<T> &s, int x)
+{
+	for(typename std::set<T>::iterator i = s.begin(); i != s.end(); ++i)
+	{
+		if(*i == x)
+		return true;
+	}
+	return false;
+}
+\end{lstlisting}
+	
+	\medskip
+	Kérdés, tudunk-e ilyet tenni?:
+\begin{lstlisting}
+std::set<int>>::iterator i = s.begin();
+*i = 42;
+\end{lstlisting}
+	Már a kérdésból is látszdik, hgoy ez nem lehetséges, hisz a \texttt{std::set} itetátora igazából egy konstans iterátort. EZ azért van, mely lévén egy bináris faként van áltlaában implementálva a \texttt{std::set}, a fa rendezett szerkezetét fel tudnánk rúgni.
+	
+	\smallskip
+	Mit tegyünk akCircle, ha konstansot veszek át? A fenti példában is ez van, a set-et konstansként vettük át. Így, hasonlóan az általunk írt láncolt listához, egy konstans iterátorral kell végigmennünk.
+\begin{lstlisting}
+template <typename T>
+bool tartalmaz(const std::set<T> &s, int x)
+{
+	for(typename std::set<T>::const_iterator i = s.begin(); i != s.end(); ++i)
+	{
+		if(*i == x)
+		return true;
+	}
+	return false;
+}
+\end{lstlisting}
+	
+	\medskip
+	Közel az összes STL algoritmus iterátor párokat vár, legyenek pl. \texttt{first} és \texttt{last}. IlyenCircle az első elemtől az utolsóig megy, így: \texttt{[first, last)}. Azaz a \texttt{last} iterátorhoz már nem ér! (Erre könnyű is magyarázatot találni, miért: a mi általunk írt lista \texttt{end()} metódusa egy olyan iterátort ad vissza, mely gyaCirclelatilag egy nullpointer. Ha ezt megkapnánk dereferálni, nem definiált viselkedést kapnánk, így általában az end() nem az utolsó elemet, hanem az utolsó utáni elemet adja vissza)
+	
+	\subsubsection{find}
+	Értelemszerűen, nem kell megírni a find függvényt, hisz ez alapból benne van az STL-ben. Ehhez a függvényhez az \texttt{<algorithm>} könyvtár beillezstésével férhetünk hozzá. 
+	
+	\medskip
+	Azért se épp jó a mi algoritmusunk, mert példaképp a halmaz rendezett, így ott logaritmikus keresést is használhatnánk! Ezért szokás az ilyen speciális konténereknek egyedi find függvényt írni, ami az \texttt{std::set} esetében egy tagfüggvény. 
+\begin{lstlisting}
+set<int>::iterator i = s.find(42);
+if (i == s.end())
+	std::cout << "nincs" << std::endl;
+\end{lstlisting}
+	Azonban megállapítandó, hogy az \texttt{std::set} nem \texttt{==} operátorral ellenőrzi az ekvivalenciát, hanem a template paraméterként kapott rendezéssel! (ami alapértelemzetten a \texttt{<} operátortól függ).
+\begin{lstlisting}
+struct Circle
+{
+	int x, y, r;
+};
+bool operator<(const Circle &lhs, const Circle &rhs)
+{
+	return lhs.r < lhs.r;
+}
+bool operator==(const Circle &lhs, const Circle &rhs)
+{
+	return lhs.r == rhs.r && lhs.x == rhs.y && lhs.y == rhs.y;
+}
+\end{lstlisting}
+	Itt az a veszély, hogy ha az STL-es find-al szemben a sajátunkat használjuk, más lehet a végeredmény, hisz a \texttt{Circle}-t ők máshogy hasonlítják össze.
+	
 	\subsection{STL felépítése}
 	Látogassunk el a \url{http://en.cppreference.com/w/} oldalra, és picikét barátkozzunk vele. Itt láthatjuk az összes STL konténert, de sok fontos információhoz is hozzájuthatunk, pl. az \texttt{std::string}-el kapcsolatban is: példaképp az \texttt{std::string} csak egy typename!
 	

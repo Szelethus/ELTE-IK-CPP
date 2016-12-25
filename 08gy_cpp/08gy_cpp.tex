@@ -5,7 +5,8 @@
 \usepackage[T1]{fontenc}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
-\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx, tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
 %\usepackage{marvosym}
 
 \usepackage{listings}
@@ -263,16 +264,36 @@ int main() {
 	
 	Tekintsük azt a példát, amikor a \texttt{void f() \{\}} függvényt is beillesztjük a headerbe: több fordítási egység esetén linkelési hibát fog okozni, mert sértjük az ODR-t. Ez azonban megkerülhető az \texttt{inline} kulcsszó használatával, ez ugyanis megszünteti a linker hibát: minden inline-ként definiált függvény beilleszthető több fordítási egységbe, ahol linkelés folyamán a definíciók közül egy tetszőlegesen kiválasztásra kerül. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
 	
+	\medskip
+	A következő ábra jól demonstrálja a problémát:
 	\begin{center}
-		$\begin{matrix}
-		&&\fbox{f()}&&\\
-		&\swarrow&&\searrow&\\
-		\fbox{\text{main.cpp}}&&&&\fbox{list.cpp}\\
-		\downarrow&&&&\downarrow\\
-		\fbox{\quad   f() \quad }&&&&\fbox{ \quad f()\quad  }\\
-		&\searrow&&\swarrow&\\
-		&&\fbox{exe}&&
-		\end{matrix}$
+		\begin{tikzpicture}
+		\tikzstyle{HeaderName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+		\tikzstyle{CppName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+		\tikzstyle{FunctionName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= white]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		
+		\node (listHpp) [HeaderName] {list.hpp};
+		\node (listHppF) [FunctionName, below = 0 mm of listHpp] {\texttt{f() \{\}}};
+		
+		\node (mainCpp) [CppName, below left = of listHpp] {main.cpp};
+		\node (mainCppF) [FunctionName, below  = 0 mm of mainCpp] {\texttt{f() \{\}}};
+		
+		\node (listCpp) [CppName, below right = of listHpp] {main.cpp};
+		\node (listCppF) [FunctionName, below  = 0 mm of listCpp] {\texttt{f() \{\}}};
+		
+		\node (exe) [CppName, below = 2.7 cm of listHpp] {exe file};
+		\node (exeF) [FunctionName, below  = 0 mm of exe] {\texttt{f() ???}};
+		
+		\draw[arrow] (listHppF) -- (mainCpp);
+		\draw[arrow] (listHppF) -- (listCpp);
+		\draw[arrow] (mainCppF) -- (exe);
+		\draw[arrow] (listCppF) -- (exe);
+		\end{tikzpicture}
+		\smallskip
+		
+		A \texttt{main.cpp}-ben vagy a \texttt{list.cpp}-ben lévő definíciója szerepeljen \texttt{f}-nek a futtatható fájlban?
 	\end{center}
 	Az \texttt{f()} egy un. \textit{strong reference}-el jön létre ha nem inline, így a linker hibát dob ha több fordítási egységben definiálva van. Ha azonban inline-ként adjuk meg, akkor  \textit{weak reference}-ként értelmezi, a meglevő definíciók közül tetszőlegesen kerül egy kiválasztásra. Ez nyilván azt is jelenti, hogy minden ilyen függvény definíciójának meg kell egyeznie, hisz kellemetlen meglepetés érhet minket, ha különböző definíciók közül olyat választ a fordító, melyre nem számítanánk (és ez egyben nem definiált viselkedés is).
 	\begin{note}
@@ -581,58 +602,5 @@ int main()
 	Linkelési hibát kaptunk, de miért? A list.hpp-ben benne van mindenféle deklaráció, és a list.cpp-ben meg több \texttt{List}-béli implementáció. Amikor a list.cpp-t fordítjuk, létrejön az object fájl, a mainben szintén. Azonban minden implementált függvény template: a háttérben a list.cpp-ben semmit sem példányosítunk, így az szinte teljesen üres fordítás után. A main.cpp-ben így hiába megy az object fájl kreálása, lévén nem kell ismerni ahhoz a függvények definícióit, azonban a linkelésnél már meg kéne tudnunk találni azokat. Így a template osztályokat/függvényeket a header fájlokban kell tárolni.
 	
 	Itt megoldás lehet, hogyha az egész cpp-t beemeljük a list.hpp-be (itt mát azonban muszáj lesz az \texttt{iosfwd}-t \texttt{iostream}-re váltani). Az átláthatóság azonban nem lett áldozat, mert a fájl tetején van a deklaráció, és szétszedve van benne definíció.
-	\section{Iterátor típusok}
-	No, próbáljuk meg alkalmazni a listánkat! Példaképp eresszük rá az alapból megírt algoritmusok egyikét:
-\begin{lstlisting}
-#include <algorithm>
-#include <iostream>
-#include "list.hpp"
-
-int main()
-{
-	List<int> head(5);
-	head.add(8);
-	head.add(10);
-	head.add(8);
-	List<int>::Iteratorit = std::find(head.begin(), head.end(), 8);
-}
-\end{lstlisting}
-	Azonban ez a kód nem fog lefordulni.
 	
-	\url{http://en.cppreference.com/w/cpp/iterator}
-	
-	Mivel netet mindig lehet használni, célszerű lehet a cppreference-t böngészni. Ezen a linken láthatjuk, hogy több iterátor típus is létezik.
-	
-	Láthatjuk, hogy több iterátor kategória is létezik, egyesek többet tudnak mint mások: erre a legfényesebb példa a listánk forward iterátora és egy tömb random access iterátora. A mi listánkon kizárólag az első elemtől az utolsóig tudunk sorban menni, míg egy tömb bármelyik elemére bármikor hivatkozhatunk. Világos, hogy egy flexibilisebb iterátorral több mindent meg tudunk tenni, vagy ugyanazt a funkciót hatékonyabban is meg tudjuk valósítani. Emiatt minden STL algoritmusnak (mint pl. az \texttt{std::find}) tudnia kell a template paraméterként kapott iterátor kategóriáját.
-	
-	Egy iterátornak úgy tudjuk a legegyszerűbben megadni a típusát, ha származunk az \texttt{std::iterator} típusból.
-	
-	\url{http://en.cppreference.com/w/cpp/iterator/iterator}
-	
-	\begin{lstlisting}
-class Iterator : public std::iterator<std::forward_iterator_tag, T>
-{
-	//..
-};
-class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
-{
-	//..
-};
-	\end{lstlisting}
-	Ezzel a módosítással már lefordul a kódunk! Így már tudjuk majd használni az \texttt{STL} algoritmusokat is a konténereinken. Ez egy baromi nagy dolog: létrehoztunk egy új adatszerkezetet, és ez tök jól együttműködik az eddigi algoritmusokkal.
-	
-	\medskip
-	Írjunk egy függvény mely a második adott értékű elemet adja vissza.
-	\begin{lstlisting}
-template <class It, class Val>
-It find2(It begin, It end, const Val &v)
-{
-	It first = std::find(begin, end, v);
-	if(first == end)
-		return end;
-	++first;
-	return std::find(first, end, v);
-}
-	\end{lstlisting}
-	Azaz még viszonylag egyszerűen egy új függvényt is létre tudunk hozni, ami minden adatszerkezettel működni fog! C++ban az algoritmusok nem a konténereken működnek: lévén úgy szokás konténereket létrehozni, hogy írunk hozzá iterátort is, így elegendő egy algirtmusnak azt tudnia, hogy hogyan kell használni azt az iterátort. Emiatt várja el egy STL algoritmus, hogy közöüljük, milyen típusú iterátorunk van. Igaz, a konténereinkkel többet kell dolgoznunk, mert ezt az iterátort egyszer meg kell írni, de hosszú távon még így is rengeteg munkát tudunk megspórolni.
 \end{document}

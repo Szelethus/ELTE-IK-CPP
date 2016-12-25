@@ -92,6 +92,7 @@
 	\newtheorem{example}[theorem]{Példa} 
 	\newtheorem{task}[theorem]{Feladat} 
 	\newtheorem{note}[theorem]{Megjegyzés}
+	%TODO ezek így nem lesznek jók.
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\begin{center}
 		{\LARGE\textbf{C++}}
@@ -100,9 +101,9 @@
 		
 		9. óra.
 	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor  előadásán. (\today)
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor és \textsc{Horváth} Gábor előadásán. (\today)
 	
-	\section{STL}
+	\section{STL konténerek}
 
 	Az \textit{STL} a \textit{Standard Template Library} rövidítése.
 	\subsection{Funktorok}
@@ -133,7 +134,9 @@ int main()
 	\end{lstlisting}
 	Itt gyakorlatilag az objektum függvényként funkcionál. A funktorok azért fontosak, mert megadhatók template paraméterként, és így tudjuk elérni, hogy rendezéshez lehessen őket használni.
 	\begin{note}
-	Miért használunk funktorokat mondjuk függvénypointerek helyett? Világos, hogyha egyedi rendezést akarunk, akkor muszáj ezt az információt valahogy átadni. A funktorok erre alkalmasabbak, példaképp vegyük ehhez egy olyan template függvényt, melynek egyik template paramétere egy olyan funktort vár, melynek \texttt{()} operátora egy paramétert vár és \texttt{bool}-al tér vissza, és feladata az erre igazat adó elem megkeresése. Hogyan tudnánk mi funktorok helyett függvénypointerrel a második páros számot megkeresni vele? Vagy az ötödik 8-al oszthatót? Nos, függvényekkel igencsak nehezen (kb statikus adattagokra kényszerülnénk, vagy egy hasonlóan nem épp elegáns megoldásra), azonban egy funktorban létrehozhatunk egy számlálót, melyet tudunk szépen növelgetni.
+	Miért használunk funktorokat mondjuk függvénypointerek helyett? Világos, hogyha egyedi rendezést akarunk, akkor muszáj ezt az információt valahogy átadni. A funktorok erre alkalmasabbak, példaképp vegyük ehhez egy olyan template függvényt, melynek egyik template paramétere egy olyan funktort vár, melynek \texttt{()} operátora egy paramétert vár és \texttt{bool}-al tér vissza, és feladata az erre igazat adó elem megkeresése. 
+	
+	Hogyan tudnánk mi funktorok helyett függvénypointerrel a második páros számot megkeresni vele? Vagy az ötödik 8-al oszthatót? Nos, függvényekkel igencsak nehezen (kb statikus adattagokra kényszerülnénk, vagy egy hasonlóan nem épp elegáns megoldásra), azonban egy funktorban létrehozhatunk egy számlálót, melyet tudunk szépen növelgetni.
 	\end{note}
 	
 	Segíthet a megértésben, ha tekintjük az alábbi példát:
@@ -167,9 +170,13 @@ int main()
 	Ez a funktor (\texttt{Less}) egy un. \textit{binary predicate}, azaz a gömbölyű zárójel operátora két azonos típusú objektumhoz rendel egy logikai értéket. Figyeljük meg, hogyan adtuk meg a harmadik paramétert: \texttt{Less}-nek meghívtuk a default konstruktorát, de nem adtunk neki változónevet. Itt egy un. névtelen temporális változó jön létre, mely \texttt{f} paramétereinek kiértékelésekor jön létre, majd az \texttt{f} lefutása után meg is semmisül. Figyeljük meg azt is, hogy ebben az esetben érték szerint vettünk át: ez nem csak hatékonyabb, hisz \texttt{Less} mérete minimális (nincs adattagja), de mivel \texttt{Less()} egy jobbérték, csak így, vagy konstans referenciával tudnánk átvenni.
 	\smallskip
 	
-	Jusson eszünkbe, mikor ekvivalens két elem! \quad $a = b \quad \Leftrightarrow \quad \neg(a<b)\, \wedge\, \neg(b<a)$.
+	Ez alapján az egyenlőség is levezethető: \quad $a = b \quad \Leftrightarrow \quad \neg(a<b)\, \wedge\, \neg(b<a)$
+	\medskip
+	
+	Könnyű látni, hogy általánosan beszélve, \texttt{Compr} összehasonlító funktorral $a$ és $b$ \texttt{T} típusú objektumoknál
+	\[ a\ \ \text{és}\ \ b\ \ \text{ekvivalens}\quad \Leftrightarrow\quad \neg \,Compr(a, b)\, \wedge\, \neg \,Compr(b, a). \]
 
-	\subsection{Konténerek}
+	\subsection{Bevezető a konténerekhez}
 	C++ban az egyetlen tároló alapértelmezetten a tömb. Azonban az meglehetősen kényelmetlen: a tömb egymás mellett lévő memóriacímek összessége, nem tehetjük meg azt, hogy csak úgy hozzáveszünk 1-1 elemet (mi van ha valaki más már írt oda?). Ezért jobban járunk, ha írunk egy egyedi kontért (pl. az általunk létrehozott \texttt{List}), vagy pedig válogatunk az előre megírt STL konténerek között.
 	
 	Három konténertípust különböztetünk meg:
@@ -179,248 +186,351 @@ int main()
 		\item Konténer adapter: Egy meglévő konténert alakítanak át, általában szogorítanak. Példaképp ha vesszük az \texttt{std::deque} konténert, ami egy kétvégű sor, könnyen tudunk belőle egy egyvégű sort csinálni. Ezen a konténerek általában egy másik konténert tárolnak, és annak a funkcióit szigorítják.
 		\\Példa: \texttt{std::queue}, \texttt{std::stack}.
 	\end{itemize}
-	
-	\subsubsection{vector}
+	A következő leírásban nem fogunk minden létező tagfüggvénnyel foglalkozni: egyrészt olyan sok van, hogy azt teljesen irreális észben tartani, másrészt sok ilyenhez érdemi hozzáfűznivalót én nehezen tudnék fűzni, így az egyes szekciók végén található link az adott konténerhez.
+	\begin{note}
+		Nagyon fontos képesség az is, hogy valaki hogyan tud utánanézni valaminek, amivel nincs teljesen tisztában, így erősen javallott a \url{cppreference.com}-el való ismerkedés, illetve más helyeken lévő információk böngészése is.
+	\end{note}	
+	\subsection{vector}
 	A \texttt{<vector>} könyvtárban található, maga a konténer az \texttt{std::vector} névre hallgat. Bár a pontos definíciója értelemszerűen implementációfüggő, vannak olyan tulajdonságok, melyeket elvár a szabvány.
 	\smallskip
+	\begin{lstlisting}
+#include <vector>
+#inclide <iostream>
+
+int main()
+{
+	std::vector<int> v;
+	v.push_back(5); //v.size() == 1
+	v.pop_back(); //v.size() == 0
 	
+	for (int i = 0; i<10; i++)
+		v.push_back(i);
+		
+	for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
+		std::cout << *it << std::endl; // 0 1 2 3 4 5 6 7 8 9
+		
+	for (int i = 0; i<v.size; i++)
+		std::cout << v[i] << std::endl; // 0 1 2 3 4 5 6 7 8 9
+}
+	\end{lstlisting}
 	A \texttt{vector} leggyakrabban dinamikusan lefoglalt tömbben tárolja az adatainkat, viszont a tömb mérete nem növelhető, így ha túl sok elemet akarunk beletenni, a \texttt{vector} lefoglal egy nagyobb memóriaterületet (leggyakrabban kétszer akkorát). Így a \texttt{push\_back}-nek a műveletigénye amortizált konstans: Általában konstans, de ha új memóriaterületet kell lefoglalni és a meglevő elemet átmásolni, akkor lineáris.
 	
 	\begin{note}
 		Számos okból a \texttt{vector} a leggyakoribb választás, ha konténerre van szükségünk. Flexibilitása és gyorsasága kiemelkedő, azonban megvannak a maga gyenge pontjai.
 	\end{note}
 	
-	Gyakorlatilag teljesen lehetetlen minden tagfüggvényt megjegyezni, és nem is érdemes. Bátran forduljunk ide: \url{http://en.cppreference.com/w/cpp/container/vector}.
-	\subsubsection{set}
-	\url{http://en.cppreference.com/w/cpp/container/set}
-%	Példaképp vegyük az előző órán beszélt \texttt{std::set}-et: ennek két template paramétere van, az egyik a tárolandó típus, a másik pedig a rendezés (van még egyéb is, de ezzel most ne foglalkozzunk). Képzeljük el mondjuk így:
+	\smallskip
+	Előzménytárgyakból már ismerkedtünk ezzel a konténerrel: az előbb említett \texttt{push\_back} tagfüggvényt szoktuk használni új elem beszúrására a konténer végére, a \texttt{pop\_back} művelettel pedig a konténer végén lévő elemet tujuk kiszedni. 
 	
-%	\begin{lstlisting}
-%	namespace std
-%	{
-%	template <class Value, class Compr = std::less<Value> >
-%	class set
-%	{
-%	//...
-%	
-%	//ossze kell hasonlitani ket elemet: v1 es v2.
-%	Compr c;
-%	if ( c(v1, v2) )
-%	
-%	//...
-%	};
-%	}
-%	\end{lstlisting}
-%	Figyeljük meg, hogy az \texttt{std::set}-nek van alapértelmezett rendezése is, ez az \texttt{std::less} (ld.: cppreference.com). A \texttt{set} egy olyan funktort fog várni, melyek a gömbölyű zárójel operátora két \texttt{Value} típusú objektumot vár paraméterként, és a visszatérési értéke \texttt{bool.}
+	Feltűnhet, hogy ezek a műveletek, csakúgy mint számos egyéb melyet a cppreference-n olvashatunk, a konténer végére fókuszál, sőt, az elejére vonatkozó műveletek nincsenek is implementálva (nincs semmilyen \texttt{push\_front} vagy \texttt{pop\_front}). Ennek az az oka, hogy az \texttt{std::vector}-nál a konténer végének a módosítása a leghatékonyabb, ha a közepén/elején szeretnénk módosító művelteket végrehajtani, az gyakran a környező elemek odébb másolásával jár.
+
+	\medskip
+	Az \texttt{std::vector} tagfüggvényei, mint a nemsoká következő STL algoritmusok, többnyire iterátorokat várnak paraméterül. A következő példában töröljük ki a 4. elemet, majd szúrjuk is vissza!
+	\begin{lstlisting}
+int main()
+{
+	std::vector<int> v;
+	for (int i = 0; i<10; i++)
+		v.push_back(i);
+		
+	for (int i = 0; i<v.size(); i++)
+		std::cout << v[i] << ' '; // 0 1 2 3 4 5 6 7 8 9
+		
+	std::vector<int>::iterator it = v.begin();
+	++it; ++it; ++it;
+	v.erase(it);
+	for (int i = 0; i<v.size(); i++)
+		std::cout << v[i] << ' '; // 0 1 2 4 5 6 7 8 9
+	
+	it = v.begin();
+	++it; ++it; ++it; 
+	v.insert(it, 3);
+	for (int i = 0; i<v.size(); i++)
+		std::cout << v[i] << ' '; // 0 1 2 3 4 5 6 7 8 9
+}
+	\end{lstlisting}
+	\begin{note}
+		Nyilván nonszensz, ahogy fent egyesével lépegettünk az iterátorral a negyedik elemig. Erre nemsokára egy értelmesebb megoldást fogunk látni.
+	\end{note}
+	Az iterátorok kezelésének azonban komoly veszélyei is vannak, a legnagyobb gonosz itt az un. iterátor invalidáció (\textit{iterator invalidation}). Amikor a \texttt{vector} által lefoglalt dinamikus tömb mérete túl kicsi az újabb elemek beszúrásához, és egy újabb tömbbe másolja át őket, minden iterátor, pointer és referencia ami a régebbi tömbre hivatkozott invalidálódik, lévén olyan területre hivatkoznak, melyeket már felszabadultak. 
+	\smallskip
+	
+	Ugyanígy a konténer közepéről történő törlés, vagy a konténer közepére történő beszúrás is iterátor invalidációval jár.
+	\smallskip
+	
+	Az invalidálódott objektumokkal végzett műveletek nem definiált viselkedést eredményeznek.
+	\begin{lstlisting}
+int main()
+{
+	std::vector<int> v;
+	v.push_back(3);
+	std::vector<int>::iterator it = v.begin();
+	
+	for (int i = 0; i<1000; i++)
+		v.push_back(i);
+		
+	*it = 10; // nem definialt viselkedes
+}
+	\end{lstlisting}
+	Az invalidáció elkerülése végett számos tagfüggvény egy iterátorral tér vissza, erre lehet példa az \texttt{insert}, mely az új elemre, vagy az \texttt{erase}, mely az utolsó eltávolított elem rákövetkezőjére hivatkozik.
 	
 	\smallskip
-	Az \texttt{std::set}-nek nem \texttt{push\_back}, hanem \texttt{insert} függvénye van elem betevésére. Ez a konténer a matematikai halmazra hasonlít, és általában egy kiegyensúlyozott bináris faként van implementálva, a hatékonyság végett.
+	Töröljünk egy vektorból minden páratlan számot!
+	\begin{lstlisting}
+int main()
+{
+	std::set<int> c = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	for(auto it = c.begin(); it != c.end(); )
+	{
+		if(*it % 2 == 1)
+			it = c.erase(it);
+		else
+			++it;
+	}
+}
+	\end{lstlisting}
+	
+	\medskip
+	Link: \url{http://en.cppreference.com/w/cpp/container/vector}.
+	
+	\begin{note}
+		Az \texttt{std::deque} működése ez alapján triviális, így annak megismerését az olvasóra bízom.
+	\end{note}
+	\subsection{set}
+	
+	Az \texttt{std::set} a \texttt{<set>} könyvtárban található. E konténernek nincs \texttt{push\_back} tagfüggvénye, helyette az \texttt{insert} függvény használatos elem betevésére. 
+	\medskip
+	
+	Ez a konténer a matematikai halmazra hasonlít: egyedi elemet tárol, és ha egy eleve bent lévő elemmel ekvivalenset próbálnánk beszúrni, nem történne semmi. Ezen kívül a szabvány azt is megköveteli, hogy ez a konténer rendezett legyen, így a tárolandó \texttt{T} típus mellett egy olyan funktort is vár template paramterül, melynek \texttt{()} operátora két \texttt{T} típust vár paraméterül és logikai értékkel tér vissza.
+	\smallskip
+	
+	Ez utóbbi template paramétert nem kell feltétlenül megadni, alapértelmezetten ugyanis az \texttt{std::set} az \texttt{std::less<T>} alapján rendez, mely gyakorlatilag az \texttt{<} operátorral ekvivalens.
+	\smallskip
+	
+	Az \texttt{std::set} általában piros-fekete bináris faként van implementálva, a hatékonyság végett.
 	\begin{note}
 		A szabvány elvárja, hogy az \texttt{insert} műveletigénye logaritmikus legyen.
 	\end{note}
-	Vegyük észre, hogy a matematikai halmaz alapértelmezetten rendezett, így ez a konténer is az. A rendezés, csakúgy mint a tárolandó típus, template paraméterként van megadva, azonban van alapértelmezett is. Például:
 	\begin{lstlisting}
-struct Kor
+#include <set>
+#include <iostream>
+
+struct Circle
 {
 	int x, y, r;
+	Circle(int _x, int _y, int _r) : x(_x), y(_y), r(_r) {}
 };
 
-std::set<Kor> s;
-	\end{lstlisting}
-	Itt probléma lesz, mert nem adtunk meg template paraméterként egy rendezést, és az alapértelmezett rendezés a \texttt{<} operátort használja, melyet nem írtunk meg a \texttt{Kor}-hoz.
-	\begin{note}
-		A rendezés megadása template paraméterekkel funktorokkal történik, melyekről később lesz szó.
-	\end{note}
-	\begin{lstlisting}
-struct Kor
+std::ostream& operator<<(std::ostream& os, const Circle &c)
 {
-	int x, y, r;
-};
-bool operator<(const Kor &lhs, const Kor &rhs)
-{
-	return lhs.r < lhs.r;
+	os << c.x << ' ' << c.y << ' ' << c.r;
+	return os;
 }
 
-std::set<Kor> s;
-	\end{lstlisting}
-	Példák még a használatra:
-\begin{lstlisting}
-std::set<Kor> s;
+bool operator<(const Circle &lhs, const Circle &rhs)
+{
+	return lhs.r < rhs.r;
+}
 
-s.insert(Kor(0,0,1));
-s.insert(Kor(0,0,2));
-s.insert(Kor(1,1,2));
-std::cout << s.size() << std::endl;
+struct LessByX
+{
+	bool operator()(const Circle &lhs, const Circle &rhs) const
+	{
+		return lhs.x < rhs.x;
+	}
+};
+
+int main()
+{
+	std::set<int> si;
+	for(int i = 10; i>0; i--) //forditva!
+		si.insert(i);
+	//torlesrol majd kesobb
+	//si.size() == 10
+	si.insert(5); //si.size() == 10
+	
+	for(std::set<int>::iterator it = si.begin(); it != si.end(); ++it)
+		std::cout << *it << ' '; // 0 1 2 3 4 5 6 7 8 9
+	
+	std::set<Circle> sk;
+	sk.insert(Circle(3, 2, 2));
+	sk.insert(Circle(1, 2, 1));
+	sk.insert(Circle(2, 2, 3));
+	for(std::set<Circle>::iterator it = sk.begin(); it != sk.end(); ++it)
+		std::cout << *it << ", "; // 1 2 1, 3 2 2, 2 2 3
+	
+	std::set<Circle, LessByX> skr;
+	skr.insert(Circle(3, 2, 2));
+	skr.insert(Circle(1, 2, 1));
+	skr.insert(Circle(2, 2, 3));
+	for(std::set<Circle, LessByX>::iterator it = skr.begin(); 
+												   it != skr.end(); ++it)
+		std::cout << *it << ", "; // 1 2 1, 2 2 3, 3 2 2
+}	
+	\end{lstlisting}
+
+	Egy egyedi rendezés használata veszélyekkel is járhat azonban.
+	\begin{lstlisting}
+struct strlen
+{
+	bool operator()(const std::string &lhs, const std::string &rhs) const
+	{
+		return lhs.length() < rhs.length();
+	}
+};
+
+int main()
+{
+	std::set<std::string, strlen> s;
+	s.insert("C++");
+	s.insert("Java");
+	s.insert("Haskell");
+	std::cout << s.count("ADA") << std::endl; // 1
+}
+	\end{lstlisting}
+	A \texttt{count} tagfüggvény megszámolja, hány \texttt{ADA}-val \textbf{ekvivalens} elem van a \texttt{set}ben. Mivel a funktorunk úgy hasonlít össze két elemet, hogy megnézi, melyik string hossza nagyobb, \texttt{C++} és az \texttt{ADA} ekvivalens lesz, így legnagyobb meglepődésünkre 1-et fog ez a program kiírni!
+	%miért pocakos a dékán úr? mert has kell
+\begin{lstlisting}
+int main()
+{
+	std::set<std::string, strlen> s;
+	s.insert("C++");
+	s.insert("Java");
+	s.insert("Haskell");
+	s.insert("GOD");
+	std::cout << s.size() << std::endl; // 3
+}
 \end{lstlisting}
-	Itt azt várnánk, hogy a halmaz mérete 3 legyen, de 2 lesz mégis. Ez abból adódik, hogy a \texttt{<} operátort úgy alkottuk meg, hogy sugártól függ (azaz az \texttt{r} adattagról), hogy egyik kör nagyobb-e mint a másik. Ez alapján az ekvivalenciát is le tudja vezetni konténer: ha $\neg(a<b)$ és $\neg(b<a)$ akkor $a=b$.
-	\subsubsection{list}
-	Ez a konténer nagyon hasonló ahhoz, mint amit mi írtunk, csak lehet üres, és kétirányú. 
+	Most értelemszerűen azt várnánk, hogy a méret 4 legyen, de mégis 3at ír ki, mert az \texttt{insert} függvény nem teszi be az \texttt{GOD}-ot, lévén az a rendezés szerint az a \texttt{C++}al ekvivalens.
+\begin{lstlisting}
+struct strlenWrong
+{
+	bool operator()(const std::string &lhs, const std::string &rhs) const
+	{
+		return lhs.length() <= rhs.length(); //ekvivalensek is lehetnek
+	}
+};
+
+int main()
+{
+	std::set<std::string, strlenWrong> s;
+	s.insert("C++");
+	s.insert("Java");
+	s.insert("Haskell");
+	s.insert("ADA");
+	std::cout << s.count("ADA") << std::endl; // 0
+	std::cout << s.size() << std::endl; // 4
+}
+\end{lstlisting}
+	Most figyeljük meg (emlékezzünk vissza dimatra), hogy egy szigorú rendezés helyett egy gyenge rendezést definiáltunk! Miért lehet ez problémás?
+	
+	\smallskip
+	Helyettesítsünk be a rendezésünkbe.
+	\[ \neg\big(\,a.length() \leq b.length()\,\big)\quad \wedge \quad \neg\big(\,b.length() \leq a.length()\,\big) \]
+	Itt ha Ha a \texttt{C++}t és az \texttt{ADA}t behelyettesítsük, látjuk, hogy ez a formula hamisat ad, így nem bizonyulnak majd ekvivalensnek.
+	
+	Ha nem szigorú részben rendezést használunk, hanem gyengét, akkor a reflexivitást is elvesztjük. Ez azt jelenti, hogy egy elem nem lehet ekvivalens önmagával!
+	
+	Könnyen látható hogy a rendezésünk nem épp jó, mivel ha ekvivalenciát vizsgálunk, sose fog igazat adni, sose tudjuk meg, egy adott benne van-e, az elemek törlése se teljesen jó így.
+	
+	Link: \url{http://en.cppreference.com/w/cpp/container/set}
+	
+	\begin{note}
+		Az \texttt{std::multiset} működése az eddigiek alapján triviális, így annak megismerését ismét az olvasóra bízom.
+	\end{note}
+	\subsection{list}
+	Ez a konténer nagyon hasonló ahhoz, mint amit mi írtunk, csak lehet üres, és kétirányú.
 	\smallskip
 	
-	Feltűnő lehet, hogy az \texttt{std::vector}-ral szemben ennek a konténernek nincs \texttt{[]} operátora, hiszen ahogy azt korábban is megállapítottuk, mire egy adott elemet elérünk, szépen el kell oda lépegetni egyesével. A szögletes zárójel operátort csak akkor szokás írni, hogy ha nagyon hatékony, lehetőleg konstans az adott elem lekérdezése, de ez a listánál nem teljesül.
+	Feltűnő lehet, hogy az \texttt{std::vector}-ral szemben ennek a konténernek nincs \texttt{[]} operátora, hiszen mire egy adott elemet elérünk, szépen el kell oda lépegetni egyesével. A szögletes zárójel operátort csak akkor szokás írni, hogy ha nagyon hatékony, lehetőleg konstans műveletigényű az adott elem lekérdezése, de ez a listánál nem teljesül.
 	\begin{note}
-		Bár elméletben gyorsabb egy láncolt lsitába beszúrni, de általában ez mégsem igaz. Azért, mert az egy dolog, hogy az elemeket egyesével odább kell tolni egy vektorban, azonban mivel abban szekvenciálisan vannak a memóriacímek egymás mellett, és a processzor nem egyesével adja vissza az elemeit, hanem egy nagyobb blokkot mutat belőle, míg a listánál muszáj egyik címről a másikra menni.
+		Bár elméletben gyorsabb egy láncolt listába beszúrni, de ez a gyakorlatban általában mégsem igaz. Azért, mert az egy dolog, hogy az elemeket egyesével odébb kell tolni egy vektorban, azonban mivel abban szekvenciálisan vannak a memóriacímek egymás mellett, és a processzor nem egyesével adja vissza az elemeit, hanem egy nagyobb blokkot mutat belőle, a vector sokkal gyorsabban végrehajtja ezeket a műveleteket, míg a listánál muszáj egyik címről a másikra haladni, ami sokkal költségesebb tud lenni.
 	\end{note}
+	\begin{note}
+		Amennyiben sok elemből álló listánk van, és azok nagy objektumokat tárolnak, hatékonyabb lehet a \texttt{vector}-nál.
+	\end{note}
+	Hogyan tudunk akkor a harmadik elemre ugrani?
+	\begin{lstlisting}
+#include <iostream>
+#include <list>
+
+int main()
+{
+	std::list<int> l;
+	for (int i = 0; i < 5; i++)
+	l.push_back(i);
+	std::list<int>::iterator it = l.begin();
+	++it; ++it;
+	std::cout << *it << std::endl; // 2
+}
+	\end{lstlisting}
+	Ennél kell hogy legyen kényelmesebb módszer is. Később, amikor az STL algoritmusokkal foglalkozunk, fogunk látni erre példát.
+	%TODO std::advance
 	
-	Ha mindenáron szeretnék 3 elemmel előrébb menni kevés gépeléssel, ez lehet megoldás:
+	\medskip
+	Ha böngészünk cppreference-en, feltűnhet, hogy az \texttt{std::vector}-ral szemben azonban létezik \texttt{push\_front} és \texttt{pop\_front} metódus: ezeket az \texttt{std::vector}-ral ellentétben konstans idő alatt el lehet végezni (elegendő a fejelemet a rákövetkező elemre állítani és kész is).
+	\medskip
+	
+	Link: \url{http://en.cppreference.com/w/cpp/container/list}
+	\subsection{map}
+	Az \texttt{std::map} a \texttt{<map>} könyvtárban található. Ez egy egyedi kulcs-érték párokat tároló konténer, mely minden kulcshoz egy értéket rendel. Működése nagyon hasonlít az \texttt{std::set}-ére, annyi különbséggel, hogy párokat tárol (így két kötelező template paramétere van), és mindig a kulcs szerint rendez.
+	\smallskip
+	
+	Van egy speciális beszúró függvénye is:
 \begin{lstlisting}
-std::list<int> l;
-std::list<int>::iterator i = l.begin();
-std::advance(i, 3);
-\end{lstlisting}
-	Persze, itt listánál egyesével kell előrelépni, de \texttt{std::vector}nál létezik hatékonyabb megoldás is, hogyha simán csak 3-al előrébb ugranánk. Erre majd később látunk egy megoldást.
-	\subsubsection{map}
-	A map egy kulcs-érték párokat tároló konténer, mely minden kulcshoz egy értéket rendel. Van egy speciális beszúró függvénye is:
-\begin{lstlisting}
-std::map<std::string, int> m;
-m["Hello"] = 42;
-m["xyz"] = 8;
-m["Hello"] = 9;
+#include <map>
+#include <iostream>
+
+int main()
+{
+	std::map<std::string, int> m;
+	m["Hello"] = 42;
+	m["xyz"] = 8;
+	m["Hello"] = 9;
+	std::cout << m.size() << std::endl; // 2
+	std::cout << m["Hello"] << std::endl; // 9
+}
 \end{lstlisting}
 	A \texttt{[]} operátor egy új kulcsot hoz létre, és ahhoz rendel egy új értéket. Az utolsó sornál mivel a \texttt{''Hello''}-t már tartalmazza a map, így annak az értékét felülírja.
 	
 	\medskip
-	\texttt{std::map}-ban az iterálás kicsit trükkösebb.
-\begin{lstlisting}
-for(std::map<std::string, int>::iterator i = m.begin(); i != m.end(); i++)
+	Sajnos ez az operátor azonban okozhat pár kellemetlen meglepetést is.
+	\begin{lstlisting}
+int main()
 {
-	std::cout << i->first << " " << i->second;
+	std::map<std::string, int> m;
+	std::cout << m.size() << std::endl; // 0
+	if(m["c++"] != 0)
+		std::cout << "nem 0" << std::endl;
+	std::cout << m.size() << std::endl; // 1
 }
-\end{lstlisting}
-	Ugyanis \texttt{std::map} párokat tárol, méghozzá egy más alapból megírt struktúrát használ, az \texttt{std::pair}-t, ami kb. így néz ki:
-\begin{lstlisting}
+	\end{lstlisting}
+	A \texttt{[]} operátor úgy működik, hogy ha a \texttt{map} nem tartalmazza a paraméterként kapott kulcsot, akkor létrehozza és beszúrja, ha benne van, visszaadja az értékét. Bár mi nem tettük bele azt hogy \texttt{c++} szándékosan, de pusztán azzal, hogy rákérdeztünk, akaratlanul is megtettük. (Figyeljük meg, hogy akkor tudnánk új elemet hozzátenni, ha azt írnánk pl. hogy \texttt{m["C++"] = 3}; azonban mi nem adtunk meg ehhez a kulcshoz értéket. Ilyenkor a map alapértelmezett értéket rendel a kulcshoz, szám típusoknál 0-t, így be fog szúrni egy \texttt{("c++", 0)} párt.)
+	\begin{lstlisting}
+bool contains(const std::map<std::string, int> &m)
+{
+	//m["c++"]; forditasi hiba: [] operator nem konstans fuggveny.
+	return m.find("C++") != m.end();
+}
+	\end{lstlisting}
+	Ez a függvény helyesen vizsgálja, hogy a \texttt{c++} benne van-e. (Ha cppreference-en rákeresünk, a \texttt{map}-nek a \texttt{find} nevű tagfüggvénye egy iterátort ad vissza a talált elemre, illetve visszaadja egy past-the-end iterátort ha nem találja meg.)
+	\medskip
+	
+	\texttt{std::map}-ban az iterálás kicsit trükkösebb, ugyanis \texttt{std::map} párokat tárol, méghozzá egy más alapból megírt struktúrát használ, az \texttt{std::pair}-t, ami kb. így néz ki:
+	\begin{lstlisting}
 template <typename T1, typename T2>
 struct pair
 {
 	T1 first;
 	T2 second;
-}
-\end{lstlisting}
-	\subsection{Algoritmusok}
-	\subsubsection{Iterátorok}
-	Az algoritmusok a iterátorokkal dolgoznak. Ahogy megállapítottuk az előző óra végén, nagyon könnyű egy új függvényt írnunk már meglévő konténerekhez, és egy új konténert is könny írni a meglevő függvényekhez. Jó példát adnak itt az STL konténerek, hisz az összeshez van írva iterátor.
-	
-	Ha mi szeretnénk új algoritmust írni, például így dolgozhatunk iterátorokkal:
-	\begin{lstlisting}
-for (std::set<int>::iterator i = s.begin(); i != s.end(); ++i)
-{
-	std::cout << *i;
-}
-	\end{lstlisting}
-	Azt, hogy az iterátor hogyan oldja meg az iterálást, nem szükséget tudnunk, elég annyi, hogy az első elemtől az utolsóig megy.
-	
-	\smallskip
-	Írjunk példaképp egy ilyen algoritmust:
-	\begin{lstlisting}
-bool tartalmaz(const std::set<int> &s, int x)
-{
-	for(std::set<int>::iterator i = s.begin(); i != s.end(); ++i)
-	{
-		if(*i == x)
-			return true;
-	}
-	return false;
-}
-	\end{lstlisting}
-	
-	Ez egy nagyon nem általános függvény, mert csak \texttt{std::set}-et fogadunk el, és csak akkor, ha ezek \texttt{int}éel vannak példányosítva. Csináljunk ebből egy egyel általánosabbat:
-\begin{lstlisting}
-template <typename T>
-bool tartalmaz(const std::set<T> &s, int x)
-{
-	for(std::set<T>::iterator i = s.begin(); i != s.end(); ++i)
-	{
-		if(*i == x)
-		return true;
-	}
-	return false;
-}
-\end{lstlisting}
-	Ez persze nem biztos hogy működni fog, ugyanis senki nem garantálja, hogy a \texttt{T} típusnak van van \texttt{==} operátora. (és ez a kód amúgy is még vérzik pár sebből)
-	
-	\medskip
-	Mellékesen, milyen jó lenne, ha nem csak \texttt{std::set}-re működne ez, hanem bármilyen itárorral rendelkező konténerre!
-\begin{lstlisting}
-template <typename It, typename T>
-It find(It &first, It &last, const T &a)
-{
-	while (first != last)
-	{
-		if (*first == a)
-			return first;
-		++first;
-	}
-	return last;
-}
-\end{lstlisting}
-	Figyeljük meg, hogy a visszatérési érték is megváltozott: keresünk egy \texttt{a} értékű elemű, és ha megtaláljuk, egy arra mutató iterátort adunk vissza. Ha nem találunk, akkor az utolsó utáni elemet adjuk vissza. Ez már egy egész jó kereső algoritmust.
-	
-	\medskip
-	Javítsuk ki a fenti függvényt, ahonnét hiányzik a \texttt{typename}.
-\begin{lstlisting}
-template <typename T>
-bool tartalmaz(const std::set<T> &s, int x)
-{
-	for(typename std::set<T>::iterator i = s.begin(); i != s.end(); ++i)
-	{
-		if(*i == x)
-		return true;
-	}
-	return false;
-}
-\end{lstlisting}
-	
-	\medskip
-	Kérdés, tudunk-e ilyet tenni?:
-\begin{lstlisting}
-std::set<int>>::iterator i = s.begin();
-*i = 42;
-\end{lstlisting}
-	Már a kérdésból is látszdik, hgoy ez nem lehetséges, hisz a \texttt{std::set} itetátora igazából egy konstans iterátort. EZ azért van, mely lévén egy bináris faként van áltlaában implementálva a \texttt{std::set}, a fa rendezett szerkezetét fel tudnánk rúgni.
-	
-	\smallskip
-	Mit tegyünk akkor, ha konstansot veszek át? A fenti példában is ez van, a set-et konstansként vettük át. Így, hasonlóan az általunk írt láncolt listához, egy konstans iterátorral kell végigmennünk.
-\begin{lstlisting}
-template <typename T>
-bool tartalmaz(const std::set<T> &s, int x)
-{
-	for(typename std::set<T>::const_iterator i = s.begin(); i != s.end(); ++i)
-	{
-		if(*i == x)
-		return true;
-	}
-	return false;
-}
-\end{lstlisting}
-	
-	\medskip
-	Közel az összes STL algoritmus iterátor párokat vár, legyenek pl. \texttt{first} és \texttt{last}. Ilyenkor az első elemtől az utolsóig megy, így: \texttt{[first, last)}. Azaz a \texttt{last} iterátorhoz már nem ér! (Erre könnyű is magyarázatot találni, miért: a mi általunk írt lista \texttt{end()} metódusa egy olyan iterátort ad vissza, mely gyakorlatilag egy nullpointer. Ha ezt megkapnánk dereferálni, nem definiált viselkedést kapnánk, így általában az end() nem az utolsó elemet, hanem az utolsó utáni elemet adja vissza)
-	
-	\subsubsection{find}
-	Értelemszerűen, nem kell megírni a find függvényt, hisz ez alapból benne van az STL-ben. Ehhez a függvényhez az \texttt{<algorithm>} könyvtár beillezstésével férhetünk hozzá. 
-	
-	\medskip
-	Azért se épp jó a mi algoritmusunk, mert példaképp a halmaz rendezett, így ott logaritmikus keresést is használhatnánk! Ezért szokás az ilyen speciális konténereknek egyedi find függvényt írni, ami az \texttt{std::set} esetében egy tagfüggvény. 
-\begin{lstlisting}
-set<int>::iterator i = s.find(42);
-if (i == s.end())
-	std::cout << "nincs" << std::endl;
-\end{lstlisting}
-	Azonban megállapítandó, hogy az \texttt{std::set} nem \texttt{==} operátorral ellenőrzi az ekvivalenciát, hanem a template paraméterként kapott rendezéssel! (ami alapértelemzetten a \texttt{<} operátortól függ).
-\begin{lstlisting}
-struct Kor
-{
-	int x, y, r;
 };
-bool operator<(const Kor &lhs, const Kor &rhs)
+	\end{lstlisting}
+	Így az az adott kulcs ill. érték lekérdezése így fog kinézni:
+	\begin{lstlisting}
+for(std::map<std::string, int>::iterator i = m.begin(); i != m.end(); i++)
 {
-	return lhs.r < lhs.r;
+	std::cout << i->first << " " << i->second;
 }
-bool operator==(const Kor &lhs, const Kor &rhs)
-{
-	return lhs.r == rhs.r && lhs.x == rhs.y && lhs.y == rhs.y;
-}
-\end{lstlisting}
-	Itt az a veszély, hogy ha az STL-es find-al szemben a sajátunkat használjuk, más lehet a végeredmény, hisz a \texttt{Kor}-t ők máshogy hasonlítják össze.
-	
+	\end{lstlisting}
+		
 \end{document}

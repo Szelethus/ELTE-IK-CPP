@@ -124,9 +124,8 @@ void swap(std::string &a, std::string &b)
 	\end{lstlisting}
 	Túlterhelésnek azt nevezzük, amikor két vagy több függvénynek a neve azonos, de a paramétereik különböznek. Tagfüggvényeknél különböző konstansság is számít.
 	\begin{lstlisting}
-class A
+struct A
 {
-public:
 	void print() 
 	{
 		std::cout << "Not const" << std::endl;
@@ -202,7 +201,7 @@ int main()
 #include <iostream>
 
 template <typename T>
-class X
+struct X
 {
 	void f()
 	{
@@ -210,7 +209,7 @@ class X
 		t.foo();
 	}
 };
-class Y
+struct Y
 {
 	void bar() {}
 };
@@ -224,7 +223,7 @@ int main()
 #include <iostream>
 
 template <typename T>
-class X
+struct X
 {
 	void f()
 	{
@@ -232,7 +231,7 @@ class X
 		t.foo();
 	}
 };
-class Y
+struct Y
 {
 	void bar() {}
 };
@@ -256,7 +255,7 @@ int main()
 
 \begin{lstlisting}
 template <typename T = void> //alapertelmezett parameter
-class X
+struct X
 {
 	void f()
 	{
@@ -264,7 +263,7 @@ class X
 		t.foo();
 	}
 };
-class Y
+struct Y
 {
 	void bar() {}
 };
@@ -278,7 +277,7 @@ int main()
 
 \begin{lstlisting}
 template <typename T>
-class X
+struct X
 {
 	void f()
 	{
@@ -288,7 +287,7 @@ class X
 };
 
 template <template <typename> class Templ>
-class Z
+struct Z
 {
 	Templ<int> t;
 };
@@ -317,7 +316,7 @@ int main()
 	
 	Így ha default konstruktort szeretnék meghívni, semmilyen zárójelt nem szabad használni.
 	\begin{note}
-		C++11ben lehet gömbölyű helyett \{\} zárójelet alkalmazni, melynél ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
+		C++11ben lehet gömbölyű helyett \{\} zárójelet alkalmazni konstruktorhívásnál, így ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
 	\end{note}
 	
 	A template-ek paramérének ismertnek kell lennie fordítási időben.
@@ -341,16 +340,14 @@ int main()
 	
 	\begin{lstlisting}
 template <class T>
-class A
+struct A
 {
-	public:
 	A()	{ std::cout << "general A" << std::endl; }
 };
 
 template <>
-class A<int>
+struct A<int>
 {
-	public:
 	A() { std::cout << "special A" << std::endl; }
 };
 
@@ -401,7 +398,7 @@ template <class T>
 class A
 {
 	static int count;
-	public:
+public:
 	A()
 	{
 		std::cout << ++count << ' ';
@@ -450,7 +447,7 @@ int main()
 template <class T>
 class A
 {
-	public:
+public:
 	class X {};
 };
 
@@ -499,5 +496,8 @@ void f()
 	A \texttt{typename} garantálja a fordítónak, hogy bármi is lesz \texttt{T}, \texttt{A<T>::X} mindenképpen típus lesz. Ha mégis olyan template paramétert adunk meg, aminél ez nem teljesülne (ez esetben \texttt{T = int}) akkor fordítási idejű hibát kapunk.
 	\begin{note}
 		A fordító általában szokott szólni, hogy a \texttt{typename} kulcsszó hiányzik.
+	\end{note}
+	\begin{note}
+		A dependent scope problémája nem csupán az osztályon belüli osztályokra érvényes. Nemsokára meglátjuk, hogy a \texttt{typedef} kulcsszó is ide tud vezetni.
 	\end{note}
 \end{document}
