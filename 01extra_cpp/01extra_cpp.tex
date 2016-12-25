@@ -1,0 +1,187 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{
+	language=C++, 
+	basicstyle=\ttfamily, 
+	keywordstyle=\color{blue}\ttfamily, 
+	stringstyle=\color{red}\ttfamily,
+	tabsize = 4
+}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks = true	
+}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Gyakorlat jegyzet}
+		
+		$+/-$ megoldások
+	\end{center}A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	\section{Második $+/-$ megoldás}
+	Paraméter dedukció az, amikor a fordító ki tudja találni a template paraméterét egy függvénynek (nagyon dióhéjban). Példa:
+	\begin{lstlisting}
+template <class T>
+void f(const T& param) {}
+
+int main()
+{
+	f<std::string>("Hello"); //nincs dedukcio
+	f("Hello"); //van dedukcio
+}
+	\end{lstlisting}
+	
+	A második feladat egy olyan template osztály létrehozása, amely heapen tárol egy objektumot, és reguláris típus. Mivel ez egy template osztály, nem tudjuk milyen típust kapunk, alapértelmezetten vegyük úgy, hogy a másolás költséges, így másolás helyett vegyünk át konstans referenciákat.
+	\begin{lstlisting}
+template <class T>
+class X
+{
+public:
+	X(const T& val) : data(new T(val)) {}
+	~X() {delete data;}
+	X(const X &other) : data(new T(*other.data)) {}
+	X &operator=(const X &other)
+	{
+		if (this == &other)
+			return *this;
+		delete data;
+		data = new T(*other.data);
+		return *this;
+	}
+private:
+	T *data;
+};
+
+int main()
+{
+	X<int> a;
+	X<int> y(a);
+	y = a;
+}
+	\end{lstlisting}
+	Bővebb magyarázathoz az 5-6. gyakorlat anyagát érdemes megnézni.
+	
+	\medskip
+	Vizsgán gyakran (DE NEM MINDIG!) nem kell megírni az értékadó operátort meg copy konstruktort, stb, mert gyakran olyan adattagokat kell tárolnunk, mint az \texttt{std::vector}. Mivel az alapértlemezett copy konstruktor és értékadó operátor az adattagok copy konstruktorát és értékadó operátorát hívja meg, így reguláris típusokat tárolunk, akkor a mi típusunk is reguláris lesz.
+	\section{Harmadik $+/-$ megoldás}
+	Helyes-e az elábbi kód?
+		
+	\begin{lstlisting}
+struct X
+{
+	virtual a();
+};
+
+struct Y : public X {/* ... */};
+
+int main()
+{
+	X *x = new Y;
+	delete x;
+}
+	\end{lstlisting}
+		
+	A válasz az hogy nem, mert itt egy \texttt{Y} típusú objektumot polimorfikusan használunk, és amikor egy \texttt{X} típusú objektummal hivatkozunk rá, törléskor felmerül a kérdés: Most a dinamikus vagy a statikus destruktor szerint töröljünk? Első esetben a fordító gondoskodna arról, hogy az öröklődési ágnak megfelelően lefussanak a destruktorok, azonban mivel ebben az esetben \texttt{X} destruktora \textbf{nem virtuális}, így a statikus destruktor hívódik meg. 
+	
+	Ez egy mondatban azt jeleni, hogy egy \texttt{Y} típusú objektumra \texttt{X} destrukora hívódik meg, ami nem definiált viselkedés.
+	\bigskip
+	
+	Soroljuk fel a standard szekvenciális konténereket! \texttt{std::vector, std::list, std::deque}
+	\bigskip
+	
+	 Írjunk egy funktort mely két string hosszát hasonlítja össze!
+	\begin{lstlisting}
+struct PlusMinusFunctor
+{
+	bool operator()(const std::string &lhs, const std::string &rhs) const
+	{
+		return lhs.size() < rhs.size();
+	}
+};
+		\end{lstlisting}
+\end{document}

@@ -346,8 +346,8 @@ namespace detail
 	A névterek segíthetnek abba, hogy logikai egységebre rendezzük a programunkat. Az egyik legnagyobb ilyen egység az \texttt{std} névtér, mely tartalmaz minden függvényt, változót, stb, ami a standard részét alkotja. 
 	
 	Lehet névtereket egymásba is ágyazni, erre lehet példa a c++11-es \texttt{chrono} könyvtár, mely az \texttt{std} névteren belül számos dolgot a \texttt{chrono} alnévtérben tárol.
-
-	\subsection{Typedef}
+	
+	\medskip
 	Már csak az a baj, hogy így a \texttt{List} nem tudja, mi az az \texttt{Iterator}, hisz az egy \texttt{datail} nevű namespace-ben van, ezért vagy minden \texttt{Iterator}-t lecserélünk \texttt{detail::Iterator}-ra, vagy pedig létrehozunk egy szinonimát, melyet a \texttt{typedef} kulcsszóval tehetünk meg.
 \begin{lstlisting}
 class List
@@ -359,7 +359,8 @@ public:
 };
 \end{lstlisting}
 	Ezzel a trükkel \texttt{List}-en belül (és csak ott!) elegendő lehet \texttt{Iterator}t írni. Ennek segítségével (mivel ezek a tpyedef-ek publikusak) így is lehet hivatkozni a \texttt{List} iterátorára: \texttt{List::Iterator}.
-	\subsection{Inline classok}
+	
+	\medskip
 	Erre másik megoldás lehet, hogyha inline class-t hozunk létre, azaz az iterátor teljes deklarációját beillesztjük a \texttt{List}-be.
 \begin{lstlisting}
 class List
@@ -376,7 +377,7 @@ public:
 	Már csak az a probléma, hogy ez az osztály csak \texttt{int}-ekre működik. Csináljunk belőle inkább egy template osztályt! Feladatunk csupán annyi, hogy az osztály elé írjunk egy \texttt{template <typename T>}-t, és minden \texttt{List}-et \texttt{List<T>}-re cseréljünk, és minden \texttt{int}-et \texttt{T}-re. Ehhez nyilván az iterátorainkat is módosítani kell.
 	
 	\medskip
-	Időközben felmerül a hatékonyság kérdése is. A listánkban eddig minden érték szerint vettünk át, ami \texttt{int}-nél (általában) hatékonyabb, mint a referencia szerinti, azonban template-eknél nem garantáljuk, hogy ilyen alap típussal fogják példányosítani az osztályunkat, és ilyenkor úgy szokás hozzáállni, hogy a leendő template paraméter egy nagyon nagy mérettel rendelkező típus lesz, melynél érték helyett konstans referenciával szokás átvenni minden paramétert hatékonyság végett. Sőt, még a \texttt{ConstIterator} dereferáló operátora is inkább konstans referenciát adjon vissza!
+	Időközben felmerül a hatékonyság kérdése is. A listánkban eddig mindent érték szerint vettünk át, ami \texttt{int}-nél (általában) hatékonyabb, mint a referencia szerinti, azonban template-eknél nem garantáljuk, hogy ilyen alap típussal fogják példányosítani az osztályunkat, és ilyenkor úgy szokás hozzáállni, hogy a leendő template paraméter egy nagyon nagy mérettel rendelkező típus lesz, melynél érték helyett konstans referenciával szokás átvenni minden paramétert hatékonyság végett. Sőt, még a \texttt{ConstIterator} dereferáló operátora is inkább konstans referenciát adjon vissza!
 	\begin{note}
 		Általában egy primitív típus, mint pl. az \texttt{int} vagy \texttt{char}, kisebb mérettel rendelkezik mint a hozzá tartozó pointer vagy referencia típus, így hatákonyabb ezeket a típusokat inkább érték szerint átvenni.
 	\end{note}
@@ -580,7 +581,7 @@ int main()
 	Linkelési hibát kaptunk, de miért? A list.hpp-ben benne van mindenféle deklaráció, és a list.cpp-ben meg több \texttt{List}-béli implementáció. Amikor a list.cpp-t fordítjuk, létrejön az object fájl, a mainben szintén. Azonban minden implementált függvény template: a háttérben a list.cpp-ben semmit sem példányosítunk, így az szinte teljesen üres fordítás után. A main.cpp-ben így hiába megy az object fájl kreálása, lévén nem kell ismerni ahhoz a függvények definícióit, azonban a linkelésnél már meg kéne tudnunk találni azokat. Így a template osztályokat/függvényeket a header fájlokban kell tárolni.
 	
 	Itt megoldás lehet, hogyha az egész cpp-t beemeljük a list.hpp-be (itt mát azonban muszáj lesz az \texttt{iosfwd}-t \texttt{iostream}-re váltani). Az átláthatóság azonban nem lett áldozat, mert a fájl tetején van a deklaráció, és szétszedve van benne definíció.
-	
+	\section{Iterátor típusok}
 	No, próbáljuk meg alkalmazni a listánkat! Példaképp eresszük rá az alapból megírt algoritmusok egyikét:
 \begin{lstlisting}
 #include <algorithm>

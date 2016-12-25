@@ -107,43 +107,7 @@
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor  előadásán. (\today)
 	\medskip
 	
-	\section{$+/-$ megoldás}
-	\begin{enumerate}
-		\item  Helyes-e az elábbi kód?
-		
-		\begin{lstlisting}
-struct X
-{
-	virtual a();
-};
-
-struct Y : public X {/* ... */};
-
-int main()
-{
-	X *x = new Y;
-	delete x;
-}
-		\end{lstlisting}
-		
-		A válasz az hogy nem, mert itt egy \texttt{Y} típusú objektumot polimorfikusan használunk, és amikor egy \texttt{X} típusú objektummal hivatkozunk rá, törléskor felmerül a kérdés: Most a dinamikus vagy a statikus destruktor szerint töröljünk? Első esetben a fordító gondoskodna arról, hogy az öröklődési ágnak megfelelően lefussanak a destruktorok, azonban mivel ebben az esetben \texttt{X} destruktora \textbf{nem virtuális}, így a statikus destruktor hívódik meg. 
-		
-		Ez egy mondatban azt jeleni, hogy egy \texttt{Y} típusú objektumra \texttt{X} destrukora hívódik meg, ami nem definiált viselkedés.
-		
-		\item Soroljuk fel a standard szekvenciális konténereket!
-		
-		\texttt{std::vector, std::list, std::deque}
-		\item Írjunk egy funktort mely két string hosszát hasonlítja össze!
-		\begin{lstlisting}
-struct PlusMinusFunctor
-{
-	bool operator()(const std::string &lhs, const std::string &rhs) const
-	{
-		return lhs.size() < rhs.size();
-	}
-};
-		\end{lstlisting}
-	\end{enumerate}
+	
 	%TODO 023 beugro pdf
 	%TODO magyarázatok
 	\section{Beugró kérdések}

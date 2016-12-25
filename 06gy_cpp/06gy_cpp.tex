@@ -441,6 +441,7 @@ private:
 
 class List {//...};
 \end{lstlisting}
+%TODO operator++ miért nem referenciával tér vissza?
 	És itt az előbb említett problémába bele is ütköztünk: a fordító siránkozik, hogy a \texttt{List} egy un. \textit{incomplete type}. Ugyanis az tudja hogy van osztály hogy \texttt{List}, de az, hogy \texttt{next} adattag, nem tudja micsoda. Ezért ezeket a tagfüggvényeket a lista után kell írni.
 \begin{lstlisting}
 class List;

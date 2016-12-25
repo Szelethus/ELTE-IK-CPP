@@ -105,27 +105,116 @@
 	\section{STL}
 
 	Az \textit{STL} a \textit{Standard Template Library} rövidítése.
+	\subsection{Funktorok}
+	Mielőtt belevetnénk magunkat az STL-ben lévő algoritmusokba és konténerekbe, fontos megismerkednünk a funktorokkal, melyek a rendezéseknél lesznek majd használatosak.
+	\medskip
+	
+	A funktor egy olyan osztály, melynek túl van terhelve a gömbölyű zárójel operátora (tehát kvázi meg lehet hívni).
+	
+	\smallskip
+	Egy egyszerű példa:
+	\begin{lstlisting}
+struct S
+{
+	int x;
+	int operator()(int y)
+	{
+		return x + y;
+	}
+};
+int main()
+{
+	S s1, s2;
+	s1.x = 5;
+	s2.x = 8;
+	std::cout << s1(2) << std::endl; //7
+	std::cout << s2(2) << std::endl; //10
+}
+	\end{lstlisting}
+	Itt gyakorlatilag az objektum függvényként funkcionál. A funktorok azért fontosak, mert megadhatók template paraméterként, és így tudjuk elérni, hogy rendezéshez lehessen őket használni.
+	\begin{note}
+	Miért használunk funktorokat mondjuk függvénypointerek helyett? Világos, hogyha egyedi rendezést akarunk, akkor muszáj ezt az információt valahogy átadni. A funktorok erre alkalmasabbak, példaképp vegyük ehhez egy olyan template függvényt, melynek egyik template paramétere egy olyan funktort vár, melynek \texttt{()} operátora egy paramétert vár és \texttt{bool}-al tér vissza, és feladata az erre igazat adó elem megkeresése. Hogyan tudnánk mi funktorok helyett függvénypointerrel a második páros számot megkeresni vele? Vagy az ötödik 8-al oszthatót? Nos, függvényekkel igencsak nehezen (kb statikus adattagokra kényszerülnénk, vagy egy hasonlóan nem épp elegáns megoldásra), azonban egy funktorban létrehozhatunk egy számlálót, melyet tudunk szépen növelgetni.
+	\end{note}
+	
+	Segíthet a megértésben, ha tekintjük az alábbi példát:
+	\begin{lstlisting}
+template <class Compr>
+bool f(int a, int b, Compr c)
+{
+	return c(a, b);
+}
+
+struct Less
+{
+	bool operator()(int a, int b) const
+	{
+		return a < b;
+	}
+};
+
+int main()
+{
+	if( f(2,3, Less()) )
+		std::cout << "2 kisebb mint 3! ";
+	
+	int a = 2, b = 2;
+	if ( f(a, b, Less()) == false && f(b, a, Less()) == false )
+		std::cout << "a es b egyenloek!" << std::endl;
+}
+	\end{lstlisting}
+	Kimenet: \texttt{2 kisebb mint 3! a es b egyenloek!}
+	
+	Ez a funktor (\texttt{Less}) egy un. \textit{binary predicate}, azaz a gömbölyű zárójel operátora két azonos típusú objektumhoz rendel egy logikai értéket. Figyeljük meg, hogyan adtuk meg a harmadik paramétert: \texttt{Less}-nek meghívtuk a default konstruktorát, de nem adtunk neki változónevet. Itt egy un. névtelen temporális változó jön létre, mely \texttt{f} paramétereinek kiértékelésekor jön létre, majd az \texttt{f} lefutása után meg is semmisül. Figyeljük meg azt is, hogy ebben az esetben érték szerint vettünk át: ez nem csak hatékonyabb, hisz \texttt{Less} mérete minimális (nincs adattagja), de mivel \texttt{Less()} egy jobbérték, csak így, vagy konstans referenciával tudnánk átvenni.
+	\smallskip
+	
+	Jusson eszünkbe, mikor ekvivalens két elem! \quad $a = b \quad \Leftrightarrow \quad \neg(a<b)\, \wedge\, \neg(b<a)$.
 
 	\subsection{Konténerek}
-	Alapértelmezett tároló egy tömb. Azonban ez meglehetősen kényelmetlen lehet: mivel ezek egymás mellett lévő memóriacímek, nem tudjuk csak úgy bővíteni őket. Egy tömb mérete nem változhat, sőt, stack-en létrehozva még a méretüket is ismerni kell fordítási időben. Ezért jobban járunk, ha egyedi konténereket írunk:
-	\subsubsection{vector}
-	A \texttt{<vector>} könyvtárban található, a \texttt{std::vector} egy template konténer. Csakúgy mint minden STL konténer, a \texttt{std::vector} az \texttt{std} névtér tagja. Bár a pontos definíciója értelemszerűen implementációfüggő, de vannak olyan tulajdonságok, melyeket elvár a szabvány, pl. az hogy rendelkezzen egy \texttt{push\_back} művelettel.
-	\smallskip
+	C++ban az egyetlen tároló alapértelmezetten a tömb. Azonban az meglehetősen kényelmetlen: a tömb egymás mellett lévő memóriacímek összessége, nem tehetjük meg azt, hogy csak úgy hozzáveszünk 1-1 elemet (mi van ha valaki más már írt oda?). Ezért jobban járunk, ha írunk egy egyedi kontért (pl. az általunk létrehozott \texttt{List}), vagy pedig válogatunk az előre megírt STL konténerek között.
 	
-	A probléma ott merülhet fel, hogy a \texttt{vector} implementációja leggyakrabban egy tömbben tárol: viszont egy tömb mérete nem növelhető, így ha túl sok elemet akarunk beletenni, a \texttt{vector} lefoglal egy nagyobb memóriaterületet (leggyakrabban kétszer akkorát). Így a \texttt{push\_back}-nek a műveletigénye amortizált konstans: Általában konstans, de ha új memóriaterületet kell lefoglalni és a meglevő elemet átmásolni, akkor lineáris.
-	
-	\smallskip
-	Még szabvány által elvárt tagfüggvények:
+	Három konténertípust különböztetünk meg:
 	\begin{itemize}
-		\item \texttt{size()} - visszaadja a felahsználó által trolt elemek számáét a \texttt{vectorban}
-		\item \texttt{capacity()} - visszaadja, hogy mennyi elemet tárolhat legfeljebb átmásolás előtt.
+		\item Szekvenciális: Olyan sorrendben tárolja az adattagokat, ahogyan betesszük őket. \\Példa: \texttt{std::vector}, \texttt{std::deque,} \texttt{std::list.}
+		\item Asszociatív: Az elemek rendezettek a konténerben.\\ Példa: \texttt{std::set}, \texttt{std::map}, \texttt{std::multiset}, \texttt{std::multimap}.
+		\item Konténer adapter: Egy meglévő konténert alakítanak át, általában szogorítanak. Példaképp ha vesszük az \texttt{std::deque} konténert, ami egy kétvégű sor, könnyen tudunk belőle egy egyvégű sort csinálni. Ezen a konténerek általában egy másik konténert tárolnak, és annak a funkcióit szigorítják.
+		\\Példa: \texttt{std::queue}, \texttt{std::stack}.
 	\end{itemize}
+	
+	\subsubsection{vector}
+	A \texttt{<vector>} könyvtárban található, maga a konténer az \texttt{std::vector} névre hallgat. Bár a pontos definíciója értelemszerűen implementációfüggő, vannak olyan tulajdonságok, melyeket elvár a szabvány.
+	\smallskip
+	
+	A \texttt{vector} leggyakrabban dinamikusan lefoglalt tömbben tárolja az adatainkat, viszont a tömb mérete nem növelhető, így ha túl sok elemet akarunk beletenni, a \texttt{vector} lefoglal egy nagyobb memóriaterületet (leggyakrabban kétszer akkorát). Így a \texttt{push\_back}-nek a műveletigénye amortizált konstans: Általában konstans, de ha új memóriaterületet kell lefoglalni és a meglevő elemet átmásolni, akkor lineáris.
+	
+	\begin{note}
+		Számos okból a \texttt{vector} a leggyakoribb választás, ha konténerre van szükségünk. Flexibilitása és gyorsasága kiemelkedő, azonban megvannak a maga gyenge pontjai.
+	\end{note}
+	
 	Gyakorlatilag teljesen lehetetlen minden tagfüggvényt megjegyezni, és nem is érdemes. Bátran forduljunk ide: \url{http://en.cppreference.com/w/cpp/container/vector}.
 	\subsubsection{set}
 	\url{http://en.cppreference.com/w/cpp/container/set}
+%	Példaképp vegyük az előző órán beszélt \texttt{std::set}-et: ennek két template paramétere van, az egyik a tárolandó típus, a másik pedig a rendezés (van még egyéb is, de ezzel most ne foglalkozzunk). Képzeljük el mondjuk így:
+	
+%	\begin{lstlisting}
+%	namespace std
+%	{
+%	template <class Value, class Compr = std::less<Value> >
+%	class set
+%	{
+%	//...
+%	
+%	//ossze kell hasonlitani ket elemet: v1 es v2.
+%	Compr c;
+%	if ( c(v1, v2) )
+%	
+%	//...
+%	};
+%	}
+%	\end{lstlisting}
+%	Figyeljük meg, hogy az \texttt{std::set}-nek van alapértelmezett rendezése is, ez az \texttt{std::less} (ld.: cppreference.com). A \texttt{set} egy olyan funktort fog várni, melyek a gömbölyű zárójel operátora két \texttt{Value} típusú objektumot vár paraméterként, és a visszatérési értéke \texttt{bool.}
 	
 	\smallskip
-	Az \texttt{std::set}-nek nem \texttt{push\_back}, hanem \texttt{insert} függvénye van elem betevésére. Ez a konténer a matematikai halmazra hasonlít, ás általában egy kiegyensúlyozott bináris faként van implementálva, a hatékonyság végett.
+	Az \texttt{std::set}-nek nem \texttt{push\_back}, hanem \texttt{insert} függvénye van elem betevésére. Ez a konténer a matematikai halmazra hasonlít, és általában egy kiegyensúlyozott bináris faként van implementálva, a hatékonyság végett.
 	\begin{note}
 		A szabvány elvárja, hogy az \texttt{insert} műveletigénye logaritmikus legyen.
 	\end{note}
