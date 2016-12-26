@@ -103,6 +103,33 @@
 		
 		$+/-$ megoldások
 	\end{center}A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	\section{Első $+/-$ megoldás}
+	Írjunk egy programot, mely a vezetéknevünk első magánhangzóját kicseréli az utolsó mássalhangzóra, \texttt{[]} operátor használata nélkül!
+	\begin{lstlisting}
+char *p = "Husi";
+tmp = *(p + 1);
+*(p + 1) = *(p + 2);
+*(p + 2) = tmp;
+	\end{lstlisting}
+	Le fog-e fordulni az alábbi kód?
+	\begin{lstlisting}
+int a;
+const int *p = &a;
+	\end{lstlisting}
+	Igen, le fog, mert konstans pointerrel mutathatunk nem konstans változóra, ez nem sérti a konstans korrentséget.
+	
+	\medskip
+	Mi az a szekvenciapont? Olyan nyelvi egységek, melyek előtt futási időben minden kifejezésnek ki kell értékelődnia (pl. pontosvessző).
+	
+	\medskip
+	Mi lesz az alábbi kód kimenete?
+	\begin{lstlisting}
+int t[][2] = {{2,3}, {4,5}, {9, 0}};
+std::cout << *(0 + *(t + 1));
+std::cout << 2[*(t + 3)];
+std::cout << *(2 + 1[t]);
+	\end{lstlisting}
+	Rendre 4, nem definiált (túlindexelünk), és 9.
 	\section{Második $+/-$ megoldás}
 	Paraméter dedukció az, amikor a fordító ki tudja találni a template paraméterét egy függvénynek (nagyon dióhéjban). Példa:
 	\begin{lstlisting}
