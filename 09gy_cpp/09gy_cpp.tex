@@ -422,7 +422,7 @@ int main()
 	std::cout << s.size() << std::endl; // 3
 }
 \end{lstlisting}
-	Most értelemszerűen azt várnánk, hogy a méret 4 legyen, de mégis 3at ír ki, mert az \texttt{insert} függvény nem teszi be az \texttt{GOD}-ot, lévén az a rendezés szerint az a \texttt{C++}al ekvivalens.
+	Most értelemszerűen azt várnánk, hogy a méret 4 legyen, de mégis 3at ír ki, mert az \texttt{insert} függvény nem teszi be a \texttt{GOD}-ot, lévén az a rendezés szerint a \texttt{C++}al ekvivalens.
 \begin{lstlisting}
 struct strlenWrong
 {
@@ -484,9 +484,8 @@ int main()
 	++it; ++it;
 	std::cout << *it << std::endl; // 2
 }
-	\end{lstlisting}
-	Ennél kell hogy legyen kényelmesebb módszer is. Később, amikor az STL algoritmusokkal foglalkozunk, fogunk látni erre példát.
-	%TODO std::advance
+	\end{lstlisting}	
+	Az iterátorok léptetésére kell hogy legyen egy egyszerűbb módszer. A fenti \texttt{std::vector}-ral tudnunk kéne ugorni azonnal a kívánt elemre, míg a listánál végig kell menni egyesével az elemeken: jó lenne egy olyan algoritmust találni, mely e kettőt egybefoglalja (erre később látunk is majd példát az STL algoritmusoknál).
 	
 	\medskip
 	Ha böngészünk cppreference-en, feltűnhet, hogy az \texttt{std::vector}-ral szemben azonban létezik \texttt{push\_front} és \texttt{pop\_front} metódus: ezeket az \texttt{std::vector}-ral ellentétben konstans idő alatt el lehet végezni (elegendő a fejelemet a rákövetkező elemre állítani és kész is).
@@ -553,5 +552,9 @@ for(std::map<std::string, int>::iterator i = m.begin(); i != m.end(); i++)
 	std::cout << i->first << " " << i->second;
 }
 	\end{lstlisting}
-		
+	
+	Link: \url{http://en.cppreference.com/w/cpp/container/map}
+	\begin{note}
+		Az \texttt{std::multimap} ehhez szintén hasonló, így gyakorlásként ezt ismét az olvasóra bíznám.
+	\end{note}
 \end{document}

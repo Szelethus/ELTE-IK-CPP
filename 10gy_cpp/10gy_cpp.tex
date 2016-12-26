@@ -120,7 +120,7 @@
 	\begin{center}
 		\begin{tabular}{|l|l|}
 			\hline
-			STL konténer&Iterator típus\\
+			STL konténer&Iteratorának típusa\\
 			\hline
 			\hline
 			\texttt{std::vector} & \multirow{2}{*}{\texttt{random access iterator}}\\
@@ -138,8 +138,12 @@
 	\medskip
 	
 	Egy iterátornak úgy tudjuk a legegyszerűbben megadni a típusát, ha származunk az \texttt{std::iterator} típusból.
+	\begin{note}
+		Az öröklődés később lesz alaposabban boncolgatva, egyenlőre mondjuk azt, hogy az öröklődés követekztében mindent átpakolunk az \texttt{std::iterator} osztályból a mi iterátorunkba.
+	\end{note}
 	
 	Link: \url{http://en.cppreference.com/w/cpp/iterator/iterator}
+	\smallskip
 	
 	Látható hogy ennek osztálynak két kötelező template paramétere van, egy iterátor típus tag, és dereferáló operátor visszatérési értéke.
 	
@@ -156,6 +160,10 @@ class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
 	//..
 };
 	\end{lstlisting}
+	A cppreference-en megfigyelhető, hogy az \texttt{std::iterator} több typedef-et tartalmaz, mely jelöli hogy az iterátorunk milyen kategóriában van, milyen típussal tér vissza a dereferáló operátor, stb.
+	\begin{note}
+		Ennek alaposabb megértését az olvasóra bízom.
+	\end{note}
 	Így már fogjuk tudnuk majd használni az \texttt{STL} algoritmusokat is a konténereinken. 
 	%TODO
 %	\begin{note}
@@ -166,16 +174,17 @@ class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
 	
 	\section{STL algoritmusok}
 	\subsection{Bevezető az algortmusokhoz}
-	Az STL algoritmusok az \texttt{<algorithm>} könyvtárban találhatóak, és számos jól ismert és fontos függvényt foglalnak magukba, mint pl. adott tulajdonságű elem keresése, partícionálás, szimmetrikus differencia meghatározása, stb.
+	Az STL algoritmusok az \texttt{<algorithm>} könyvtárban találhatóak, és számos jól ismert és fontos függvényt foglalnak magukba, mint pl. adott tulajdonságú elem keresése, partícionálás, szimmetrikus differencia meghatározása, stb.
 	\medskip
 	
-	Az STL algoritmusok alap gondolatmenetét jól demonstrálja az alábbi példa (most még tekintsünk el az iterátor típusoktól): Írjunk egy függvény mely a második adott értékű elemet adja vissza!
+	Az STL algoritmusok alap gondolatmenetét jól demonstrálja az alábbi példa : Írjunk egy függvény mely egy \texttt{std::vector<int>} konténernek a második adott értékű elemére hivatkozó iterátort ad vissza!
 	\begin{lstlisting}
 #include <vector>
 #include <iostream>
 
-template <class It, class Val>
-It findSecond(It begin, It end, const Val &v)
+typedef std::vector<int>::const_iterator VectIt;
+
+VectIt findSecond(VectIt begin, VectIt end, const Val &v)
 {
 	while(begin != end && *begin != v)
 	{
@@ -202,184 +211,304 @@ int main()
 		std::cout << *it << std::endl; // 5
 }
 	\end{lstlisting}
+	Amennyiben \texttt{findSecond} nem talál két \texttt{v}-vel ekvivalens elemet, egy past-the-end iterátort ad vissza.
+	\begin{note}
+		Lévén a konténert nem módosítjuk, bátran dolgozhatunk a nagyobb biztonságot nyújtó \texttt{const\_iterator}-ral.
+	\end{note}
+	Azonban könnyű látni, hogy egyáltalán nem fontos információ az algoritmus szempontjából, hogy a \texttt{vector} \texttt{int}-eket tárol.
+	\begin{lstlisting}
+template<class T>
+typename std::vector<T>::const_iterator 
+	findSecond(typename std::vector<T>::const_iterator begin, 
+			   typename std::vector<T>::const_iterator end, 
+			   const T &v)
+{
+	while(begin != end && *begin != v)
+	{
+		++begin;
+	}
+	if (begin == end)
+		return end;
+	++begin;
+	while(begin != end && *begin != v)
+	{
+		++begin;
+	}
+	return begin;
+}
+	\end{lstlisting}
+	Sajnos sikerült elég kilométer függvénydeklarációt sikerült írnunk, de a célt elértük.
 	
-	Az algoritmusok iterátorokkal dolgoznak, azonban az, hogy minek az iterátorát használják, egyáltalán nem fontos tudniuk: elegendő annyi, hogy rendelkeznek azokkal az operátorokkal, melyeket fent felsoroltunk. Így például a mi listánk iterátorát ugyanúgy megadhatnánk a fenti függvények, mint egy \texttt{std::vector<int>}-ét.
+	\smallskip
+	Megállapítható, hogy itt még azt se kell tudnunk, minek az iterátorával dolgozunk, elegendő annyit tudnunk, hogy a \texttt{++} iterátorral lehet léptetni, és össze tudjuk hasonlítani őket az \texttt{!=} operátorral, azaz teljesítik egy input iterator feltételeit. Első körben vegyük az összehasonlítandó elem típusát külön template paraméterként.
+	\begin{lstlisting}
+template <class InputIt, class Val>
+InputIt findSecond(InputIt begin, InputIt end, const Val &v)
+{
+	//...
+}
+	\end{lstlisting}
+	Ezzel lényegében készen vagyunk, azonban egy apró módosítással elérhetjük hogy véletlenül se adjunk át olyan elemet harmadik paraméterként, mellyel a dereferált iterátor nem hasonlítható össze.
+	\begin{note}
+		Ez leginkább az \texttt{std::iterator}-ból való öröklés alkalmazását próbálja demonstrálni.
+	\end{note}
+	\begin{lstlisting}
+template <class InputIt>
+InputIt findSecond(InputIt begin, InputIt end, 
+				   const typename InputIt::value_type &v)
+{
+	//...
+}
+	\end{lstlisting}
 	
-	%TODO brunner tibis rész
+	Az STL algoritmusok iterátorokkal dolgoznak, azonban az, hogy minek az iterátorát használják, egyáltalán nem fontos tudniuk: elegendő annyi, hogy rendelkeznek azokkal az operátorokkal, melyeket fent felsoroltunk. Így például a mi listánk iterátorát ugyanúgy megadhatnánk a fenti függvények, mint egy \texttt{std::vector<int>}-ét.
 	
 	\medskip
-	Azonban hogyan lehet megállapítani az iterator típusát? Emlékezzünk vissz arra, hogy a \texttt{List}-ét hogyan jelöltük meg: az öröklődés következtében az osztályunk kapott pár typedef-et, melyek közül az egyik az \texttt{iterator\_category}.
+	A korábban elhangzottak alapján implementáljunk egy függvényt, mely egy iterátort léptet előre: Amennyiben a paraméterként kapott iterátor kategóriája bidirectional iterator, egyesével lépegessünk a kívánt helyre, random access iterator esetén egyből ugorjunk oda.
 	\begin{lstlisting}
 template<typename BDIT> 
-void algorithm(BDIT, BDIT, std::bidirectional_iterator_tag) 
+BDIT algorithm(BDIT it, int pos, std::bidirectional_iterator_tag) 
 {
-	std::cout << "Slow" << std::endl;
+	for(int i = 0; i<pos; i++)
+	++it;
+	std::cout << "Slow" << ' ';
+	return it;
 }
 
 template<typename RAIT>
-void algorithm(RAIT, RAIT, std::random_access_iterator_tag) 
+RAIT algorithm(RAIT it, int pos, std::random_access_iterator_tag) 
 {
-	std::cout << "Fast" << std::endl;
+	std::cout << "Fast" << ' ';
+	return it + pos;
 }
 
 template<typename IT> 
-void algorithm(IT begin, IT end) 
+IT advance(IT it, int pos) 
 {
-	typedef typename std::iterator_traits<IT>::iterator_category cat;
-	algorithm(begin, end, cat());
+	typedef typename IT::iterator_category cat;
+	return algorithm(it, pos, cat());
 }
+
 int main() 
 {
 	std::vector<int> v;
 	std::list<int> l;
-	algorithm(v.begin(), v.end()); // Fast
-	algorithm(l.begin(), l.end()); //Slow
+	for (int i = 0; i<10; i++)
+	{
+		v.push_back(i);
+		l.push_front(i);
+	}
+	std::cout << *advance(v.begin(), 3) << std::endl; // Fast 3
+	std::cout << *advance(l.begin(), 3) << std::endl; // Slow 6
 }  
 	\end{lstlisting}
-	Mit tegyünk akCircle, ha konstansot veszek át? A fenti példában is ez van, a set-et konstansként vettük át. Így, hasonlóan az általunk írt láncolt listához, egy konstans iterátorral kell végigmennünk.
-\begin{lstlisting}
-template <typename T>
-bool contains(const std::set<T> &s, int x)
+	\medskip
+	\begin{note}
+		Az \texttt{std::vector} és \texttt{std::list}-nél felmerült iterátor lépegetésre találtunk megoldást: a fentihez hasonló működésű \texttt{std::advance} alkalmazható e célra.
+	\end{note}
+	Így tudjuk elérni azt, hogy különböző iterátor típusokra különböző algoritmust használjunk (bár nyilván ez jóval hatékonyabban van megoldva a standard könyvtárban).
+	\medskip
+	
+	Ezek ismerétében vágjunk bele az STL algoritmusokba!
+	\begin{note}
+		Cppreference-en megfigyelhető, hogy irtózatosan sok algoritmus van -- csak úgy mint a konténereknél, a fontosabb algoritmusokról lesz szó, míg a többivel való ismerkedés gyakorlás végett az olvasóra bízom.
+	\end{note}
+	\subsection{find}
+	Az \texttt{std::find} segítségével az első adott értékű elemre hivatkozó iterátort kaphatunk. Keressük meg a 4-el ekvivalens elemet!
+	\begin{lstlisting}
+int main()
 {
-	for(typename std::set<T>::const_iterator i = s.begin(); i != s.end(); ++i)
-	{
-		if(*i == x)
-		return true;
-	}
-	return false;
+	std::set<int> s;
+	for(int i = 0; i<10; i++)
+		s.insert(i);
+	std::set<int>::iterator result = std::find(s.begin(), s.end(), 4);
+	if (result != s.end())
+		std::cout << *result << std::endl; // 4
+	else
+		std::cout << "4 nem eleme" << std::endl;
 }
-\end{lstlisting}
-	
-	\medskip
-	Közel az összes STL algoritmus iterátor párokat vár, legyenek pl. \texttt{first} és \texttt{last}. IlyenCircle az első elemtől az utolsóig megy, így: \texttt{[first, last)}. Azaz a \texttt{last} iterátorhoz már nem ér! (Erre könnyű is magyarázatot találni, miért: a mi általunk írt lista \texttt{end()} metódusa egy olyan iterátort ad vissza, mely gyaCirclelatilag egy nullpointer. Ha ezt megkapnánk dereferálni, nem definiált viselkedést kapnánk, így általában az end() nem az utolsó elemet, hanem az utolsó utáni elemet adja vissza)
-	
-	\subsubsection{find}
-	Értelemszerűen, nem kell megírni a find függvényt, hisz ez alapból benne van az STL-ben. Ehhez a függvényhez az \texttt{<algorithm>} könyvtár beillezstésével férhetünk hozzá. 
-	
-	\medskip
-	Azért se épp jó a mi algoritmusunk, mert példaképp a halmaz rendezett, így ott logaritmikus keresést is használhatnánk! Ezért szokás az ilyen speciális konténereknek egyedi find függvényt írni, ami az \texttt{std::set} esetében egy tagfüggvény. 
-\begin{lstlisting}
-set<int>::iterator i = s.find(42);
-if (i == s.end())
-	std::cout << "nincs" << std::endl;
-\end{lstlisting}
-	Azonban megállapítandó, hogy az \texttt{std::set} nem \texttt{==} operátorral ellenőrzi az ekvivalenciát, hanem a template paraméterként kapott rendezéssel! (ami alapértelemzetten a \texttt{<} operátortól függ).
+	\end{lstlisting}
+	\begin{note}
+		Lévén az \texttt{std::set} egy bináris fa, így várhatóan a keresést logaritmikus idő alatt is meg tudjuk tenni: ezért szokás az ilyen speciális konténereknek egyedi find függvényt írni, ami az \texttt{std::set} esetében egy tagfüggvény. 
+	\end{note}
+	\begin{lstlisting}
+std::set<int>::iterator it = s.find(42);
+if (i != s.end())
+	//...
+	\end{lstlisting}
+	Azonban megállapítandó, hogy míg az \texttt{std::find} az \texttt{==} operátorral végzi az összehasonlítást, addig az \texttt{std::set} a template paraméterként kapott rendezéssel! (ami alapértelemzetten a \texttt{<} operátortól függ.)
 \begin{lstlisting}
 struct Circle
 {
 	int x, y, r;
+	Circle(int _x, int _y, int _r) : x(_x), y(_y), r(_r) {}
 };
+
 bool operator<(const Circle &lhs, const Circle &rhs)
 {
 	return lhs.r < lhs.r;
 }
+
 bool operator==(const Circle &lhs, const Circle &rhs)
 {
 	return lhs.r == rhs.r && lhs.x == rhs.y && lhs.y == rhs.y;
 }
+
+int main()
+{
+	std::set<Circle> s;
+	for(int i = 0; i<10; i++)
+		s.insert(Circle(i, i + 1, i + 4));
+	for(int i = 0; i<10; i++)
+		s.insert(Circle(i, i + 1, i + 2));
+	
+	std::set<Circle>::iterator it1 = s.find(Circle(2, 3, 4));
+	std::set<Circle>::iterator it2 = std::find(s.begin(), s.end(), Circle(2, 3, 4));
+	
+	std::cout << it1->x << ' ' << it1->y << ' ' << it1->r << std::endl; // 0 1 4
+	std::cout << it2->x << ' ' << it2->y << ' ' << it2->r << std::endl; // 1 9 10
+}
 \end{lstlisting}
-	Itt az a veszély, hogy ha az STL-es find-al szemben a sajátunkat használjuk, más lehet a végeredmény, hisz a \texttt{Circle}-t ők máshogy hasonlítják össze.
+	Ezzel semmi komolyabb gond nincs, de nem szabad meglepődni, amikor az ember ettől függően más megoldást kap mint amire számít.
 	%TODO xazaxos rész
-	\subsection{STL felépítése}
-	Látogassunk el a \url{http://en.cppreference.com/w/} oldalra, és picikét barátkozzunk vele. Itt láthatjuk az összes STL konténert, de sok fontos információhoz is hozzájuthatunk, pl. az \texttt{std::string}-el kapcsolatban is: példaképp az \texttt{std::string} csak egy typename!
-	
-	Mivel teljesen irreális minden STL algoritmusról részletesen beszélni, így ajánlatos ezeket is nézni: \url{http://en.cppreference.com/w/cpp/algorithm}.
-	
-	Érdemes megbarátkozni az STL-el: lévén vizsgán lehet használni mindent ami a standard könyvtárban benne van, könnyen megspórolhatjuk a gondolkodást a megfelelő STL algoritmus hívásával.
-	
-	\medskip
-	Rendezzük egy \texttt{vector} elemeit!
+	\subsection{sort és stable\_sort}
+	A következő példában próbáljuk rendezni egy \texttt{vector} elemeit!
 	\begin{lstlisting}
 std::vector<int> v {6,3,7,4,1,3};
 std::set<int> s {6,3,7,4,1,3};
 std::set<int> s1(v.begin(), v.end());
 v.assign(s1.begin(), s1.end());
-for(int i : v)
+for(std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
 {
-	std::cout << i << ' '; // 1 3 4 6 7 
+	std::cout << *it << std::endl; // 1 3 4 6 7 
 }
 	\end{lstlisting}
+%	for(int i : v)
+%	{
+%		std::cout << i << ' '; // 1 3 4 6 7 
+%	}
+%	
 	\begin{note}
 		Az fenti inicializálások a c++11-es újítás részei, sok magyarázatra gondolom nem szorulnak.
-		
-		A fenti ciklus szokatlan lehet, ez is egy c++11es újítás, un. \textit{range-based for loop}. A fenti kód ezzel ekvivalens:
-		\begin{lstlisting}
-int i;
-for(std::vector<int>::iterator it = v.begin(); it != v.end(); it++)
-{
-	i = *it;
-	std::cout << i << ' ';
-}
-		\end{lstlisting}
-		Számunkra legyen elég most annyi, hogy az így írt ciklusok akkor működnek, ha a jobb oldalon álló objektum (most \texttt{v}) rendelkezik \texttt{begin()} és \texttt{end()} tagfüggvényekkel, vagy pedig az objektum egy tömb. Ez nem a teljes lista, de most legyen egyenlőre ennyi elég.
+%		
+%		A for ciklus szintén szokatlan lehet, ez is egy c++11es újítás, un. \textit{range-based for loop}. A fenti kód ezzel ekvivalens:
+%		\begin{lstlisting}
+%int i;
+%for(std::vector<int>::iterator it = v.begin(); it != v.end(); it++)
+%{
+%	i = *it;
+%	std::cout << i << ' ';
+%}
+%		\end{lstlisting}
+%		Számunkra legyen elég most annyi, hogy az így írt ciklusok akkor működnek, ha a jobb oldalon álló objektum (most \texttt{v}) rendelkezik \texttt{begin()} és \texttt{end()} tagfüggvényekkel, vagy pedig az objektum egy tömb.
 	\end{note}
-	Most kihasználtuk, hogy az \texttt{std::set} alapértelmezetten rendezett: átpakoljuk abba, majd vissza. No persze, ez minden, csak nem hatékony. Továbbá feltűnhet, hogy az egyik 3-as kiesett: az \texttt{std::set} kiszűrte az egyiket, mert ekvivalens elemet nem tárol. Ennél sokkal hatékonyabb, ha egy STL algoritmussal dolgozunk:
+	Most kihasználtuk, hogy az \texttt{std::set} alapértelmezetten rendezett: átpakoltuk az elemeket abba, majd visszaillesztettük az eredeti konténerbe. No persze, ez minden, csak nem hatékony. Ráadásul az egyik 3-as kiesett: az \texttt{std::set} megszűrte az elemet, mert ekvivalenseket nem tárol.
+	
+	\medskip
+	Az ilyen jellegű barkácsolások sose fogadhatóak el hatékonyság szempontjából. Ismerkedjünk meg az ennél sokkal hatékonyabb \texttt{std::sort}-al!
 	\begin{lstlisting}
 std::vector<int> v {6,3,7,4,1,3};
 std::sort(v.begin(), v.end());
-for(int i : v)
-{
-	std::cout << i << ' '; // 1 3 3 4 6 7 
-}
+for(std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
+	std::cout << *it << ' '; // 1 3 3 4 6 7
 	\end{lstlisting}
-	Fontosabb algoritmusok:
-	\begin{compactitem}
-		\item find
-		\item search
-		\item sort
-		\item reverse
-		\item rotate
-		\item unique
-		\item remove
-		\item stb...
-	\end{compactitem}
-	Beszéljünk is ez utóbbiról!
+	Az \texttt{std::sort}, ha külön paramétert nem adunk neki, az \texttt{<} operátor szerint rendez.
 	
-	\url{http://en.cppreference.com/w/cpp/algorithm/remove}
+	\medskip
+	Rendezzük a fenti elemeket úgy, hogy a \texttt{>} operátor szerint legyenek sorban!
 	\begin{lstlisting}
-#include <iostream>
-#include <vector>
-#include <algorithm>
+struct Greater
+{
+	bool operator()(int lhs, int rhs) const
+	{
+		return lhs > rhs;
+	}
+};
 
 int main()
 {
-	std::vector<int> v{1,2,3,3,4,5,6};
-	std::cout << v.size() << std::endl;
-	std::remove(v.begin(), v.end(), 3);
-	std::cout << v.size() << std::endl;
+	std::vector<int> v {6,3,7,4,1,3};
+	std::sort(v.begin(), v.end(), Greater());
+	for(std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
+		std::cout << *it << ' '; // 7 6 4 3 3 1 
 }
 	\end{lstlisting}
-	Legnagyobb meglepetésünkre, ez semmit se fog törölni: az \texttt{std::remove} átrendezi a konténert, úgy hogy a konténer elején legyenek a nem törlendő elemeket, és utána a törlendőek, és az első törlendő elemre visszaad egy iterátort. Ennek segítségével tudjuk, hogy ettől az iterátortól a \textit{past-the-end iterator}-ig minden törlendő.
+	\begin{note}
+		Ez jól demonstrálja, hogy az \texttt{std::sort}, csak úgy mint a legtöbb STL algoritmus, számos overload-al rendelkezik.
+	\end{note}
+	Az \texttt{std::sort} az ekvivalens elemek sorrendjét nem (feltétlenül) tartja meg: rendezés után azoknak a sorrendje nem definiált.
+	\begin{lstlisting}
+struct StringLength
+{
+	bool operator()(const std::string &lhs, const std::string &rhs) const
+	{
+		return lhs.size() < rhs.size();
+	}
+};
+
+int main()
+{
+	std::vector<std::string> v;
+	v.push_back("ADA");
+	v.push_back("Java");
+	v.push_back("1234567");
+	v.push_back("Maci");
+	v.push_back("C++");
+	v.push_back("Haskell");
+	
+	std::sort(v.begin(), v.end(), StringLength());
+	
+	for(std::vector<std::string>::iterator it = v.begin(); it != v.end(); ++it)
+		std::cout << *it << ' ';
+}
+	\end{lstlisting}
+	Lehetséges output: \texttt{C++, ADA, Java, Maci, Haskell, 1234567}.
+	
+	Amennyiben fontos, hogy az ekvivalens elemek relatív sorrendje megmaradjon, használjunk \texttt{std::sort} helyett \texttt{std::stable\_sort}-ot, mely pontosan ezt csinálja.
+	\begin{note}
+		Ennek nyilván ára is, van, általában az \texttt{std::stable\_sort} kevésbé hatékony.
+	\end{note}
+	
+	Link: \url{http://en.cppreference.com/w/cpp/algorithm/sort}.
+	\subsection{remove}
+	Az \texttt{std::remove} algoritmus a konténerben lévő elemek törlését segíti elő. Töröljük ki egy vectorból az összes 3-al ekvivalens elemet!
 	\begin{lstlisting}
 std::vector<int> v{1,2,3,3,4,5,6};
-std::cout << v.size() << std::endl;
+std::cout << v.size() << std::endl; // 7
+std::remove(v.begin(), v.end(), 3);
+std::cout << v.size() << std::endl; // 7
+	\end{lstlisting}
+	Legnagyobb meglepetésünkre, ez semmit se fog törölni: az \texttt{std::remove} átrendezi a konténert, úgy hogy a konténer elején legyenek a nem törlendő elemeket, és utána a törlendőek, és az első törlendő elemre visszaad egy iterátort. Ennek segítségével tudjuk, hogy ettől az iterátortól a past-the-end iteratorig minden törlendő.
+	\begin{lstlisting}
+std::vector<int> v{1,2,3,3,4,5,6};
+std::cout << v.size() << std::endl; // 7
 auto it = std::remove(v.begin(), v.end(), 3);
 v.erase(it, v.end());
-std::cout << v.size() << std::endl;
+std::cout << v.size() << std::endl; // 5
 	\end{lstlisting}
 	\begin{note}
 		Ebben a kódban van pár c++11-es újítás is: az \texttt{auto} kulcsszó megadható konkrét típus helyett. Ilyenkor az egyenlőségjel bal oldalán lévő objektum típusára helyettesítődik a kulcsszó. Példaképp, fent a fordító meg tudja határozni, hogy az \texttt{std::remove}-nak a visszatérési értéke itt \texttt{std::vector<int>::iterator} lesz, így a kód azzal ekvivalens, mintha ezt írtuk volna:
 		
 		{\centering\texttt{std::vector<int>::iterator it = std::remove(v.begin(), v.end(), 3);} \par}
 		
-		Bár az \texttt{auto} kulcsszót sokáig lehetne még boncolgatni, legyen annyi elég egyenlőre, hogy a template paraméter dedukciós szabályok szerint működik: azaz a const/volatile tulajdonságok \textit{(c/v qualifiers)} elvesznek közben. (c++11et nem szükséges tudni a vizsgához)
+		Bár az \texttt{auto} kulcsszót sokáig lehetne még boncolgatni, legyen annyi elég egyenlőre, hogy a template paraméter dedukciós szabályok szerint működik (c++11et nem szükséges tudni a vizsgához).
 	\end{note}
+	\subsection{Végszó az algoritmusokhoz}
+	Megjegyzendő, hogy nem minden algoritmus működik minden iterátor típussal (pl. az \texttt{std::sort} random access iteratort vár), és vannak egyes algoritmusok, melyeknek speciális előfeltételei is vanak (például az \texttt{std::unique} egy rendezett konténert vár).
+	\medskip
+	
+	Fontos az is, hogy ezek az algoritmusok általában nagyon hatékonyak, így gyakran nem is érdemes saját magunktól megírni.
 	
 	\medskip
-	Megjegyzendő, hogy nem minden algoritmus működik minden iterátor típussal, és vannak egyes algoritmusokank speciális előfeltétele: például az \texttt{std::unique} egy rendezett konténert vár. Megjegyzendő még, hogy két különböző rendező algoritmusunk is van: \texttt{std::sort} és \texttt{std::stable\_sort}. AZ utóbbi garantálja, hogy az ekvivalens elemek relatív sorrendje ne vltozzon (pl. korábbi példában az \texttt{ADA} és a \texttt{C++}, melyek ekvivalensek, de nem egyenlőek).
-	
-	Fontos az is, hogy ezek az algoritmusok általában nagyon hatékonyak, így gyakran nem is érdemes sajt magunktól megírni.
-	
-	\medskip
-	Fent kiírtam hogy \texttt{std::remove}, de ebből a namespace-t elhagyhatom.
+	Gyakran nincs szükség arra, hogy a függvénynevek elé kiírjuk, melyik névtérből származnak.
 	\begin{lstlisting}
 //...
 auto it = remove(v.begin(), v.end(), 3);
 //...
 	\end{lstlisting}
-	Itt a fordító a függvény paraméterekből ki tudja találni (\textit{Argument Dependent Lookup, ADL}), hogy milyen névtérből van az algoritmus. Mivel a \texttt{vector} ugyanúgy az \texttt{std} névtérből származik, és azt adtunk meg paraméternek, tudni fogja a fordító, hogy a \texttt{remove}-ot is abban a névtérben kell keresni.
+	Itt a fordító a függvény paraméterekből ki tudja találni , hogy milyen névtérből van az algoritmus. Ezt \textit{Argument Dependent Lookup}-nak nevezzük, vagy röviden ADL-nek. Mivel a \texttt{vector} ugyanúgy az \texttt{std} névtérből származik, és azt adtunk meg paraméternek, tudni fogja a fordító, hogy a \texttt{remove}-ot is abban a névtérben kell keresni.
 	
-	\bigskip
+	\subsection{Gyakorló feladat}
 	
 	Vegyünk egy konténert, és jelöljünk meg benne bár elemet, melyektől azt szeretnénk, hogy legyenek egymás mellett, de minden más elem sorrendje ne változzon.
 	\begin{center}
@@ -416,8 +545,6 @@ auto it = remove(v.begin(), v.end(), 3);
 			\hline
 		\end{tabular}
 	\end{center}
-	A legtöbb algoritmusnál, mely visszatér egy iterátorral, úgy jelzik, hogy az adott elemet nem találtak meg (stb), hogy egy \texttt{past-the-end} iterátort adnak vissza.
-	%TODO jobb struktúrálás.
 	\begin{center}
 		\textit{,,Általában az emberek nem szeretik, hogyha kicsesznek velük, és ha kicseszel a kollégáiddal, morcosak lesznek''}
 		
