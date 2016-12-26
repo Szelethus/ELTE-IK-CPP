@@ -5,7 +5,7 @@
 \usepackage[T1]{fontenc}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
-\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx, multirow}
 %\usepackage{marvosym}
 
 \usepackage{listings}
@@ -186,7 +186,28 @@ int main()
 		\item Konténer adapter: Egy meglévő konténert alakítanak át, általában szogorítanak. Példaképp ha vesszük az \texttt{std::deque} konténert, ami egy kétvégű sor, könnyen tudunk belőle egy egyvégű sort csinálni. Ezen a konténerek általában egy másik konténert tárolnak, és annak a funkcióit szigorítják.
 		\\Példa: \texttt{std::queue}, \texttt{std::stack}.
 	\end{itemize}
+	Minden STL konténer rendelkezik konstans és nem konstans iterátorral, fordított irányú és konstans fordított irányú iterátorral melyre így hivatkozhatunk:
+	\begin{center}
+		\begin{tabular}{|l|l|l|l|}
+			\hline
+			Iterátor típus&Ahogy hivatkozhatunk rájuk&Első elem&Past-the-end\\
+			\hline
+			\hline
+			iterátor&\texttt{/*konténer név*/::iterator}&\texttt{begin()}&\texttt{end()}\\
+			\hline
+			konstans iterátor&\texttt{/*konténer név*/::const\_iterator}&\texttt{cbegin()}&\texttt{cend()}\\
+			\hline
+			fordított irányú&\multirow{2}{*}{\texttt{/*konténer név*/::reverse\_iterator}}&\texttt{rbegin()}&\texttt{rend()}\\
+			iterátor&&&\\
+			\hline
+			fordított irányú&\multirow{2}{*}{\texttt{/*konténer név*/::reverse\_const\_iterator}}&\texttt{crbegin()}&\texttt{crend()}\\
+			konstans iterátor&&&\\
+			\hline
+		\end{tabular}
+	\end{center}
+	
 	A következő leírásban nem fogunk minden létező tagfüggvénnyel foglalkozni: egyrészt olyan sok van, hogy azt teljesen irreális észben tartani, másrészt sok ilyenhez érdemi hozzáfűznivalót én nehezen tudnék fűzni, így az egyes szekciók végén található link az adott konténerhez.
+	
 	\begin{note}
 		Nagyon fontos képesség az is, hogy valaki hogyan tud utánanézni valaminek, amivel nincs teljesen tisztában, így erősen javallott a \url{cppreference.com}-el való ismerkedés, illetve más helyeken lévő információk böngészése is.
 	\end{note}	
@@ -280,7 +301,7 @@ int main()
 int main()
 {
 	std::set<int> c = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-	for(auto it = c.begin(); it != c.end(); )
+	for(std::vector<int>::iterator it = c.begin(); it != c.end(); )
 	{
 		if(*it % 2 == 1)
 			it = c.erase(it);

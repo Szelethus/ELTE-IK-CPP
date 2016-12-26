@@ -5,7 +5,7 @@
 \usepackage[T1]{fontenc}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
-\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx}
+\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx, multirow}
 %\usepackage{marvosym}
 
 \usepackage{listings}
@@ -104,147 +104,142 @@
 		10. óra.
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor és \textsc{Horváth} Gábor előadásán. (\today)
-	\section{STL algoritmusok}\section{Iterátor típusok}
-	No, próbáljuk meg alkalmazni a listánkat! Példaképp eresszük rá az alapból megírt algoritmusok egyikét:
-	\begin{lstlisting}
-	#include <algorithm>
-	#include <iostream>
-	#include "list.hpp"
+	\section{Iterátor típusok}
+	Korábban már elhangzott, hogy az általunk implementált \texttt{List}-hez tartozó \texttt{Iterator} és \texttt{ConstIterator} un. forward iterátorok. A forward iterator egy iterátor típus -- ebből több is van, és elengedhetetlenek az STL algoritmusok megértéséhez. 4 iterátor típust különböztetünk meg: input iterator, forward iterator, bidirectional iterator és random access iterator.
+	\begin{itemize}
+		\item Az \textbf{input iterator} típusokon legalább egyszer végig lehet menni egy irányba, továbbá rendelkeznek \texttt{++}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
+		\item A \textbf{forward iterator} típusokon többször is végig lehet menni, de csak egy irányba. Továbbá rendelkeznek \texttt{++}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
+		\item A \textbf{bidirectional iterator} típusokon többször is végig lehet menni, mindkét irányba. Továbbá rendelkeznek \texttt{++}, \texttt{$--$}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
+		\item A \textbf{random access iterator} típusokon többször is végig lehet menni, mindkét irányba, ezen felül a két iterátor között bármelyik elemre azonnal lehet hivatkozni. Továbbá rendelkeznek \texttt{++}, \texttt{
+		$--$}, \texttt{*}, \texttt{==}, \texttt{!=}, \texttt{$-$} (két iterátor távolságát adja meg), összeadás \texttt{int}-el (paraméterként kapott mennyiségű elemmel előrelépés), kivonás \texttt{int}-el (hátralépés) operátorral/függvénnyel.
+	\end{itemize}
+	E listán látható, hogy pl. egy random access iterator sokkal flexibilisebb, és gyorsabb is, hisz bármikor bármelyik elemhez hozzáférhetünk, míg a mi listánk forward iteratora sokkal limitáltabb.
 	
-	int main()
-	{
-	List<int> head(5);
-	head.add(8);
-	head.add(10);
-	head.add(8);
-	List<int>::Iteratorit = std::find(head.begin(), head.end(), 8);
-	}
-	\end{lstlisting}
-	Azonban ez a kód nem fog lefordulni.
-	
-	\url{http://en.cppreference.com/w/cpp/iterator}
-	
-	Mivel netet mindig lehet használni, célszerű lehet a cppreference-t böngészni. Ezen a linken láthatjuk, hogy több iterátor típus is létezik.
-	
-	Láthatjuk, hogy több iterátor kategória is létezik, egyesek többet tudnak mint mások: erre a legfényesebb példa a listánk forward iterátora és egy tömb random access iterátora. A mi listánkon kizárólag az első elemtől az utolsóig tudunk sorban menni, míg egy tömb bármelyik elemére bármikor hivatkozhatunk. Világos, hogy egy flexibilisebb iterátorral több mindent meg tudunk tenni, vagy ugyanazt a funkciót hatékonyabban is meg tudjuk valósítani. Emiatt minden STL algoritmusnak (mint pl. az \texttt{std::find}) tudnia kell a template paraméterként kapott iterátor kategóriáját.
+	\smallskip
+	Az STL konténerek iterátorai is különböző iterator kategóriákban vannak:
+	\begin{center}
+		\begin{tabular}{|l|l|}
+			\hline
+			STL konténer&Iterator típus\\
+			\hline
+			\hline
+			\texttt{std::vector} & \multirow{2}{*}{\texttt{random access iterator}}\\
+			\texttt{std::deque} &\\
+			\hline
+			\texttt{std::list} & \multirow{5}{*}{\texttt{bidirectional iterator}}\\
+			\texttt{std::set} & \\
+			\texttt{std::multiset} & \\
+			\texttt{std::map} & \\
+			\texttt{std::multimap} & \\
+			\hline
+		\end{tabular}
+	\end{center}
+	Világos, hogy egy flexibilisebb iterátorral több mindent meg tudunk tenni, vagy ugyanazt a funkciót hatékonyabban is meg tudjuk valósítani. Emiatt minden STL algoritmusnak (mint pl. az \texttt{std::find}) tudnia kell a template paraméterként kapott iterátor kategóriáját.
+	\medskip
 	
 	Egy iterátornak úgy tudjuk a legegyszerűbben megadni a típusát, ha származunk az \texttt{std::iterator} típusból.
 	
-	\url{http://en.cppreference.com/w/cpp/iterator/iterator}
+	Link: \url{http://en.cppreference.com/w/cpp/iterator/iterator}
+	
+	Látható hogy ennek osztálynak két kötelező template paramétere van, egy iterátor típus tag, és dereferáló operátor visszatérési értéke.
 	
 	\begin{lstlisting}
-	class Iterator : public std::iterator<std::forward_iterator_tag, T>
-	{
+template <class T>
+class Iterator : public std::iterator<std::forward_iterator_tag, T>
+{
 	//..
-	};
-	class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
-	{
+};
+
+template <class T>
+class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
+{
 	//..
-	};
+};
 	\end{lstlisting}
-	Ezzel a módosítással már lefordul a kódunk! Így már tudjuk majd használni az \texttt{STL} algoritmusokat is a konténereinken. Ez egy baromi nagy dolog: létrehoztunk egy új adatszerkezetet, és ez tök jól együttműködik az eddigi algoritmusokkal.
+	Így már fogjuk tudnuk majd használni az \texttt{STL} algoritmusokat is a konténereinken. 
+	%TODO
+%	\begin{note}
+%		Ez egy baromi nagy dolog: létrehoztunk egy új adatszerkezetet, és ez tök jól együttműködik az eddigi algoritmusokkal.
+%		
+%		Azaz még viszonylag egyszerűen egy új függvényt is létre tudunk hozni, ami minden adatszerkezettel működni fog! C++ban az algoritmusok nem a konténereken működnek: lévén úgy szokás konténereket létrehozni, hogy írunk hozzá iterátort is, így elegendő egy algirtmusnak azt tudnia, hogy hogyan kell használni azt az iterátort. Emiatt várja el egy STL algoritmus, hogy közöüljük, milyen típusú iterátorunk van. Igaz, a konténereinkkel többet kell dolgoznunk, mert ezt az iterátort egyszer meg kell írni, de hosszú távon még így is rengeteg munkát tudunk megspórolni.
+%	\end{note}
 	
+	\section{STL algoritmusok}
+	\subsection{Bevezető az algortmusokhoz}
+	Az STL algoritmusok az \texttt{<algorithm>} könyvtárban találhatóak, és számos jól ismert és fontos függvényt foglalnak magukba, mint pl. adott tulajdonságű elem keresése, partícionálás, szimmetrikus differencia meghatározása, stb.
 	\medskip
-	Írjunk egy függvény mely a második adott értékű elemet adja vissza.
+	
+	Az STL algoritmusok alap gondolatmenetét jól demonstrálja az alábbi példa (most még tekintsünk el az iterátor típusoktól): Írjunk egy függvény mely a második adott értékű elemet adja vissza!
 	\begin{lstlisting}
-	template <class It, class Val>
-	It find2(It begin, It end, const Val &v)
+#include <vector>
+#include <iostream>
+
+template <class It, class Val>
+It findSecond(It begin, It end, const Val &v)
+{
+	while(begin != end && *begin != v)
 	{
-	It first = std::find(begin, end, v);
-	if(first == end)
-	return end;
-	++first;
-	return std::find(first, end, v);
+		++begin;
 	}
+	if (begin == end)
+		return end;
+	++begin;
+	while(begin != end && *begin != v)
+	{
+		++begin;
+	}
+	return begin;
+}
+
+int main()
+{
+	std::vector<int> v;
+	for (int i = 0; i<10; i++)
+		v.push_back(i);
+	v.push_back(5);
+	std::vector<int>::iterator it = findSecond(v.begin(), v.end(), 5);
+	if (it != v.end())
+		std::cout << *it << std::endl; // 5
+}
 	\end{lstlisting}
-	Azaz még viszonylag egyszerűen egy új függvényt is létre tudunk hozni, ami minden adatszerkezettel működni fog! C++ban az algoritmusok nem a konténereken működnek: lévén úgy szokás konténereket létrehozni, hogy írunk hozzá iterátort is, így elegendő egy algirtmusnak azt tudnia, hogy hogyan kell használni azt az iterátort. Emiatt várja el egy STL algoritmus, hogy közöüljük, milyen típusú iterátorunk van. Igaz, a konténereinkkel többet kell dolgoznunk, mert ezt az iterátort egyszer meg kell írni, de hosszú távon még így is rengeteg munkát tudunk megspórolni.
 	
+	Az algoritmusok iterátorokkal dolgoznak, azonban az, hogy minek az iterátorát használják, egyáltalán nem fontos tudniuk: elegendő annyi, hogy rendelkeznek azokkal az operátorokkal, melyeket fent felsoroltunk. Így például a mi listánk iterátorát ugyanúgy megadhatnánk a fenti függvények, mint egy \texttt{std::vector<int>}-ét.
 	
-	Az algoritmusok a iterátorokkal dolgoznak. Ahogy megállapítottuk az előző óra végén, nagyon könnyű egy új függvényt írnunk már meglévő konténerekhez, és egy új konténert is könny írni a meglevő függvényekhez. Jó példát adnak itt az STL konténerek, hisz az összeshez van írva iterátor.
+	%TODO brunner tibis rész
 	
-	Ha mi szeretnénk új algoritmust írni, például így dolgozhatunk iterátorokkal:
+	\medskip
+	Azonban hogyan lehet megállapítani az iterator típusát? Emlékezzünk vissz arra, hogy a \texttt{List}-ét hogyan jelöltük meg: az öröklődés következtében az osztályunk kapott pár typedef-et, melyek közül az egyik az \texttt{iterator\_category}.
 	\begin{lstlisting}
-for (std::set<int>::iterator i = s.begin(); i != s.end(); ++i)
+template<typename BDIT> 
+void algorithm(BDIT, BDIT, std::bidirectional_iterator_tag) 
 {
-	std::cout << *i;
+	std::cout << "Slow" << std::endl;
 }
+
+template<typename RAIT>
+void algorithm(RAIT, RAIT, std::random_access_iterator_tag) 
+{
+	std::cout << "Fast" << std::endl;
+}
+
+template<typename IT> 
+void algorithm(IT begin, IT end) 
+{
+	typedef typename std::iterator_traits<IT>::iterator_category cat;
+	algorithm(begin, end, cat());
+}
+int main() 
+{
+	std::vector<int> v;
+	std::list<int> l;
+	algorithm(v.begin(), v.end()); // Fast
+	algorithm(l.begin(), l.end()); //Slow
+}  
 	\end{lstlisting}
-	Azt, hogy az iterátor hogyan oldja meg az iterálást, nem szükséget tudnunk, elég annyi, hogy az első elemtől az utolsóig megy.
-	
-	\smallskip
-	Írjunk példaképp egy ilyen algoritmust:
-	\begin{lstlisting}
-bool tartalmaz(const std::set<int> &s, int x)
-{
-	for(std::set<int>::iterator i = s.begin(); i != s.end(); ++i)
-	{
-		if(*i == x)
-			return true;
-	}
-	return false;
-}
-	\end{lstlisting}
-	
-	Ez egy nagyon nem általános függvény, mert csak \texttt{std::set}-et fogadunk el, és csak akCircle, ha ezek \texttt{int}éel vannak példányosítva. Csináljunk ebből egy egyel általánosabbat:
-\begin{lstlisting}
-template <typename T>
-bool tartalmaz(const std::set<T> &s, int x)
-{
-	for(std::set<T>::iterator i = s.begin(); i != s.end(); ++i)
-	{
-		if(*i == x)
-		return true;
-	}
-	return false;
-}
-\end{lstlisting}
-	Ez persze nem biztos hogy működni fog, ugyanis senki nem garantálja, hogy a \texttt{T} típusnak van van \texttt{==} operátora. (és ez a kód amúgy is még vérzik pár sebből)
-	
-	\medskip
-	Mellékesen, milyen jó lenne, ha nem csak \texttt{std::set}-re működne ez, hanem bármilyen itárorral rendelkező konténerre!
-\begin{lstlisting}
-template <typename It, typename T>
-It find(It &first, It &last, const T &a)
-{
-	while (first != last)
-	{
-		if (*first == a)
-			return first;
-		++first;
-	}
-	return last;
-}
-\end{lstlisting}
-	Figyeljük meg, hogy a visszatérési érték is megváltozott: keresünk egy \texttt{a} értékű elemű, és ha megtaláljuk, egy arra mutató iterátort adunk vissza. Ha nem találunk, akCircle az utolsó utáni elemet adjuk vissza. Ez már egy egész jó kereső algoritmust.
-	
-	\medskip
-	Javítsuk ki a fenti függvényt, ahonnét hiányzik a \texttt{typename}.
-\begin{lstlisting}
-template <typename T>
-bool tartalmaz(const std::set<T> &s, int x)
-{
-	for(typename std::set<T>::iterator i = s.begin(); i != s.end(); ++i)
-	{
-		if(*i == x)
-		return true;
-	}
-	return false;
-}
-\end{lstlisting}
-	
-	\medskip
-	Kérdés, tudunk-e ilyet tenni?:
-\begin{lstlisting}
-std::set<int>>::iterator i = s.begin();
-*i = 42;
-\end{lstlisting}
-	Már a kérdésból is látszdik, hgoy ez nem lehetséges, hisz a \texttt{std::set} itetátora igazából egy konstans iterátort. EZ azért van, mely lévén egy bináris faként van áltlaában implementálva a \texttt{std::set}, a fa rendezett szerkezetét fel tudnánk rúgni.
-	
-	\smallskip
 	Mit tegyünk akCircle, ha konstansot veszek át? A fenti példában is ez van, a set-et konstansként vettük át. Így, hasonlóan az általunk írt láncolt listához, egy konstans iterátorral kell végigmennünk.
 \begin{lstlisting}
 template <typename T>
-bool tartalmaz(const std::set<T> &s, int x)
+bool contains(const std::set<T> &s, int x)
 {
 	for(typename std::set<T>::const_iterator i = s.begin(); i != s.end(); ++i)
 	{
@@ -284,7 +279,7 @@ bool operator==(const Circle &lhs, const Circle &rhs)
 }
 \end{lstlisting}
 	Itt az a veszély, hogy ha az STL-es find-al szemben a sajátunkat használjuk, más lehet a végeredmény, hisz a \texttt{Circle}-t ők máshogy hasonlítják össze.
-	
+	%TODO xazaxos rész
 	\subsection{STL felépítése}
 	Látogassunk el a \url{http://en.cppreference.com/w/} oldalra, és picikét barátkozzunk vele. Itt láthatjuk az összes STL konténert, de sok fontos információhoz is hozzájuthatunk, pl. az \texttt{std::string}-el kapcsolatban is: példaképp az \texttt{std::string} csak egy typename!
 	
