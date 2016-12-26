@@ -1,0 +1,597 @@
+\documentclass[a4paper,11.5pt]{article}
+\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+\usepackage{amsmath, amsthm,amssymb,paralist,array, ellipsis, graphicx, multirow}
+\usepackage[table]{xcolor}
+%\usepackage{marvosym}
+
+\usepackage{listings}
+\lstset{
+	language=C++, 
+	basicstyle=\ttfamily, 
+	keywordstyle=\color{blue}\ttfamily, 
+	stringstyle=\color{red}\ttfamily,
+	tabsize = 4
+}
+
+\makeatletter
+\renewcommand*{\mathellipsis}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisgap%
+		{\ldotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\dotsb@}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\@cdots}{%
+	\mathinner{%
+		\kern\ellipsisbeforegap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisgap%
+		{\cdotp}\kern\ellipsisaftergap%
+	}%
+}
+\renewcommand*{\ellipsis@default}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	\ellipsis@after\relax}
+\renewcommand*{\ellipsis@centered}{%
+	\ellipsis@before
+	\kern\ellipsisbeforegap
+	.\kern\ellipsisgap
+	.\kern\ellipsisgap
+	.\kern\ellipsisaftergap
+	\ellipsis@after\relax}
+\AtBeginDocument{%
+	\DeclareRobustCommand*{\dots}{%
+		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
+\def\ellipsisgap{.1em}
+\def\ellipsisbeforegap{.05em}
+\def\ellipsisaftergap{.05em}
+\makeatother
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks = true	
+}
+
+\begin{document}
+	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
+	\setlength\parindent{0pt}
+	\def\s{\hspace{0.2mm}\vphantom{\beta}}
+	\def\Z{\mathbb{Z}}
+	\def\Q{\mathbb{Q}}
+	\def\R{\mathbb{R}}
+	\def\C{\mathbb{C}}
+	\def\N{\mathbb{N}}
+	\def\Ra{\overline{\mathbb{R}}}
+	
+	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
+	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
+	
+	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
+	\def\limn{\displaystyle\lim_{n\to +\infty}}
+	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	
+	\theoremstyle{definition}
+	\newtheorem{theorem}{Tétel}[subsection] 
+	
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definíció} 
+	\newtheorem{example}[theorem]{Példa} 
+	\newtheorem{task}[theorem]{Feladat} 
+	\newtheorem{note}[theorem]{Megjegyzés}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{center}
+		{\LARGE\textbf{C++}}
+		
+		{\Large Extra órai jegyzet}
+	\end{center}
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán.
+	\medskip
+	
+	\section{Kivételek kezelése}
+	
+	Mik azk a hibák amiket kezelni kell vagy érdemes? 
+	
+	\begin{enumerate}
+		\item programozói hiba (pl túlindexelés)
+		
+		Javasolt: Lelőni a programot. Mert ha észrevesszük hogy hibás, akkor bármi megtörténhet (pl. lehet hogy fájlokat szétszedi amiben dolgozik).
+		
+		Erre megoldás például az \texttt{std::terminate}. Ezt ha meghívjuk, a programot kilövi. Van más is, például az \texttt{exit} és \texttt{quick\_exit}. A quick exit a destruktorokat se engedi lefutni.
+		
+		\item Ha a fájl-al van probléma, akkor vagy olyan jellegű, hogy van esély recovery-re, akkor kommunikálhatunk is a programon keresztül. Például ha nem találja a fájlt, akkor azt lehet kezelni a program terminálása nélkül is.
+		
+		\item Van, mikor lehet kezelni a problémát. 
+		
+		Például ha van egy applikáció, ami magas szintű, mondjuk banki tranzakciókat végez, és egy alsó szintű mondjuk fájlkezelő libraryben van hiba, akkor azt valahogy vissza kell vinni az app-ba.
+		
+	\end{enumerate}
+		Esetleges megoldás:
+		\begin{lstlisting}
+int f (...)
+{
+	//...
+	return -1;
+	//..
+}
+		\end{lstlisting}
+
+		Gond: Nem mindig tudunk egy nevezetes értéket visszaadni. De ha mondjuk pointert kell visszadni, akkor ez még annyira se működne. 
+		
+		Kérdés, egy alacsony szintről hogyan juttatjuk el a problémát magasabb szintre?
+		
+		\begin{lstlisting}
+int e = g(...);
+if (e)
+	return e;
+		\end{lstlisting}
+		
+		Ha valaki nem kezeli ebben a hibákat, akkor nem fog máködni az egész. Fentebb e-ben tároljuk el g-nek az eredményét, és utána e-től függ hogy az mit ad tovább. Probléma, hogy ha hiba van fent, akkor nagyon alacsony szintre kell visszaolvasni hogy a hiba forrását fel lehessen lelni.
+		
+		Konkúzió: Visszatérési értékkel kivételeket kezelni nem nagyon éri meg.
+		
+		C++ kód hibakezelése:
+		
+		\begin{lstlisting}
+f()
+{
+	g();
+	h();
+	l();
+}
+		\end{lstlisting}
+		
+		Csak akkor írok hibakezelést, ahol valóban kell. Nem kell kilométernyi if, stb. Mivel sok if nincs, így ez még hatékonyabb is. Ráadásul elértük a célt: mert ez valóban a tetejére fog mászni.
+		
+		\textbf{Exception kezelés}
+		
+		\begin{lstlisting}
+void l()
+{
+	if (/* ... */)
+	{
+		throw e;
+	}
+}
+		\end{lstlisting}
+		
+		Így jelzünk hibát
+		
+		\begin{lstlisting}
+void a()
+{
+	try
+	{
+		f();
+	}catch(E &e){
+		//...	
+	}
+}
+		\end{lstlisting}
+		\texttt{a}-ban van csak valami, ami lekezeli. Így \texttt{l}-ben dobja a hibát, átmegy \texttt{f}-en, és ott landol. (Ez a stack unwind, vagy stack visszatekerése)
+		
+		\begin{lstlisting}
+struct S
+{
+	~S()
+	{
+		std::cout << "dtor S" << std::endl;
+	}
+};
+
+int main()
+{
+	S s;
+	throw 5;
+}
+		\end{lstlisting}
+		Mivel dobtam valamit amit sose kaptam el, ami nem definiált viselkedés.
+		\begin{lstlisting}
+struct S
+{
+	~S()
+	{
+		std::cout << "dtor S" << std::endl;
+	}
+};
+
+int main()
+{
+	try
+	{
+		S s;
+		throw 5;
+	}catch(int i){
+		std::cout << "catch int" << std::endl;
+	}
+}
+		\end{lstlisting}
+		
+		Lekezelt hibák esetén a destruktorok lefutnak rendesen.
+		\begin{lstlisting}
+int main()
+{
+	try
+	{
+		int *p = new int{5};
+		f();
+		delete p;
+	}catch(int i){
+		std::cout << "catch int" << std::endl;
+	}
+}
+		\end{lstlisting}
+		
+		Ez memory leakhez vezethet, mert ha az \texttt{f()} dob kivételt, akkor a \texttt{delete p;} sor sose fog lefutni. Erre jó nekünk a RAII. 
+		
+		\begin{lstlisting}
+int main()
+{
+	try
+	{
+		std::unique_ptr<int> p(new int{5});
+		f();
+		delete p;
+	}catch(int i){
+		std::cout << "catch int" << std::endl;
+	}
+}
+		\end{lstlisting}
+		
+		Itt már nincs probléma, mert \texttt{p}-nek a destruktora le fog futni. Ha exception safe kódot akarunk írni, akkor midnen egyes alkalommal amikor mi lefoglalunk valamit, nekünk akkor biztosítani kell azt hogy azt az erőforrást felfogjuk szabadítani. Mert ha nincs egyetlen stacken lévő objektum se, ami oda mutatna, akkor resource leak következhet be.
+		
+		Mit jelent az hogy exception safe?
+		
+		\begin{enumerate}
+			\item weak exception guarantee:
+			
+			Akárhogyan is dobódik a programban a kivétel, sose fog reasource leaket okozni.
+			
+			\textbf{Ezt mindig minden programnak tudnia kell.}
+			
+			Ez egyszerűen megoldható, akkor a RAII-t kell hazsnálni: minden objektumot úgy hozunk létre, hogy  destruktorelintézze ezt.
+			
+			\item strong:
+			
+			tranzakcionális, azaz 2 dolog lehetséges \texttt{f} meghívásakor. Első lehetőség hogy lefut jól, és nincs semmi baj, a második esetben dobódik hiba, a program ennek hatására olyan állapotba jut, mintha f sose lett volna meghívódva. (azaz nem fordulhat elő az, hogy f-et kidobjuk, de a fele munkát már elvégzi.)
+			
+			CAS - Copy And Swap
+			\begin{lstlisting}
+f (T &t)
+{
+	T t2 = t;
+}
+			\end{lstlisting}
+			
+			Itt ha a copy konstruktor dob egy kivételt, akkor még a strong teljesül.
+			
+			\begin{lstlisting}
+f (T &t)
+{
+	T t2 = t;
+	g(t2);	
+	swap(t2, t);
+}
+			\end{lstlisting}
+			
+		\end{enumerate}
+			A swapot mindig lehet úgy megvalósítani, hogy nem dob kivételt. A swap az biztosan sikerült. Ha a copy konstruktor nem dobott semmit, akkor nem lesz gond. Így elértük a strong-ot, de ezzel egy extra másolást raktunk bele.
+			
+			\begin{lstlisting}
+int g();
+
+void f(std::unique_ptr<int> p, int);
+
+int main()
+{
+	try 
+	{
+		f(std::unique_ptr<int>(new int{5}, g());
+	}catch(int i){
+		std::cout << "catch int" << std::endl;
+	}
+}
+
+			\end{lstlisting}
+		Ez expection safe lesz? A válasz az hogy nem, mert a c++ban nem specifikált a végrehajtási sorrend. Előbb hajtódik végre a két paraméter kiértékelése mint az \texttt{f} meghívása. a paraméterek kiértékelési sorrend azonban már kérdéses. Az is lehet hogy létrehoz egy 5-öt a heap-en, és utána hoz neki létre egy unique pointert, és lehet g csak utána fut le. Ha g az dob egy kivételt.
+		
+		Pontosabban:
+		
+		Egy változó élettartama a konstruktor hívás végétől a destruktor hívás elejéig tart. Ha a konstruktor nem tud teljesen lefutni, a destruktor se fog. Itt előfordulhat hogy lefoglalja a memóriaterületet, meghívja g-t, és utána hívja meg a \texttt{unique\_ptr} konstruktorát,	de ha\texttt{g} dob kivételt, akkor memory leak lesz.
+		
+		A megoldás a szekvenciaponttal történő elválasztás, külön változóban hozom létre.
+		\begin{lstlisting}
+std::unique_ptr<int> p(new int{5});
+f(std::move(p), g());
+		\end{lstlisting}
+		Ez már teljesen biztonságos lesz.
+		
+		\subsection{Problémák a konstruktorokkal}
+		
+		\begin{lstlisting}
+struct Y
+{
+	Y()
+	{
+		throw 5;
+	}
+}
+struct X
+{
+	X() : y() {}
+	
+	Y y;
+}
+		\end{lstlisting}
+		
+		Ez nem lesz jó, hogyan kapjuk el? így:
+		
+		\begin{lstlisting}
+struct Y
+{
+	Y()
+	{
+	throw 5;
+	}
+};
+struct X
+{
+	X() try : y() 
+	{
+		//constructor code
+	}catch(int i)
+	{ 
+		std::cout << "X ctor exc" << std::endl;
+	}
+	
+	Y y;
+};
+
+int main()
+{
+	try
+	{
+		X x;
+	}catch (int i)
+	{
+		std::cout << "catch int main" << std::endl;
+	}
+}
+		\end{lstlisting}
+		Ekkor a kimenetben mindkét string benne lesz.
+		Ha \texttt{X x} helyett \texttt{throw 5;}-t írnánk, és catch-be írok egy \texttt{throw}-t, akkor hajíthatjuk a hibát tovább. Ha ez lenne:
+		\begin{lstlisting}
+		
+int main()
+{
+	try
+	{
+		throw 5;
+	}catch (int i)
+	{
+		std::cout << "catch int main" << std::endl;
+		throw 5;
+	}
+}
+		\end{lstlisting}
+		Ekkor csak az egyik dobódik el, a másik nem definiált.
+		
+		Ha a fentebbi kdot nézzük, X konstruktorában elkapunk egy hibát. De semmit se tudunk tenni, mert az X nem lett létrehozva, és destruktora se fog lefutni, így kb csak logolni tudunk. Ilyenkor érdemes továbbdobni, és ha nem is tesszük, a ordító automatikusan odaír még egy \texttt{throw;}-t.
+		
+		Sima \texttt{throw;}-t írok ,akkor azt dobom tovább amit elkaptam (de ez nyilván csak \texttt{catch}-ben működik.)
+		
+		Itt ezen a \texttt{catch}-en belül számos egyéb probléma van: Mivel X nem lett létrehozva, ezért az adattagjaihoz nem férünk hozzá, így csak a globálisokhoz (amiket alapból nem is szeretünk) és a paraméterekhez férünk hozzá.
+		
+		\texttt{new} ad erős garanciát.
+		
+		A \texttt{new} általában elég bajos. Például, a memóriaallokáció dobhat-e exceptiont? Minek szabad, miben nem szabad használni? 
+		
+		Ökölszabály: destruktorból nem szivároghat ki exception. Egy hívásban egyszerre csak egy exception lehet. Nézzük ezt meg:
+		
+		
+		\begin{lstlisting}
+struct Y
+{
+	~Y()
+	{
+		std::cout << "dtor y" << std::endl;
+	}
+};
+
+
+
+int main()
+{
+	try
+	{
+		Y y1;
+		Y y2;
+	}catch (int i)
+	{
+		std::cout << "catch int main" << std::endl;
+	}
+}
+		\end{lstlisting}
+		Kimenet ekkor:
+		\begin{lstlisting}
+dtor y
+dtor y
+catch int main
+		\end{lstlisting}
+		Mivan, ha kivétel az X-nek a destruktorából jön?
+		\begin{lstlisting}
+struct Y
+{
+	~Y()
+	{
+		std::cout << "dtor y" << std::endl;
+	}
+
+};
+struct X
+{
+	~X()
+	{
+		std::cout << "dtor x" << std::endl;
+		throw 5;
+	}
+};
+
+
+
+int main()
+{
+	try
+	{
+		X x1;
+		X x2;
+	}catch (int i)
+	{
+		std::cout << "catch int main" << std::endl;
+	}
+}
+		\end{lstlisting}
+		Itt a RAII miatt mind \texttt{x1}-nek, mind \texttt{x2}-nek le fog futni a destruktora, viszont 2 különböző exception lesz hajítva, ami hibára vezet.
+		
+		Destruktorban dobni szabad, de akkor destruktoron belül le kell kezelni. Ez egy \textbf{nagyon} nem definiált viselkedés. Itt GARANTÁLT hogy valami rossz működés fog történni. Nem definiáltnál még lehet hogy jól lefut a program, de ennél az esetnél garantált a hiba. Hasonló módon swap-nak se szabad dobnia.
+		
+		\subsection{Hogyan viselkedik az eldobott exception}
+		
+		\begin{lstlisting}
+int main()
+{
+	try
+	{
+		char c = 5;
+		throw c;
+	}catch(int i){
+		std::cout << "catch int main" << std::endl;
+	}
+}
+		\end{lstlisting}
+		A karakter implicit módon át tud konvertálódni integerré, de viszont ha változóval dobom át, akkor az implicit konverziókat nem vesszük figyelembe. A catch ádban semmiféle konverzió nem történhet. Lambdát semmi se tudja elkapni.
+		
+		\begin{lstlisting}
+int main()
+{
+	throw
+	{
+		throw new int{5};
+	}
+	catch(int i)
+	{
+		std::cout << "catch int main" << std::endl;
+		delete i;
+		throw;
+	}
+}
+		\end{lstlisting}
+		MINDIG ÉRTÉK szerint dobunk, és catchelni néha referencia szerint. Itt fent kinek a dolga \texttt{i} törlése? Mival ha továbbdobjuk?
+		
+		\begin{lstlisting}
+struct FileError
+{
+	virtual int errorCode() {return 0;}
+};
+
+struct FileNotExist : FileError
+{
+	virtual int errorCode() {return 1;}
+};
+
+int main()
+{
+	try
+	{
+		throw FileNotExist();
+	}catch (FileError e)
+	{
+		std::cout << "catch main" << e.errorCode() << std::endl;
+	}
+}
+		\end{lstlisting}
+		
+		Ez itt oké lesz, mert az ősosztály a leszármazottakat elkaphatja. Itt 0-t kapunk, mert slicing következik be. Ha referencia szerint veszünk át, akkor lesz 1.
+		
+		Itt most a probléma az lesz az első esetben, hogy a \texttt{FileNotExist} statikus és dinamikus része is \texttt{FileError} típusú lesz. Mivel a \texttt{FileError} copy-konstruktora volt meghívva, enek megfelelően hozza létre. Ha viszont referencia szerint veszünk át, akkor a statikus része ennek \texttt{FileError} típusú lesz, de a dinamikus része (azaz amilyen memóriaterületen van) az \texttt{FileNotExist} típusú lesz. 
+		
+		\subsection{Több catch használata}
+		
+		Lehet több catch-el is játszani.
+		\begin{lstlisting}
+struct FileError
+{
+	virtual int errorCode() {return 0;}
+};
+
+struct FileNotExist : FileError
+{
+	virtual int errorCode() {return 1;}
+};
+
+int main()
+{
+	try
+	{
+		throw FileNotExist();
+	}catch (FileNotExist e)
+	{
+		std::cout << "catch main" << e.errorCode() << std::endl;
+		throw 5;
+	}catch (FileError e)
+	{
+		std::cout << "catch main" << e.errorCode() << std::endl;
+	}catch (...)
+	{
+		//...	
+	}
+}
+		\end{lstlisting}
+		Itt az elsőbe fog belefutni. A legleszármazottabbat érdemes előreírni, és megyünk így kijjebb. a Z\texttt{catch(...)} mindenre illeszkedik. Mindig csak egy \texttt{catch} futhat le.
+		\bigskip
+		
+		\subsection{C++11}
+		
+		Ha van egy végrehajtási szál, melyben \texttt{f()} meghívja \texttt{g()}-t, ami meghívja \texttt{h()}-t, akkor ez egy úgynevezett THREAD. Ha több ilyenem is van, pl.
+		
+		\texttt{f() -> g() -> h()}
+		
+		\texttt{l() -> m() -> n()}
+		
+		Itt a két thread dobhat két exceptiont, de threadenként csak 1-et.
+		
+		\medskip
+		C++11-ben jött egy úgynevezett \texttt{noexcept} dolog. Ez arra hogy, hogy megtiltja egy függvénynek hogy exceptiont dobjon. Ha egy noexcept függvényből hiba dobódik, akkor azonnal leáll a program. Egy ilyen függvényből SOHA nem fog kiszivárogni kivétel, vagy ha mégis, akkor le fog élni a program.
+		
+		Érdemes egy függvényt \texttt{noexcept}-nek jelölni, ha nincs benne \texttt{noexcept}-et. Ezzel azonban óvatosan kell bánni, mert ha ne adj isten később még is kellene, és megváltoztatjuk \texttt{f()}-t úgy, hogy dobjon kivételt, akkor korábban destruktorokban problémákat okozhat. A \texttt{noexcept}-et komolyan át kell gondolni, ami egyszer az lett, maradjon is az.
+		\medskip
+		
+		Move szemantika:
+		
+		Tegyük fel hogy \texttt{A+B+C+D}-ben minden egy nagy mátrix. A program kiszámolja \texttt{A+B}-t, utána \texttt{A+B+C}-t, utána meg \texttt{A+B+C+D}, amit utána átmásolok, vagyis így 3 nagy mátrixot kiszámoltam, ami nagy pazarlás.
+		
+		Legyen úgy, hogy létrehozom \texttt{A+B}-t, és mivel ezt úgy is tönkretehetem majd, ezt módosítom amikor \texttt{C}-t hozzáadom, \texttt{D}-vel ugyanez, és ezt adjuk értékül.
+		
+		Másolásnál ha hiba történik, nincs baj, mert az eredeti példány megmarad. Na de ezzel a move dologgal más a dolog, mert mondjuk egy nagy vector elemeinél valamelyik elem move-jánál exception dobódik, akkor valamelyik vektor a kettő közül az egyik elveszik. Ez baj, így próbáljuk meg visszarakni. De azonban ez is tönkremehet. 
+		
+		Így csak akkor move-olhatunk STL konténereket, ha az a move \texttt{noexcept}.
+		
+		
+\end{document}
