@@ -101,7 +101,7 @@
 		
 		2 óra.
 	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Porkoláb} Zoltán és \textsc{Horváth} Gábor. (\today)
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Porkoláb} Zoltán és \textsc{Horváth} Gábor gyakorlata alapján. (\today)
 	
 	%TODO függvény és operátor túlterhelés ide illene a legjobban
 	%TODO globális és statikus függvényeket is ide kéne beilleszteni
@@ -145,7 +145,7 @@ int main()
 	\end{lstlisting}
 	
 	\section{A stack működése}
-	A stack a c++ alapértelmezett ,,memóriája'', minden változó alapértelmezetten itt jön létre és semmisül meg. Amennyiben egy változóra többet nem tudunk hivatkozni, automatikusan megsemmisül.
+	A stack a C++ alapértelmezett tárolási osztálya lokális változók esetén: minden változó alapértelmezetten itt jön létre és semmisül meg. Az itt létrejött változók automatikusan megsemmisülnek. Az élettartamuk a definíciójuktól az adott blokk végéig tart.
 	
 	\begin{lstlisting}
 #include <iostream>
@@ -165,9 +165,8 @@ int main()
 	\end{lstlisting}
 	\medskip
 	
-	A fenti kód működését így képzelhetjük el:
+	A fenti kód futása során a stack-et így képzelhetjük el:
 	
-	%durva kód copy paste inc... dont be mad :'(
 	\begin{center}
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
@@ -193,7 +192,7 @@ int main()
 		\node (x) [Node] at (7,0.25) {x};
 		\end{tikzpicture}
 	\end{center}
-	Az ábrán egy stack-et látunk. Amikor a vezérlés az \texttt{f} függvényhez ér, és ott létrehozza az \texttt{x} változót, azt behelyezi a stack-be. A \texttt{return} kulcsszó hatására készít \texttt{x}-ről egy temporális példányt, ami a függvény visszatérési értéke lesz. Amikor a vezérlés visszatér a \texttt{main} függvényhez, {x}-re nem tudunk tovább hivatkozni, így azt megsemmisíti, és ez ismétlődik folyamatosan.
+	Az ábrán egy stack-et látunk. Amikor a vezérlés az \texttt{f} függvényhez ér, és ott létrehozza az \texttt{x} változót, azt behelyezi a stack-be. A \texttt{return} kulcsszó hatására készít \texttt{x}-ről egy temporális példányt, ami a függvény visszatérési értéke lesz. Amikor a vezérlés visszatér a \texttt{main} függvényhez, {x}-re nem tudunk tovább hivatkozni, így azt megsemmisíti, és ez ismétlődik, ameddig a ciklus véget nem ér.
 	\smallskip
 	
 	A stack egy FILO (\textit{first in last out}) adatszerkezet -- azaz azt az elemet ,,dobja'' ki a vezérlés a stack-ből, melyet utoljára rakott be.
@@ -208,17 +207,17 @@ void swapWrong(int a, int b)
 {
 	int tmp = a;
 	a = b;
-	b = a;
+	b = tmp;
 }
 
 int main()
 {
 	int c = 5, d = 8;
-	swap(c, d);
+	swapWrong(c, d);
 	std::cout << c << ' ' << d << std::endl;
 }
 	\end{lstlisting}		
-	A program kimenete \texttt{5 8} ment. Ez egy teljesen jól definiált viselkedés. Ez azért van, mert itt \textbf{érték} szerint vettük át (\textit{pass by value}) \texttt{a} és \texttt{b} változót. A következő ábrán megfigyelhetjük miért is nem. Képzeljük el, ahogy ebbe a verembe a kódunk elrakja a \texttt{c} és \texttt{d} változókat. Majd meghívja a \texttt{swapWrong} függvényt, melyben létrehozott \texttt{a} és \texttt{b} változókat ismét behelyezi. Bár a függvényre lokális \texttt{a} és \texttt{b} változókat megcseréli, de a függvényhívás után ezeket ki is törli a stackből.
+	A program kimenete \texttt{5 8}. Ez egy teljesen jól definiált viselkedés. Ennek az az oka, hogy itt \textbf{érték} szerint vettük át (\textit{pass by value}) \texttt{a} és \texttt{b} paramétert. A következő ábrán megfigyelhetjük mi is történik pontosan. Képzeljük el, hogy a stackbe a program elrakja a \texttt{c} és \texttt{d} változókat. Eztán meghívja a \texttt{swapWrong} függvényt, melyben létrehozott \texttt{a} és \texttt{b} paraméterek szintén a stackre kerülnek. Bár a függvényre lokális \texttt{a} és \texttt{b} paraméterek értékét megcseréli, de a függvényhívás után ezeket ki is törli a stackből. Az eredeti \texttt{c} és \texttt{d} változók éréke nem változott a függvényhívás során.
 	\begin{center}
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
@@ -235,8 +234,8 @@ int main()
 		\draw [thick, black] (5, 0) -- (5, 3);
 		\node (c3) [Node] at (4,0.25) {\texttt{c} (5)};
 		\node (d3) [Node] at (4,0.75) {\texttt{d} (8)};
-		\node (a3) [Node] at (4,1.25) {\texttt{a} (8)};
-		\node (b3) [Node] at (4,1.75) {\texttt{b} (5)};
+		\node (a3) [Node] at (4,1.25) {\texttt{a} (5)};
+		\node (b3) [Node] at (4,1.75) {\texttt{b} (8)};
 		\node (b3) [Node] at (4,2.25) {\texttt{tmp} (5)};
 		
 		\draw [thick, black] (6, 0) -- (8, 0);
@@ -255,12 +254,10 @@ int main()
 		\node (b4) [Node] at (10,0.75) {\texttt{d} (8)};
 		\end{tikzpicture}
 		\smallskip
-		
-		Tekintsünk el a \texttt{tmp} változótól.
 	\end{center}
-	C++ban alapértelmezett a paraméterátadás függvényeknél érték szerint történik.
-	\subsection{Mutatóval történő paraméter átvétel}
-	A mutatók olyan nyelvi elemek, melyek egy memóriaterületre mutatnak. Segítségükkel anélkül is tudunk hivatkozni egy adott objektumra (és nem csak a másolatára), hogy közvetlenül az objektummal dolgoznánk. Most röviden megismerkedünk velük, de később részletesebben visszatérünk rájuk.
+	C++ban alapértelmezett módon a paraméterátadás érték szerint történik.
+	\subsection{Mutatók érték szerinti átadása}
+	A mutatók olyan nyelvi elemek, melyek egy adott típusú memóriaterületre mutatnak. Segítségükkel anélkül is tudunk hivatkozni egy adott objektumra (és nem csak a másolatára), hogy közvetlenül az objektummal dolgoznánk. Most röviden megismerkedünk velük, de később részletesebben visszatérünk rájuk.
 	\begin{lstlisting}
 int main()
 {
@@ -268,7 +265,7 @@ int main()
 	int *p = &c;
 }
 	\end{lstlisting}
-	A fenti példában \texttt{p} egy mutató (\textit{pointer}), mely egy \texttt{int} típusra mutat. Ahhoz, hogy értéket tudjunk adni egy mutatónak, egy memóriacímet (\textit{referenciát}) kell neki értékül adni, amire rá tud mutatni, erre való a \textbf{referáló operátor} (\&). Ha a mutató által \textit{mutatott értéket} szeretnénk módosítani, akkor dereferálnunk kell a \textbf{dereferáló operátor}ral (*).
+	A fenti példában \texttt{p} egy mutató (\textit{pointer}), mely egy \texttt{int} típusra mutat. Ahhoz, hogy értéket tudjunk adni egy mutatónak, egy memóriacímet kell neki értékül adni, erre való a \textbf{címképző operátor} (\&). Ha a mutató által \textit{mutatott értéket} szeretnénk módosítani, akkor dereferálnunk kell a \textbf{dereferáló operátor}ral (*).
 	\begin{lstlisting}
 int *p = &c; //referaljuk c-t
 *p = 4; //dereferaljuk p-t
@@ -277,13 +274,15 @@ p = &d;
 	\end{lstlisting}
 	Rendre: pointer inicializálása, pointer által mutatott érték módosítása, pointer átállítása másik memóriacímre, és a mutatott érték módosítása.
 	
-	Egy mutató mutathat változóra, másik mutatóra, saját magára, és sehova is. Azok a mutatókak, melyek sehová sem mutatnak, nullpointernek nevezzük, és így hozhatjuk létre őket:
+	Egy mutató mutathat változóra, másik mutatóra vagy sehova. Azokat a mutatókat, melyek sehová sem mutatnak, null pointernek nevezzük, és így hozhatjuk létre őket:
 	
 	{\centering \texttt{p = 0;\quad \quad p = NULL;\quad \quad p = nullptr;} \par}
 	
 	\begin{note}
-		Ez a három értékadás (közel) ekvivalens, azonban a \texttt{nullptr} kulcsszó csak c++11ben érhető el.
+		Ez a három értékadás (közel) ekvivalens, azonban a \texttt{nullptr} kulcsszó csak C++11ben és azutáni szabványokban érhető el.
 	\end{note}
+
+  Nézzük meg, hogy hogyan tudunk megcserélni két értéket ezúttal helyesen, mutatók segítségével.
 	
 	\begin{lstlisting}
 void swapP(int *a, int *b)
@@ -294,7 +293,10 @@ void swapP(int *a, int *b)
 }
 	\end{lstlisting}
 	
-	Amennyiben ezt a függvényt hívjuk meg, valóban megcserélődik a két változó értéke. De ehhez fontos, hogy ne simán \texttt{swapP(c, d)}-t írjunk függvényhívásként, az ugyanis az fordítási hibához vezetne, mert a \texttt{c} és \texttt{d} típusa \texttt{int}, és nem \texttt{int*}. Ahhoz, hogy értéket adjunk egy pointernek, a \texttt{c}-hez és \texttt{d}-hez tartozó memóriacímeket kell átadni, így a \texttt{swapP(\&c, \&d)} hívás lesz megfelelő.
+	Amennyiben ezt a függvényt hívjuk meg, valóban megcserélődik a két változó értéke. De ehhez fontos, hogy ne \texttt{swapP(c, d)}-t írjunk, az ugyanis az fordítási hibához vezetne, hiszen a \texttt{c} és \texttt{d} típusa \texttt{int}, és nem \texttt{int*}. Ahhoz, hogy értéket adjunk egy pointernek, a \texttt{c}-hez és \texttt{d}-hez tartozó memóriacímeket kell átadni, így a \texttt{swapP(\&c, \&d)} hívás lesz megfelelő.
+	\begin{note}
+    A mutatókat továbbra is érték szerint adjuk át. Az \texttt{a} és \texttt{b} paraméterekben lévő memóriacím tehát a másolata annak, amit a hívás helyén megadtunk.
+	\end{note}
 	\begin{center}
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
@@ -343,8 +345,6 @@ void swapP(int *a, int *b)
 		\end{tikzpicture}
 	\end{center}
 	
-	Ezt azonban ez még mindig \textbf{érték szerinti} átadásnak nevezzük, mert most nem konkrét értéket, hanem a memóriacímet másoltuk át.
-	
 	\begin{lstlisting}
 void swapWrong2(int *a, int *b)
 {
@@ -353,7 +353,7 @@ void swapWrong2(int *a, int *b)
 	b = tmp;
 }
 	\end{lstlisting}
-	Ebben a példában nem a pointerek által mutatott értéket, hanem magukat a pointereket cseréljük meg. Itt annyi fog csupán történni, hogy a függvény beljesében \texttt{a} és \texttt{b} pointer másra fog mutatni. De annak értéke nem változik.
+	Ebben a példában nem a pointerek által mutatott értéket, hanem magukat a pointereket cseréljük meg. Itt az fog történni, hogy a függvény belsejében \texttt{a} és \texttt{b} pointer másra fog mutatni. A mutatott értékek viszont nem változnak.
 	
 	\begin{center}
 		\begin{tikzpicture}
@@ -406,15 +406,15 @@ void swapWrong2(int *a, int *b)
 		\node (b4) [Node] at (7,0.75) {\texttt{d} (5)};
 		\end{tikzpicture}
 	\end{center}
-	\subsection{Referencia szerinti paraméter átvétel}
-	Megállapíthatjuk, hogy az előző megoldásnál nem változtattuk meg azt, hogy mire mutassanak a pointerek, így azokat konstansként is definiálhatnánk. A konstans pointerek módosíthatják a mutatott cím értékét, de máshova nem mutathatnak. Úgy tudunk egy ilyen pointert létrehozni, hogy a csillag után írjuk a \texttt{const} kulcsszót.
+	\subsection{Referencia szerinti paraméter átadás}
+	Megállapíthatjuk, hogy az előző megoldásnál nem változtattuk meg, hogy mire mutassanak a pointerek, így azokat konstansként is definiálhatnánk. A konstans pointerek módosíthatják a mutatott értéket, de nem lehet őket átállítani egy másik memória címre. Úgy tudunk egy ilyen pointert létrehozni, hogy a csillag után írjuk a \texttt{const} kulcsszót.
 	\begin{lstlisting}
 void swap(int * const a, int * const b)
 {
 	//...
 }
 	\end{lstlisting}
-	Egy kis szintaktikai cukorkával megúszhatjuk azt, hogy folyton kiírjuk a \texttt{* const}-ot (lévén ritkán akarjuk megváltoztatni hogy ilyen esetben a pointer hova mutasson). Erre való a {referencia szerinti paraméter átváétel} (\textit{pass by reference}). A referencia úgy működik, mintha egy konstans pointer lenne.
+	Egy kis szintaktikai cukorkával megúszhatjuk azt, hogy folyton kiírjuk a \texttt{* const}-ot (lévén nem akarjuk megváltoztatni, hogy ilyen esetben a pointer hova mutasson). Erre való a {referencia szerinti paraméter átváétel} (\textit{pass by reference}). A referencia hasonlóan működik, mintha egy konstans pointer lenne, csak nem lehet sehova se mutató referenciát létrehozni.
 	\begin{lstlisting}
 void swapRef(int &a, int &b)
 {
@@ -423,16 +423,16 @@ void swapRef(int &a, int &b)
 	b = tmp;
 }
 	\end{lstlisting} 
-	Ez a két függvény lényegében ekvivalensek. A különbség a referencia és a pointer között csupán annyi, hogy egy referencia nem lehet null.
+  Ez a függvény lényegében ekvivalens a \texttt{swapP} fügvénnyel. 
 	\begin{note}
 		Ez bár ezt referencia szerinti átvételnek nevezzük, de itt is történik másolás, a memóriacímet ítt is érték szerint vesszük át.
 	\end{note}
-		Megjegyzendő, hogy a fenti \texttt{swapRef} függvénynek nem kell memóriacímeket átadni, \texttt{swapRef(a,b)}-t kell írnunk.
+		Megjegyzendő, hogy a fenti \texttt{swapRef} függvény meghívásakor nem kell jeleznünk, hogy memóriacímeket akarunk átadni, \texttt{swapRef(a,b)}-t kell írnunk.
 	\begin{note}
 		Egy referenciát mindig inicializálni kell. Csak úgy mint egy konstanst (különben fordítási hibát kapunk.)
 	\end{note}
 	\subsection{Visszatérési érték problémája}
-	Nem primitív (pl. \texttt{int}) típusoknál gyakran megeshet, hogy egy adott ípushoz tartozó pointer mérete kisebb, mint magának az objektumé, így megérheti mindentől függetlenül a paramétert referencia szerint átvenni. Ezen felbátorodva mondhatnánk azt is, hogy referenciával is térjünk vissza (a követekező példában tekintsünk el attól, hogy \texttt{int}-el dolgozunk, bátran képzeljük azt hogy az pl. egy nagyon nagy mátrix)!
+	Nem primitív (pl. \texttt{int}) típusoknál gyakran megeshet, hogy egy adott típushoz tartozó pointer mérete kisebb, mint magának az objektumé, így megérheti mindentől függetlenül a paramétert referencia szerint átvenni. Ezen felbátorodva mondhatnánk azt is, hogy referenciával is térjünk vissza (a követekező példában tekintsünk el attól, hogy \texttt{int}-el dolgozunk, bátran képzeljük azt hogy az pl. egy nagyon nagy mátrix)!
 	\begin{lstlisting}
 int& addOne(int &i)
 {
