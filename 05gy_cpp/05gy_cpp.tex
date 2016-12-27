@@ -132,17 +132,23 @@
 		\end{tabular}
 	\end{center}
 	\subsection{Stack}
-	A stack a c++ alapértelmezett ,,memóriája'', minden változó alapértelmezetten itt jön létre és semmisül meg. Ez utóbbi nagyon fontos: azok a változók, amelyek kiesnek a scope-ból, automatikusan megsemmisülnek, így nem kell a létrehozással és a megsemmisüléssel külön bajlódnunk.
+	A második gyakorlaton már volt szó részletesebben a stack működéséről. Jusson eszünkbe egy nagyon fontos tulajdonsága: azok a változók, amelyekre már többet nem tudunk hivatkozni, automatikusan megsemmisülnek, így nem kell a létrehozással és a megsemmisítéssel külön bajlódnunk.
+	\smallskip
+	
+	A stack-en létrehozott változókat szokás \textbf{automatikus változók}nak (\textit{automatic variable}) is hívni.
+	
+	\smallskip
+	Vegyük példaként a második gyakorlatról már ismerős kódrészletet.
 	
 	\begin{lstlisting}
 #include <iostream>
 
 int f()
 {
-	int x = 0; //x letrejon
+	int x = 0;
 	++x;
 	return x;
-} //x megsemmisul
+}
 
 int main()
 {
@@ -154,10 +160,8 @@ int main()
 }
 	\end{lstlisting}
 	Kimenet: \texttt{1 1 1 1 1}
-	
-	A stack-en létrehozott változókat szokás \textbf{automatikus változók}nak (\textit{automatic variable}) is hívni.
-	
 	\smallskip
+	
 	A stacken lérehozott változók kezelése nagyon kényelmes, mert jól látható, mikor jönnek jönnek létre, mikor semmisülnek meg, stb. Azonban fordulhat elő olyan, hogy nem szeretnénk, hogy minden alkalommal megsemmisüljön a fenti példában az \texttt{x}, ilyenkor kiút lehet a statikus változók használata.
 	\subsection{Globális/statikus tárhely}
 	%TODO globális változók
@@ -170,7 +174,7 @@ int f()
 	return x;
 }
 
-int main(){/* */}
+int main() {/*...*/}
 	\end{lstlisting}
 	Kimenet: \texttt{1 2 3 4 5}
 	

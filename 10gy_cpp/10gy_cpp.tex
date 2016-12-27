@@ -270,7 +270,7 @@ template<typename BDIT>
 BDIT algorithm(BDIT it, int pos, std::bidirectional_iterator_tag) 
 {
 	for(int i = 0; i<pos; i++)
-	++it;
+		++it;
 	std::cout << "Slow" << ' ';
 	return it;
 }
@@ -363,10 +363,11 @@ int main()
 		s.insert(Circle(i, i + 1, i + 2));
 	
 	std::set<Circle>::iterator it1 = s.find(Circle(2, 3, 4));
-	std::set<Circle>::iterator it2 = std::find(s.begin(), s.end(), Circle(2, 3, 4));
+	std::set<Circle>::iterator it2 = std::find(s.begin(), s.end(), 
+														Circle(2, 3, 4));
 	
-	std::cout << it1->x << ' ' << it1->y << ' ' << it1->r << std::endl; // 0 1 4
-	std::cout << it2->x << ' ' << it2->y << ' ' << it2->r << std::endl; // 1 9 10
+	std::cout << it1->x << ' ' << it1->y << ' ' << it1->r; // 0 1 4
+	std::cout << it2->x << ' ' << it2->y << ' ' << it2->r; // 1 9 10
 }
 \end{lstlisting}
 	Ezzel semmi komolyabb gond nincs, de nem szabad meglepődni, amikor az ember ettől függően más megoldást kap mint amire számít.

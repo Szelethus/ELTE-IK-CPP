@@ -167,7 +167,9 @@ int main()
 	\end{lstlisting}
 	Kimenet: \texttt{2 kisebb mint 3! a es b egyenloek!}
 	
-	Ez a funktor (\texttt{Less}) egy un. \textit{binary predicate}, azaz a gömbölyű zárójel operátora két azonos típusú objektumhoz rendel egy logikai értéket. Figyeljük meg, hogyan adtuk meg a harmadik paramétert: \texttt{Less}-nek meghívtuk a default konstruktorát, de nem adtunk neki változónevet. Itt egy un. névtelen temporális változó jön létre, mely \texttt{f} paramétereinek kiértékelésekor jön létre, majd az \texttt{f} lefutása után meg is semmisül. Figyeljük meg azt is, hogy ebben az esetben érték szerint vettünk át: ez nem csak hatékonyabb, hisz \texttt{Less} mérete minimális (nincs adattagja), de mivel \texttt{Less()} egy jobbérték, csak így, vagy konstans referenciával tudnánk átvenni.
+	Ez a funktor (\texttt{Less}) egy un. \textit{binary predicate}, azaz a gömbölyű zárójel operátora két azonos típusú objektumhoz rendel egy logikai értéket. Figyeljük meg, hogyan adtuk meg a harmadik paramétert: \texttt{Less}-nek meghívtuk a default konstruktorát, de nem adtunk neki változónevet. Itt egy un. névtelen temporális változó jön létre, mely \texttt{f} paramétereinek kiértékelésekor jön létre, majd az \texttt{f} lefutása után meg is semmisül. 
+	
+	Figyeljük meg azt is, hogy ebben az esetben érték szerint vettünk át: ez nem csak hatékonyabb, hisz \texttt{Less} mérete minimális (nincs adattagja), de mivel \texttt{Less()} egy jobbérték, csak így, vagy konstans referenciával tudnánk átvenni.
 	\smallskip
 	
 	Ez alapján az egyenlőség is levezethető: \quad $a = b \quad \Leftrightarrow \quad \neg(a<b)\, \wedge\, \neg(b<a)$
@@ -175,6 +177,9 @@ int main()
 	
 	Könnyű látni, hogy általánosan beszélve, \texttt{Compr} összehasonlító funktorral $a$ és $b$ \texttt{T} típusú objektumoknál
 	\[ a\ \ \text{és}\ \ b\ \ \text{ekvivalens}\quad \Leftrightarrow\quad \neg \,Compr(a, b)\, \wedge\, \neg \,Compr(b, a). \]
+	\begin{note}
+		Azokat a funktorokat, melyeknek az \texttt{()} operátora csak \textbf{egy} adott típusú objektumot várnak és \texttt{bool} a visszatérési értékük, \textit{unary predicate}-nek hívjuk.
+	\end{note}
 
 	\subsection{Bevezető a konténerekhez}
 	C++ban az egyetlen tároló alapértelmezetten a tömb. Azonban az meglehetősen kényelmetlen: a tömb egymás mellett lévő memóriacímek összessége, nem tehetjük meg azt, hogy csak úgy hozzáveszünk 1-1 elemet (mi van ha valaki más már írt oda?). Ezért jobban járunk, ha írunk egy egyedi kontért (pl. az általunk létrehozott \texttt{List}), vagy pedig válogatunk az előre megírt STL konténerek között.
@@ -536,6 +541,7 @@ bool contains(const std::map<std::string, int> &m)
 	Ez a függvény helyesen vizsgálja, hogy a \texttt{c++} benne van-e. (Ha cppreference-en rákeresünk, a \texttt{map}-nek a \texttt{find} nevű tagfüggvénye egy iterátort ad vissza a talált elemre, illetve visszaadja egy past-the-end iterátort ha nem találja meg.)
 	\medskip
 	
+	
 	\texttt{std::map}-ban az iterálás kicsit trükkösebb, ugyanis \texttt{std::map} párokat tárol, méghozzá egy más alapból megírt struktúrát használ, az \texttt{std::pair}-t, ami kb. így néz ki:
 	\begin{lstlisting}
 template <typename T1, typename T2>
@@ -551,6 +557,11 @@ for(std::map<std::string, int>::iterator i = m.begin(); i != m.end(); i++)
 {
 	std::cout << i->first << " " << i->second;
 }
+	\end{lstlisting}
+	Amennyiben új elemeket szúrunk be, gyakran megkerülhető a problémás \texttt{[]} használata. Az \texttt{std::map} insert függvénye egy \texttt{std::pair}-t vár paraméterül, melyet könnyen tudunk alkotni \texttt{std::make\_pair} függvény segítségével.
+	\begin{lstlisting}
+std::set<int, char> s;
+s.insert(std::make_pair(1, 'a'));
 	\end{lstlisting}
 	
 	Link: \url{http://en.cppreference.com/w/cpp/container/map}
