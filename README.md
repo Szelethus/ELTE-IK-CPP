@@ -7,14 +7,12 @@ A második előadás nagyon kiesik az összes többi témájából, így én abb
 
 ## Pótlandó dolgok
 
-* Láthatóság és élettartam
 * Implicit konverziók
-* Globális változókról átláthatóbb leírás, static kulcsszó
-* Template-ekről rendesebb leírás 
-* sizeof-ról bővebben (pl. sizeof(unsigned) == sizeof(int))
 * using namespace std;
-* ábrák a swap-os függvényekhez
 * UML diagramok 11 gyakhoz
+* Kiértékelési sorrend
+* Nyelvi elemek
+* istream/ostream iterator
 
 ## Linkek
 
