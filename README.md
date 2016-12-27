@@ -13,6 +13,7 @@ A második előadás nagyon kiesik az összes többi témájából, így én abb
 * Kiértékelési sorrend
 * Nyelvi elemek
 * istream/ostream iterator
+* jobb és balérték
 
 ## Linkek
 
