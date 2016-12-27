@@ -113,38 +113,7 @@ void swap(int &a, int &b)
 	b = tmp;
 }
 	\end{lstlisting}
-	Ez a függvény mind addig jó is, amíg csak \texttt{int}-eket szeretnénk megcserélni, de mi van, ha \texttt{std::string}-eket kéne? A megoldás egyszerű, \textbf{túlterheljük} (\textit{overload}) a \texttt{swap} függvényt.
-	\begin{lstlisting}
-void swap(std::string &a, std::string &b)
-{
-	int tmp = a;
-	a = b;
-	b = tmp;
-}
-	\end{lstlisting}
-	Túlterhelésnek azt nevezzük, amikor két vagy több függvénynek a neve azonos, de a paramétereik különböznek. Tagfüggvényeknél különböző konstansság is számít.
-	\begin{lstlisting}
-struct A
-{
-	void print() 
-	{
-		std::cout << "Not const" << std::endl;
-	}
-	void print() const //overload
-	{
-		std::cout << "Const" << std::endl;
-	}
-};
-
-int main()
-{
-	A a;
-	a.print(); //Not const
-	
-	const A ca;
-	ca.print(); //const
-}
-	\end{lstlisting}
+	Ahogy azt láttuk, túl tudjuk terhelni ezt a függvényt, hogy más típusokat is fogadjon.
 	Azonban gyorsan megállapítható, hogy állandóan egy újabb overloadot létrehozni nem épp ideális megoldás. Ez a kisebb gond, a nagyobb az, hogy a kódismétlés áldozatai leszünk: ha bármi miatt egváltozna a \texttt{swap} belső implementáció, az összes létező swap süggvényben meg kéne ejteni a változtatást. Erre egy megoldás lehet, ha létrehozunk egy sablont, melynek mintájára a fordító maga tud generálni egy megfelelő függvényt.
 	\begin{lstlisting}
 template <typename T>

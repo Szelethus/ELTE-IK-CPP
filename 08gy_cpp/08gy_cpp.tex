@@ -306,34 +306,9 @@ int main() {
 		Az inline kulcsszó egy javaslat a fordítónak, de nem parancs. Nem inline függvények lehetnek inline-ok, és inlineként definiált függvények lehet mégsem lesznek azok.
 	\end{note}
 	Azok a tagfüggvények, melyek nem az osztály törzsében vannak definiálva, nem lesznek inline-ok, ezért volt az, hogy mielőtt szétszedtük a listánkat header fájlra és fordítási egységre, linkelési hibát kaptunk (\texttt{Iterator} és \texttt{ConstIterator} pár tagfüggvénye külön volt véve).
-	\subsection{Operátor túlterhelés}
-	%TODO ez a szekció a 7. gyakorlat elején talán jobb lenne.
 	\medskip
-	Írjuk meg a \texttt{print} függvényt értelmesebben! Ahogy láttuk a 7. gyakorlat elején, lehetőségünk van függvényeket túlterhelni, és ez operátorokra is igaz. Ha példaként vesszük a lineáris algebrából tanult rendezett valós számhármasokat ($\R^3$), lehetőségünk van arra, hogy a tanultak alapján definiáljuk a köztük értelmezett összeadást.
-	%TODO temporális változók
-	\begin{lstlisting}
-struct LinAlgVector
-{
-	double x1, x2, x3;
 	
-	LinAlgVector(double _x1, double _x2, double _x3) : 
-											x1(_x1), x2(_x2), x3(_x3) {}
-};
-
-LinAlgVector operator+(const LinAlgVector &lhs, const LinAlgVector &rhs)
-{
-	return LinAlgVector(lhs.x1 + rhs.x1, lhs.x2 + rhs.x2, lhs.x3 + rhs.x3);
-}
-
-int main()
-{
-	LinAlgVector a(1,2,3), b(1,1,1), c = a + b;
-}
-	\end{lstlisting}
-	A \texttt{main} függvényben lévő értékadás ezzel ekvivalens: \texttt{c = operator+(a, b)}, így láthatjuk, hogy az operátorok túlterhelése gyakorlatilag a függvénytúlterhelés speciális esete. 
-	\smallskip 
-	
-	A gyakran beolvasáshoz használt jobb shift operátor (\texttt{right shift operator}), a $<<$ is túlterhelhető, mely kihasználható egy általunk létrehozott objektum kiíratásának definiálására. Mivel mi at \texttt{std::cout} változóval szeretnénk majd kiíratni, melynek típusa \texttt{std::ostream}, így a függvényünk első paramétere egy ilyen típus lesz, a második meg egy \texttt{List} típus.
+	Cseréljük le továbbá a print függvényt:
 	
 	\begin{lstlisting}
 std::ostream& operator<<(std::ostream& os, const List &l)
@@ -345,9 +320,7 @@ std::ostream& operator<<(std::ostream& os, const List &l)
 	return os;
 }
 	\end{lstlisting}
-	
-	Feltűnhet, hogy a kiírató változót a függvény végén vissza is adjuk, melynek oka az, hogy tudjuk a kiíratást láncolni. Sajnos fordítási hibát kapunk, hisz a fordító nem tudja mi az az \texttt{ostream}, így kell valamit include-olni. Ilyenkor a header fájlba inkább érdemes az \texttt{iosfwd} headert berakni \texttt{iostream} helyett, mert ez minden beolvasással és kiíratással kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység méretéte (azonban a cpp fájlban muszáj \texttt{iostream}-et használni, hogy a definíciók meglegyenek).
-	
+	Sajnos fordítási hibát kapunk, hisz a fordító nem tudja mi az az \texttt{ostream}, így kell valamit include-olni. Ilyenkor a header fájlba inkább érdemes az \texttt{iosfwd} headert berakni \texttt{iostream} helyett, mert ez minden beolvasással és kiíratással kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység méretéte (azonban a cpp fájlban muszáj \texttt{iostream}-et használni, hogy a definíciók meglegyenek).
 	\section{Névterek}
 	
 	A probléma csak az, hogy nagyon sok hasznos nevet elhasználtunk, pl. több \texttt{Iterator} nevű osztályt nem hozhatunk létre (az un. \textit{global namespace}-be kerültek), különben a névütközés áldozatai leszünk. Pedig várhatóan nem csak ennek az egy konténernek szeretnék iterátort írni. Megoldás lehet, hogyha az iterátorainkat egy névtérbe (\textit{namesspace}) rakjuk.

@@ -103,7 +103,7 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
 	\section{A c++ memóriamodellje}
-	A c++ szabvány 3 memóriatípust különít el. Ezek közül a stack-et használtuk csak eddig.
+	A c++ szabvány 3 memóriatípust különít el. Ezek közül főleg a stack-et használtuk eddig.
 	\begin{center}
 		\begin{tabular}{|c|}
 			\\
@@ -276,7 +276,7 @@ int main()
 struct List
 {
 	int data;
-	List *next
+	List *next;
 };
 	\end{lstlisting}
 	Alkalmazzuk is ezt úgy, hogy  a listaelemek dinamikusan legyen eltárolva!
@@ -373,7 +373,7 @@ void free(List *head)
 	\end{note}
 	Beszéljünk arról, mennyi a teher a felhasználón. Eddig tudnia kellett, milyen sorrendben kell felszabadítani midnent, de most már elég arra figylenie, hog lista használata után meg kell hívnia a \texttt{free} függvényt. A felhasználó így kisebb eséllyel követ el hibát, jobban tud figyelni arra, ami valóban a dolga. Legyenek a függvényeink és osztályaink olyanok, hogy \textbf{könnyű legyen őket jól használni, és nehéz legyen rosszul}.
 	
-	\medskip
+	\subsection{Osztályra statikus változók}
 	Teszteljünk!
 	\begin{lstlisting}
 int main()
@@ -386,11 +386,76 @@ int main()
 	free(head);
 }
 	\end{lstlisting}
-	A program lefordult, és (nálunk) tökéletesen le is futott. Azonban ha történt memory leak, az egy nem definiált viselkedés, így nem lehetünk benne biztosak, hogy valóban nem történt szivárgás. Ha azonban ezzel a paranccsal fordítjuk a kódunkat:
+	A program lefordult, és (nálunk) tökéletesen le is futott. Azonban ha történt memory leak, az egy nem definiált viselkedés, így nem lehetünk benne biztosak, hogy valóban nem történt szivárgás. Egy lehetséges módszer, amivel megvizsgálhatjuk ezt, a statikus változók használata.
+	
+	\smallskip
+	Az osztályon belül statikusként deklarált változókat osztályszintű változóknak is hívjuk, ugyanis minden, az osztályhoz tartozó objektum ugyanazon a statikus változón ,,osztozkodik''. Ha az egyiken keresztül azt a változót módosítjuk, a többiben módosulni fog. Élettartamuk és láthatóságuk a program elejétől végéig tart.
+	
+	Hozzunk létre \texttt{List}-ben egy számlálót, ami számon tartja mennyi objektumot hoztunk belőle létre, és semmisítettünk meg!
+	\begin{lstlisting}
+struct List
+{
+	int data;
+	List *next;
+	
+	static int count; // !
+};
+
+List *add(List *head, int data)
+{
+	if (head == 0)
+	{
+		List *ret = new List;
+		head->count++; // !
+		ret->data = data;
+		ret->next = 0;
+		return ret;
+	}
+	head->next = add(head->next, data);
+	return head;
+}
+
+void free(List *head)
+{
+	if (head == 0)
+	return;
+	free(head->next);
+	head->count--; // !
+	delete head;
+}
+
+int main()
+{
+	List *head = 0;
+	head = add(head, 8);
+	head = add(head, 7);
+	head = add(head, 2);
+	
+	free(head);
+	std::cout << head->count; // !
+}
+	\end{lstlisting}
+	Azonban kaptunk egy fordítási hibát, miszerint hiányzik \texttt{count} definíciója -- Ahogy fent is említve volt, itt csak \textit{deklaráltuk}, de nem \texttt{definiáltuk} \texttt{count}-ot, így ezt tegyük is meg gyorsan.
+	
+	Osztályszintű változókat csak osztályon kívül tudunk definiálni (ezek alól kivételt képeznek az osztályszintű konstans változók):
+	\begin{lstlisting}
+int List::count;
+	\end{lstlisting}
+	Figyeljük meg, hogy \texttt{count}-nak nem adtunk kezdőértéket, hisz minden statikus változó (számok esetében) alapértelmezetten 0-ra incializál.
+	\smallskip
+	
+	Mivel azonban ez a változó minden \texttt{List} objektummal közös, így nem muszáj egy változón keresztül hivatkozunk rá, a \texttt{List::count} kifejezéssel is megtehetjük.
+	\medskip
+	
+	Ezzel a kis módosítással meg is kapjuk a kívánt kimenetet, \texttt{0}. Ez alapján tudhatjuk, hogy minden objektum törlésre került.
+	\begin{note}
+		A későbbiekben úgy tekintünk \texttt{List}-re, mintha ezeket a módosításokat nem ejtettük volna meg.
+	\end{note}
+	Ha azonban egy elemet kétszer töröltünk, az lehet, hogy nem derül ki. Ennek kiszűrésében segíthet, ha ezzel a paranccsal fordítjuk a kódunkat:
 	\begin{center}
 		\texttt{g++ list.cpp -fsanitize=address -g}
 	\end{center}
-	akkor úgy fordul a kód, hogy futási időjű ellenőrzéséket végez, hogy nem szivárog-e a memória (a \texttt{-g} a szebb hibaüzenetekhez kell). Amennyiben egy memóriacímet nem szabadítottunk fel, vagy egyet kétszer töröltünk, megállítja a program futását, és ,,jól'' átlátható hibaüzenetet ad (bővebben: 3. gyakorlat anyaga). 
+	E segítségével úgy fordul a kód, hogy futási időjű ellenőrzéséket tesz bele a fordító, hogy nem szivárog-e a memória, vagy nem töröltük-e valamit kétszer (a \texttt{-g} a szebb hibaüzenetekhez kell). Ha ez bekövetkezne, megállítja a program futását, és ,,jól'' átlátható hibaüzenetet ad (bővebben: 3. gyakorlat anyaga). 
 	
 	\medskip
 	Ez a láncolt lista még mindig messze áll egy jó struktúrától. Szerencsére nem csak adattagokat, de függvényeket is tudunk struct-okba írni, melyek alapértelmezetten hozzáférnek az adott objektum adattagjaihoz.
