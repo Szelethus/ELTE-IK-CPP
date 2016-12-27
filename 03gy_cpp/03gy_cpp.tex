@@ -353,7 +353,8 @@ std::cout << sizeof(t) << std::endl;
 		\end{lstlisting}
 		A \texttt{sizeof} operátor megadja a paraméterként megadott típus, vagy objektum esetében annak típusának méretét (bővebben később). Ez minden implementációra specifikus. Azt látjuk, hogy mindig ötszöröse lesz a \texttt{t} az \texttt{i}-nek. Azaz a tömbök tiszta adatok.  Stacken ábrázolja így képzeljük el:
 		
-		\begin{center}
+		\begin{figure}[!h]
+			\centering
 			\begin{tikzpicture}
 				\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
 				\tikzstyle{arrow} = [thick,->,>=stealth]
@@ -371,7 +372,7 @@ std::cout << sizeof(t) << std::endl;
 			\smallskip
 			
 			A \texttt{main} függvény változói.
-		\end{center}
+		\end{figure}
 		\subsection{Biztonsági rések nem definiált viselkedés következében}
 		Irassuk ki a a tömb elemeit! (de ezt basszuk is el!)
 		\begin{lstlisting}

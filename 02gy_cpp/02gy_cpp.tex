@@ -101,7 +101,8 @@ int main()
 	
 	A fenti kód futása során a stack-et így képzelhetjük el:
 	
-	\begin{center}
+	\begin{figure}[!h]
+		\centering
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
@@ -125,7 +126,7 @@ int main()
 		\draw [thick, black] (8, 0) -- (8, 2);
 		\node (x) [Node] at (7,0.25) {x};
 		\end{tikzpicture}
-	\end{center}
+	\end{figure}
 	Az ábrán egy stack-et látunk. Amikor a vezérlés az \texttt{f} függvényhez ér, és ott létrehozza az \texttt{x} változót, azt behelyezi a stack-be. A \texttt{return} kulcsszó hatására készít \texttt{x}-ről egy temporális példányt, ami a függvény visszatérési értéke lesz. Amikor a vezérlés visszatér a \texttt{main} függvényhez, {x}-re nem tudunk tovább hivatkozni, így azt megsemmisíti, és ez ismétlődik, ameddig a ciklus véget nem ér.
 	\smallskip
 	
@@ -152,7 +153,8 @@ int main()
 }
 	\end{lstlisting}		
 	A program kimenete \texttt{5 8}. Ez egy teljesen jól definiált viselkedés. Ennek az az oka, hogy itt \textbf{érték} szerint vettük át (\textit{pass by value}) \texttt{a} és \texttt{b} paramétert. A következő ábrán megfigyelhetjük mi is történik pontosan. Képzeljük el, hogy a stackbe a program elrakja a \texttt{c} és \texttt{d} változókat. Eztán meghívja a \texttt{swapWrong} függvényt, melyben létrehozott \texttt{a} és \texttt{b} paraméterek szintén a stackre kerülnek. Bár a függvényre lokális \texttt{a} és \texttt{b} paraméterek értékét megcseréli, de a függvényhívás után ezeket ki is törli a stackből. Az eredeti \texttt{c} és \texttt{d} változók éréke nem változott a függvényhívás során.
-	\begin{center}
+	\begin{figure}[!h]
+		\centering
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
@@ -188,7 +190,7 @@ int main()
 		\node (b4) [Node] at (10,0.75) {\texttt{d} (8)};
 		\end{tikzpicture}
 		\smallskip
-	\end{center}
+	\end{figure}
 	C++ban alapértelmezett módon a paraméterátadás érték szerint történik.
 	\subsection{Mutatók érték szerinti átadása}
 	A mutatók olyan nyelvi elemek, melyek egy adott típusú memóriaterületre mutatnak. Segítségükkel anélkül is tudunk hivatkozni egy adott objektumra (és nem csak a másolatára), hogy közvetlenül az objektummal dolgoznánk. Most röviden megismerkedünk velük, de később részletesebben visszatérünk rájuk.
@@ -231,7 +233,8 @@ void swapP(int *a, int *b)
 	\begin{note}
     A mutatókat továbbra is érték szerint adjuk át. Az \texttt{a} és \texttt{b} paraméterekben lévő memóriacím tehát a másolata annak, amit a hívás helyén megadtunk.
 	\end{note}
-	\begin{center}
+	\begin{figure}[!h]
+		\centering
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
@@ -277,7 +280,7 @@ void swapP(int *a, int *b)
 		\node (a4) [Node] at (7,0.25) {\texttt{c} (8)};
 		\node (b4) [Node] at (7,0.75) {\texttt{d} (5)};
 		\end{tikzpicture}
-	\end{center}
+	\end{figure}
 	
 	\begin{lstlisting}
 void swapWrong2(int *a, int *b)
@@ -289,7 +292,8 @@ void swapWrong2(int *a, int *b)
 	\end{lstlisting}
 	Ebben a példában nem a pointerek által mutatott értéket, hanem magukat a pointereket cseréljük meg. Itt az fog történni, hogy a függvény belsejében \texttt{a} és \texttt{b} pointer másra fog mutatni. A mutatott értékek viszont nem változnak.
 	
-	\begin{center}
+	\begin{figure}[!h]
+		\centering
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
@@ -339,7 +343,7 @@ void swapWrong2(int *a, int *b)
 		\node (a4) [Node] at (7,0.25) {\texttt{c} (5)};
 		\node (b4) [Node] at (7,0.75) {\texttt{d} (8)};
 		\end{tikzpicture}
-	\end{center}
+	\end{figure}
 	\subsection{Referencia szerinti paraméter átadás}
 	Megállapíthatjuk, hogy az előző megoldásnál nem változtattuk meg, hogy mire mutassanak a pointerek, így azokat konstansként is definiálhatnánk. A konstans pointerek módosíthatják a mutatott értéket, de nem lehet őket átállítani egy másik memória címre. Úgy tudunk egy ilyen pointert létrehozni, hogy a csillag után írjuk a \texttt{const} kulcsszót.
 	\begin{lstlisting}

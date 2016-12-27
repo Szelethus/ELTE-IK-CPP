@@ -129,7 +129,8 @@ int main()
 	Fentebb láthatjuk hogyan lehet egy változót a heap-en létrehozni. Ehhez használatos a \texttt{new} operátor, a heapen lefoglalandó memória típusa (ez esetben \texttt{int}), és konstruktor paraméterek (itt példaképp 5 kezdőértékkel inicializálink). Fontos, hogy a stack-et teljesen nem kerültük meg, mert szükségünk van egy pointerre, mely a heap-en kezelt címre mutat (\texttt{p}).
 	
 	Ezt a címet a \texttt{delete} operátorral tudjuk felszabadítani.
-	\begin{center}
+	\begin{figure}[!h]
+		\centering
 		\begin{tikzpicture}
 		\tikzstyle{Heap} = [rectangle, minimum width=4cm, minimum height=2cm, text centered, draw=black, fill=white]
 		\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
@@ -150,7 +151,7 @@ int main()
 		\node (p) [ListNode] at (-2,0.25) {p};
 		\draw[arrow] (p) -- (2);
 		\end{tikzpicture}
-	\end{center}
+	\end{figure}
 	
 	A heapen nincs a változóknak nevük, így mindig szükségünk lesz egy mutatóra, hogy tudjunk rá hivatkozni. \textbf{Ha egyszer létrehozunk valamit a heap-en, nekünk is kell gondoskodni arról, hogy felszabadítsuk.} Az egyik leggyakoribb hiba a dinamikus memóriakezelésnél, ha a memóriát nem szabadítjuk fel, ilyenkor a lefoglalt memóriaterületre hivatkozni már nem lehet de lefoglalva marad, mondhatni elszivárog (\textit{memory leak}). 
 	\smallskip
@@ -235,7 +236,8 @@ int main()
 	Ezen a ponton mondhatjuk azt hogy készen vagyunk, hisz \texttt{List} használható láncolt listaként (bár valóban igen kényelmetlen).
 	\medskip
 	
-	\begin{center}
+	\begin{figure}[!h]
+		\centering
 		\begin{tikzpicture}
 		\tikzstyle{Heap} = [rectangle, minimum width=6cm, minimum height=2cm, text centered, draw=black, fill=white]
 		\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
@@ -258,7 +260,7 @@ int main()
 		\draw [arrow] (7node) -- (2node);
 		\draw [arrow] (headNode) -- (7node);
 		\end{tikzpicture}
-	\end{center}
+	\end{figure}
 	Sajnos a törlést sikerült picit elcsesznünk: először kitörljük a fejelemet (mely az első elemre mutat), viszont az első elem segítségével tudnánk a többi elemre is hivatkozni, így mire a második listaelemet törölnénk, \texttt{head} már egy felszabadított memóriaterületre mutat, amit törlés utáni használatnak (\textit{use after delete}) szokás nevezni, és az egy nem definiált viselkedés.
 	
 	A megoldás:
@@ -526,7 +528,8 @@ int main()
 	Fentebb létrehoztunk egy új listát \texttt{head} mintájára. Nyilván, a másolatnak a destruktora hamarabb lefut. Futtatáskor (ha sanitizerrel fordítunk) egy kilométer hibaüzenetet kapunk: többször próbáltuk meg ugyanazt a memóriaterületet felszabadítani. Ennek az az oka, hogy a \texttt{cHead}-ben lévő pointer \textbf{ugyanarra} a listára fog mutatni (lévén a bitről bitre történő másolásnál a pointerek ugyanazt a memóriacímet adják értékül egymásnak), és a \texttt{cHead} megsemmisülése után a \texttt{head} is megpróbálja a már kitörölt listát kitörölni.
 	
 	%\resizebox{\textwidth}{!}{%
-	\begin{center}
+	\begin{figure}[!h]
+		\centering
 		\begin{tikzpicture}
 			\tikzstyle{Heap} = [rectangle, minimum width=6cm, minimum height=2cm, text centered, draw=black, fill=white]
 			\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
@@ -554,7 +557,7 @@ int main()
 		\smallskip
 		
 		Zárójelben a lista első elemének \texttt{data} adattagjának értéke.
-	\end{center}
+	\end{figure}
 	%}
 	
 	Kerüljük ki a hibát, és írjunk saját copy konstruktort!
@@ -587,7 +590,8 @@ int main()
 }
 \end{lstlisting}
 	Mint a korábbi függvényeink, ez is rekurzióval működik: a \texttt{new List(*other.next)} újra és újra meghívja a copy konstruktort, amíg az other.next nem lesz nullpointer.
-	\begin{center}
+	\begin{figure}[!h]
+		\centering
 		\begin{tikzpicture}
 		\tikzstyle{Heap} = [rectangle, minimum width=6cm, minimum height=3cm, text centered, draw=black, fill=white]
 		\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
@@ -615,7 +619,7 @@ int main()
 		\draw [arrow] (headNode) -- (7node);
 		\draw [arrow] (cHeadNode) -- (7node2);
 		\end{tikzpicture}
-	\end{center}
+	\end{figure}
 	
 	\medskip
 	Ezzel meg is oldottuk a problémát. 
