@@ -129,7 +129,7 @@
 int main()
 {
 	int i = 0;
-	std::cout << ++i << ++i << std::endl;
+	std::cout << i++ << i++ << std::endl;
 }
 	\end{lstlisting}
   Lehetséges kimenet: \texttt{01} (GCC 6.1 fordítóval 64 bites x86 Linux platformon)
@@ -214,11 +214,12 @@ int main()
 		\node (objectFile2) [Node, below = of translationUnit2] {Tárgykód};
 		\node (objectFile2FileName) [FileName, below = 0mm of objectFile2] {\texttt{.o}};
 		
-		\node (exe) [NodeExe, below = 5.8 cm of header] {Végrehajtható állomány};
-		\node (exeFileName) [FileNameExe, below = 0mm of exe] {\texttt{.exe} / \texttt{.out}};
 
-		\node (libFile1) [Node, below right = of translationUnit2] {Könyvtár};
+		\node (libFile1) [Node, below = 4.1 cm of header] {Könyvtár};
 		\node (libFile1FileName) [FileName, below = 0mm of libFile1] {\texttt{.a} / \texttt{.lib} / \texttt{.so} / \texttt{.dll}};
+		
+		\node (exe) [NodeExe, below = 6.2 cm of header] {Végrehajtható állomány};
+		\node (exeFileName) [FileNameExe, below = 0mm of exe] {\texttt{.exe} / \texttt{.out}};
 		
 		
 		\draw[arrow] (headerFileName) -- (cpp1);
@@ -230,6 +231,7 @@ int main()
 		\draw[arrow] (objectFile1FileName) -- (exe);
 		\draw[arrow] (objectFile2FileName) -- (exe);
 		\draw[arrow] (libFile1FileName) -- (exe);
+		%TODO lehet az utolsó két oszlopot fel kéne cserélni
 		
 		\end{tikzpicture}
 		\smallskip
@@ -402,7 +404,7 @@ int main()
 		A header fájlokba nem szabad definíciókat rakni (bár kivétel létezik, pl. template-ek, inline függvények, melyekről később lesz szó).
 	\end{note}
 	
-	\section{Figyelmeztetések}
+	\subsection{Figyelmeztetések}
 
   A fordító gyanús vagy hibás kódrészlet esetén tud figyelmeztetéseket generálni. A legtöbb fordító alapértelmezetten elég kevés hibalehetőségre figyelmeztet. További figyelmeztetések bekapcsolásával hamarabb, már fordítási időben megtalálhatunk bizonyos hibákat vagy nem definiált viselkedéseket. Ezért ajánlott a \texttt{-Wall}, \texttt{-Wextra} kapcsolókat használni.
 
