@@ -1,13 +1,12 @@
-\documentclass[a4paper,11.5pt]{article}
+\documentclass[a4paper,11.5pt,table]{article}
 \usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
 \usepackage[normalem]{ulem}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
-\usepackage{amsmath, xcolor, amsthm,amssymb,paralist,array, ellipsis, graphicx, tikz}
-\usetikzlibrary{shapes.geometric, arrows, positioning}
-%\usepackage{marvosym}
+\usepackage{amsmath, amsthm,amssymb, paralist, tikz, multirow}
+\usetikzlibrary{arrows, positioning}
 
 \usepackage{listings}
 \lstset{
@@ -18,82 +17,17 @@
 	tabsize = 4
 }
 
-\makeatletter
-\renewcommand*{\mathellipsis}{%
-	\mathinner{%
-		\kern\ellipsisbeforegap%
-		{\ldotp}\kern\ellipsisgap%
-		{\ldotp}\kern\ellipsisgap%
-		{\ldotp}\kern\ellipsisaftergap%
-	}%
-}
-\renewcommand*{\dotsb@}{%
-	\mathinner{%
-		\kern\ellipsisbeforegap%
-		{\cdotp}\kern\ellipsisgap%
-		{\cdotp}\kern\ellipsisgap%
-		{\cdotp}\kern\ellipsisaftergap%
-	}%
-}
-\renewcommand*{\@cdots}{%
-	\mathinner{%
-		\kern\ellipsisbeforegap%
-		{\cdotp}\kern\ellipsisgap%
-		{\cdotp}\kern\ellipsisgap%
-		{\cdotp}\kern\ellipsisaftergap%
-	}%
-}
-\renewcommand*{\ellipsis@default}{%
-	\ellipsis@before
-	\kern\ellipsisbeforegap
-	.\kern\ellipsisgap
-	.\kern\ellipsisgap
-	.\kern\ellipsisgap
-	\ellipsis@after\relax}
-\renewcommand*{\ellipsis@centered}{%
-	\ellipsis@before
-	\kern\ellipsisbeforegap
-	.\kern\ellipsisgap
-	.\kern\ellipsisgap
-	.\kern\ellipsisaftergap
-	\ellipsis@after\relax}
-\AtBeginDocument{%
-	\DeclareRobustCommand*{\dots}{%
-		\ifmmode\@xp\mdots@\else\@xp\textellipsis\fi}}
-\def\ellipsisgap{.1em}
-\def\ellipsisbeforegap{.05em}
-\def\ellipsisaftergap{.05em}
-\makeatother
-
 \usepackage{hyperref}
 
 \begin{document}
 	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
 	\setlength\parindent{0pt}
-	\def\s{\hspace{0.2mm}\vphantom{\beta}}
-	\def\Z{\mathbb{Z}}
-	\def\Q{\mathbb{Q}}
-	\def\R{\mathbb{R}}
-	\def\C{\mathbb{C}}
-	\def\N{\mathbb{N}}
-	\def\Ra{\overline{\mathbb{R}}}
-	
-	\def\sume{\displaystyle\sum_{n=1}^{+\infty}}
-	\def\sumn{\displaystyle\sum_{n=0}^{+\infty}}
-	
-	\def\narrow{\underset{n\rightarrow+\infty}{\longrightarrow}}
-	\def\limn{\displaystyle\lim_{n\to +\infty}}
-	\def\limx{\displaystyle\lim_{x\to +\infty}}
+	\def\<{<\hspace{0mm}<}
 	
 	\theoremstyle{definition}
-	\newtheorem{theorem}{Tétel}[subsection] 
-	
-	\theoremstyle{definition}
-	\newtheorem{definition}[theorem]{Definíció} 
-	\newtheorem{example}[theorem]{Példa} 
-	\newtheorem{task}[theorem]{Feladat} 
-	\newtheorem{note}[theorem]{Megjegyzés}
+	\newtheorem{note}{Megjegyzés}[subsection]
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
 	\begin{center}
 		{\LARGE\textbf{C++}}
 		
@@ -160,18 +94,15 @@ int main()
 	Amennyiben a szabvány definiál néhány lehetséges opciót, de a fordítóra bízza, hogy az melyiket választja, akkor \textbf{nem specifikált} viselkedésről beszélünk.
 	
   A nem specifikált viselkedés csak akkor probléma, ha a program végeredményét (megfigyelhető működését) befolyásolhatja a fordító választása. Például a fenti kódot módosíthatjuk a következő képpen:
-	
-	\begin{example}\ 
-		
-		\begin{lstlisting}
+
+	\begin{lstlisting}
 int main()
 {
 	int i = 0;
 	int j = 0;
 	std::cout << ++i << ++j << std::endl; // 11
 }
-		\end{lstlisting}
-	\end{example}
+	\end{lstlisting}
 	Bár azt továbbra se tudjuk, hogy \texttt{++i} vagy \texttt{++j} értékelődik ki hamarabb, (\textit{nem specifikált}), azt biztosan tudjuk, hogy 11-et fog kiírni (a program végeredménye \textit{jól definiált}).
 	\subsection{Implementáció által definiált viselkedés}
 	A szabvány nem köti meg, hogy egy \texttt{int} egy adott platformon mennyi byte-ból álljon. Ez állandó, egy adott platformon egy adott fordító mindig ugyanakkorát hoz létre, de platform/fordítóváltás esetén ez változhat. Ennek az az oka, hogy különböző platformokon különböző választás eredményez hatékony programokat. Ennek köszönhetően hatékony kódot tud generálni a fordító, viszont a fejlesztő dolga, hogy megbizonyosodjon róla, hogy az adott platformon a primitív típúsok méretei megfelelnek a program által elvárt követelményeknek.
