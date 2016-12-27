@@ -258,13 +258,15 @@ struct Hallgato
 	Amikor ennek a méretét kérdezzük le (figyeljük meg, hogy változott a sorrend), akkor a válasz már 24. Ennek az oka az, hogy míg az első esetben így volt eltárolva a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
 	\begin{center}
 		\begin{tikzpicture}
-		\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20]
+		\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 1.2pt]
+		\tikzstyle{Border} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, line width = 1.2pt]
+		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 0.2pt]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
 		\node (1) [Node] {atlag};
 		\node (2) [HalfNode, right = 0mm of 1] {kor};
 		\node (3) [HalfNode, right = 0mm of 2] {mag};
+		\node (border) [Border, right = -0.2mm of 1] {};
 		
 		\end{tikzpicture}
 	\end{center}
@@ -272,20 +274,23 @@ struct Hallgato
 	\begin{center}
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20]
+		\tikzstyle{Border} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, line width = 1.2pt]
+		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 0.2pt]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
 		\node (1) [HalfNode] {kor};
 		\node (2) [Node, right = 0mm of 1] {atlag};
 		\node (3) [HalfNode, right = 0mm of 2] {mag};
-		\draw [thick, black] (1.95,-0.35) -- (1.95,0.35);
+		\node (border) [Border, right = -1.26cm of 1] {};
+		\node (border) [Border, left = -1.26cm of 3] {};
 		\end{tikzpicture}
 	\end{center}
 	Sajnos itt már szétvágná \texttt{atlag}-ot. Ez nagyon nem hatékony, mert állandóan gondolnia kéne a fordítónak arra, hogy épp hogyan kaparja össze \texttt{atlag}-ot.
 	\begin{center}
 		\begin{tikzpicture}
-		\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20]
+		\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 1.2pt]
+		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 0.2pt]
+		\tikzstyle{Border} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, line width = 1.2pt]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
 		\node (1) [Node] {atlag};
@@ -293,7 +298,8 @@ struct Hallgato
 		\node (3) [HalfNode, left = 0mm of 2] {kor};
 		\node (4) [HalfNode, right = 0mm of 1] {};
 		\node (5) [HalfNode, right = 0mm of 4] {mag};
-		
+		\node (border) [Border, right = -0.2mm of 1] {};
+		\node (border) [Border, left = -0.2mm of 1] {};
 		\end{tikzpicture}
 	\end{center}
 	Ez így sokkal hatékonyabb, bár 3 gép szót használ. Ebben az esetben a kód eltárolja, hogy legyen egy kis \textit{padding } a változó után. Tehát semmi extráért nem kell fizetnünk, de attól még picit több memóriát foglalunk le.
