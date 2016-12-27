@@ -168,29 +168,30 @@ int main()
 	\subsection{Szám literálok} %TODO tuti jó ez a cím?
 	Függően attól hogy egy számot hogyan írunk c++ban, mást jelenthet:
 	\begin{center}
+		\setlength{\extrarowheight}{2pt}
 		\begin{tabular}{|c|l|}
 			\hline
-			5&\texttt{int}\\
+			\texttt{5}						&\texttt{int}\\
 			\hline
-			5.&\texttt{double}\\
+			\texttt{5.}						&\texttt{double}\\
 			\hline
-			5.f&\texttt{float}\\
+			\texttt{5.f}					&\texttt{float}\\
 			\hline
-			5e-4&\texttt{double}, értéke 0.0005\\
+			\texttt{5e-4}					&\texttt{double}, értéke 0.0005\\
 			\hline
-			5e-4f&\texttt{float}\\
+			\texttt{5e-4f}					&\texttt{float}\\
 			\hline
-			0xFF&{16-os számrendszerben}\\
-			& ábrázolt \texttt{int}\\
+			\multirow{2}{*}{\texttt{0xFF}}	&{16-os számrendszerben}\\
+											& ábrázolt \texttt{int}\\
 			\hline
-			012&{8-as számrendszerben}\\
-			&ábrázolt \texttt{int}\\
+			\multirow{2}{*}{\texttt{012}}	&{8-as számrendszerben}\\
+											&ábrázolt \texttt{int}\\
 			\hline
-			5l&\texttt{long int}\\
+			\texttt{5l}						&\texttt{long int}\\
 			\hline
-			5u&\texttt{unsigned int}\\
+			\texttt{5u}						&\texttt{unsigned int}\\
 			\hline
-			5ul&\texttt{unsigned long int}\\
+			\texttt{5ul}					&\texttt{unsigned long int}\\
 			\hline
 		\end{tabular}
 		\end{center}
