@@ -361,22 +361,5 @@ int main()
 	b.magassag = 3;
 }
 	\end{lstlisting}      
-	\section{Inicializáció}
-	Amikor létrehozunk egy \texttt{Hallgato} típusú objektumot fentebb, akkor minden adattagjára meghívódik a default konstruktor (erről bővebben 6. gyakorlaton).
-	
-	\texttt{int}-ek alapértezetten memóriaszemetet kapnak.
-	\begin{lstlisting}
-int i;
-
-int main() 
-{
-	std::cout << i << std::endl;
-}
-	\end{lstlisting}   
-	Itt ha kiíratjuk \texttt{i}-t, mégis mindig 0-t fogunk kapni. Ennek oka az, hogy \texttt{i} egy globális változó, és a globális változók mindig 0-ra inicializálódnak (legalábbis az \texttt{int}-ek). A globális változókat csak egyszer hozzuk létre a program futásakot, így érdemes jól definiált kezdőértéket adni neki.
-	
-	 Azonban a stacken rengetegszer létre kell hozni változókat, nem csak egyszer, így ott nem éri meg minden alkalommal egy jól definiált kezdőértékkel inicializálni. Sokkal nagyobb lenne a hatása a futási időre.
-	
-	Az hogy miért épp 0-ra inicializálódnak, azért van, mert mert az nagyon gyors, és determinisztikus. Így hibákat is egyszerűbb kiszűrni, hisz egy globálisról mindig tudjuk hogy 0-ra inicializál alapértelmezetten.
 	
 \end{document}

@@ -100,98 +100,8 @@
 		
 		3 óra.
 	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Porkoláb} Zoltán és \textsc{Horváth} Gábor. (\today)
 	
-	\section{Érték szerinti paraméter átvétel}
-	Próbáljuk megvalósítani a swap függvényt!
-		\begin{lstlisting}
-#include <iostream>
-void swap(int a, int b)
-{
-	int tmp = a;
-	a = b;
-	b = a;
-}
-
-int main()
-{
-	int c = 5, d = 8;
-	swap(c, d);
-	std::cout << c << ' ' << d << std::endl;
-}
-		\end{lstlisting}		
-		A program kimenete \texttt{5 8} ment. Ez egy teljesen jól definiált viselkedés. Ez azért van, mert itt \textbf{érték} szerint vettük át (\textit{pass by value}) \texttt{a} és \texttt{b} változót. A következő ábrán, mely egy stack-et ábrázol (amiben a c++ tárolja ezeket a változókat), megfigyelhetjük miért is nem. Képzeljük el, ahogy ebbe a verembe a kódunk elrakja a \texttt{c} és \texttt{d} változókat. Majd meghívja a \texttt{swap} függvényt, melyben létrehozott \texttt{a} és \texttt{b} változókat ismét behelyezi. Bár a függvényre lokális \texttt{a} és \texttt{b} változókat megcseréli, de a függvényhívás után ezeket ki is törli a stackből.
-		\begin{center}
-			\begin{tabular}{r|c|l}
-				&&\\
-				&&\\
-				\cline{2-2}
-				b&~~~~~8~~~~~~&\\
-				\cline{2-2}
-				a&5&\\
-				\cline{2-2}
-				\hline
-				\hline
-				d&8& Innentől jön a main fv.\\
-				\cline{2-2}
-				c&5&\\
-				\cline{2-2}
-			\end{tabular}
-		\end{center}
-		C++ban alapértelmezett a paraméterátadás függvényeknél érték szerint történik.
-		
-		\begin{lstlisting}
-//...
-int main()
-{
-	int c = 5, d = 8;
-	//...
-	int *p = &c;
-}
-		\end{lstlisting}
-		Itt \texttt{p} egy mutató (\textit{pointer}), mely egy \texttt{int} típusra mutat. Ahhoz, hogy értéket tudjunk adni egy mutatónak, egy memóriacímet (\textit{referenciát}) kell neki értékül adni, amire rá tud mutatni, erre való a \textbf{referáló operátor}, a \&. Ha a mutató által \textit{mutatott értéket} szeretnénk módosítani, akkor dereferálnunk kell a \textbf{dereferáló operátor}ral, ami a *.
-		\begin{lstlisting}
-int *p = &c; //referaljuk c-t
-*p = 4; //dereferaljuk p-t
-p = &d;
-*p = 7;
-		\end{lstlisting}
-		Rendre: pointer inicializálása, pointer által mutatott érték módosítása, pointer átállítása másik memóriacíme, és a mutatott érték módosítása.
-		
-		Egy mutató mutathat változóra, másik mutatóra, saját magára, és sehova is. Azok a mutatókak, melyek sehová sem mutatnak, nullpointernek nevezzük, és így hozhatjuk létre őket:
-		
-		{\centering \texttt{p = 0;\quad \quad p = NULL;\quad \quad p = nullptr;} \par}
-		
-		\begin{note}
-			Ez a három értékadás (közel) ekvivalens, azonban a \texttt{nullptr} kulcsszó csak c++11ben érhető el.
-		\end{note}
-		
-		\begin{lstlisting}
-void swap(int *a, int *b)
-{
-	int tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-		\end{lstlisting}
-		
-		Amennyiben ezt a függvényt hívjuk meg, minden oké lesz. De ehhez fontos, hogy ne simán \texttt{swap(c, d)}-t írjunk, az ugyanis nem fog működni, mert a \texttt{c} és \texttt{d} típusa \texttt{int}, és nem \texttt{int*}. Ahhoz, hogy értéket adjunk egy pointernek, a \texttt{c}-hez és \texttt{d}-hez tartozó memóriacímeket kell átadni, így \texttt{swap(\&c, \&d)} lesz a helyes.
-		\bigskip
-		
-		Mivel a függvény most konkrétan a \texttt{c} és \texttt{d} változókkal dolgozik, így valóban meg fogja tudni cserélni az értéküket. Azonban ez még mindig \textbf{érték szerinti} átadás, mert most nem konkrét értéket, hanem a memóriacímet másoltuk át.
-		
-		\begin{lstlisting}
-void swapWrong2(int *a, int *b)
-{
-	int *tmp = a;
-	a = b;
-	b = tmp;
-}
-		\end{lstlisting}
-		Ebben a példában nem a pointerek által mutatott értéket, hanem magukat a pointereket cseréljük meg. Itt annyi fog csupán történni, hogy a függvény beljesében \texttt{a} és \texttt{b} pointer másra fog mutatni. De annak értéke nem változik.
-		
-		\medskip
-		\texttt{swap(\&a, 6)} nem fordul le, mert 6 konstans, ráadásul \texttt{int}, és nem egy memóriacím.
 	\section{Pointer aritmetika}
 		\begin{lstlisting}
 const int ci = 6;
@@ -241,8 +151,56 @@ int *const ** const dsfdsf = NULL;
 	\begin{note}
 		Mutatóra mutató mutató (**) még előfordul, de komplikáltabb ritkán.
 	\end{note}
+	\subsection{Függvény pointerek}
+	C++ban lehetőségünk van arra is, hogy függvényeket adjunk át paraméternek.
+	\begin{lstlisting}
+int add(int a, int b)
+{
+	return a + b;
+}
+
+int mul(int a, int b)
+{
+	return a * b;
+}
+
+int reduce(int *start, int size, int initial, int (*op)(int, int))
+{
+	int ret = initial;
+	for (int i = 0; i < size; i++)
+	{
+		ret = (*op)(ret, start[i]);
+	}
+	return ret;
+}
+
+int main()
+{
+	int t[] = {1,2,3,4,5};
+	std::cout << reduce(t,5,0,&add) << std::endl;
+	std::cout << reduce(t,5,0,&mul) << std::endl;
+}
+	\end{lstlisting}
+	
+	Itt \texttt{reduce} egy olyan paramétert is vár, mely igazából egy függvény, mely \texttt{int}-et ad vissza, és két \texttt{int}-et vár paraméterül.
+	\medskip
+	
+	A kódban feltűnhet, hogy a tömb mellé paraméterben elkértük annak méretét is. Ez azért van, mert a \texttt{t} tömb egy \texttt{int}-re mutató mutatóvá fog konvertálni, ami az első elemre mutat. Ennek hatására értelemszerűen elvesztjük azt az információt, hogy mekkora volt a tömb. Így át kell adni ezt az információt is. Mellékesen, függvényeket kezelni csak pointerekkel lehet, és mivel a fordító tudja hogy függvényeket akarunk átadni, így a \texttt{\&} jel elhagyható függvényhíváskor, és az\texttt{op} elől is elhagyható a * a paramétereknél.
+	\begin{lstlisting}
+int reduce(int *start, int size, int initial, int op(int, int)))
+{
+	//...
+}
+
+int main()
+{
+	int t[] = {1,2,3,4,5};
+	std::cout << reduce(t,5,0,add) << std::endl;
+	std::cout << reduce(t,5,0,mul) << std::endl;
+}
+	\end{lstlisting}
 	\section{Tömbök}
-		
+	A tömbök a c++ alapértelmezett konténere, mellyel egyszerre tömb azonos típusú elemet kezelhetünk. Előzménytárgyakból már megismertük valamennyi funkcionalitását, ám számos veszélyét még nem.
 		\begin{lstlisting}
 #include <iostream>
 int main()
@@ -251,7 +209,7 @@ int main()
 	int t[] = {5,4,3,2,1};
 }
 		\end{lstlisting}
-		Ez egy 5 elemű \textbf{tömb}. Nézzük meg, mekkora a mérete (figyelem, ez \textbf{implementációfüggő!})!
+		\texttt{t} egy 5 elemű \textbf{tömb}. Nézzük meg, mekkora a mérete (figyelem, ez \textbf{implementációfüggő!})!
 		\begin{lstlisting}
 std::cout << sizeof(i) << std::endl;
 std::cout << sizeof(t) << std::endl;
@@ -331,55 +289,7 @@ int main()
 		{\centering \texttt{g++ main.cpp -Wall -Wextra} \par}
 		
 		Ez a 2 parancs szintén extra ellenőrzéseket vezet be, de nem változtatják meg a kódot, csak fordítási időben ellenőriznek.
-	\subsection{Függvény pointerek}
-	C++ban lehetőségünk van arra is, hogy függvényeket adjunk át paraméternek.
-		\begin{lstlisting}
-int add(int a, int b)
-{
-	return a + b;
-}
-
-int mul(int a, int b)
-{
-	return a * b;
-}
-
-int reduce(int *start, int size, int initial, int (*op)(int, int))
-{
-	int ret = initial;
-	for (int i = 0; i < size; i++)
-	{
-		ret = (*op)(ret, start[i]);
-	}
-	return ret;
-}
-
-int main()
-{
-	int t[] = {1,2,3,4,5};
-	std::cout << reduce(t,5,0,&add) << std::endl;
-	std::cout << reduce(t,5,0,&mul) << std::endl;
-}
-		\end{lstlisting}
-		
-		Itt \texttt{reduce} egy olyan paramétert is vár, mely igazából egy függvény, mely \texttt{int}-et ad vissza, és két \texttt{int}-et vár paraméterül.
-		\medskip
-		
-		A kódban feltűnhet, hogy a tömb mellé paraméterben elkértük annak méretét is. Ez azért van, mert a \texttt{t} tömb egy \texttt{int}-re mutató mutatóvá fog konvertálni, ami az első elemre mutat. Ennek hatására értelemszerűen elvesztjük azt az információt, hogy mekkora volt a tömb. Így át kell adni ezt az információt is. Mellékesen, függvényeket kezelni cska pointerekkel lehet, és mivel a fordító tudja hogy függvényeket akarunk átadni, így a \texttt{\&} jel elhagyható függvényhíváskor, és az\texttt{op} elől is elhagyható a * a paramétereknél.
-		\begin{lstlisting}
-int reduce(int *start, int size, int initial, int op(int, int)))
-{
-	//...
-}
-
-int main()
-{
-	int t[] = {1,2,3,4,5};
-	std::cout << reduce(t,5,0,add) << std::endl;
-	std::cout << reduce(t,5,0,mul) << std::endl;
-}
-		\end{lstlisting}
-	\subsection{Tömbökről bővebben}
+	\subsection{Hivatkozás tömb elemeire}
 		\begin{lstlisting}
 #include <iostream>
 
