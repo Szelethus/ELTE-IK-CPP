@@ -159,14 +159,10 @@ int f()
 
 int main()
 {
-	std::cout << f() << std::endl;
-	std::cout << f() << std::endl;
-	std::cout << f() << std::endl;
-	std::cout << f() << std::endl;
-	std::cout << f() << std::endl;
+	for (int i = 0; i<5; i++)
+		std::cout << f() << ' '; // 1 1 1 1 1
 }
 	\end{lstlisting}
-	Kimenet: \texttt{1 1 1 1 1}
 	\medskip
 	
 	A fenti kód működését így képzelhetjük el:
@@ -228,34 +224,39 @@ int main()
 		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
-		\draw [thick, black] (-3, 0) -- (-1, 0);
-		\draw [thick, black] (-3, 0) -- (-3, 2.5);
-		\draw [thick, black] (-1, 0) -- (-1, 2.5);
-		\node (c1) [Node] at (-2,0.25) {\texttt{c} (5)};
-		\node (d1) [Node] at (-2,0.75) {\texttt{d} (8)};
-		
 		\draw [thick, black] (0, 0) -- (2, 0);
-		\draw [thick, black] (0, 0) -- (0, 2.5);
-		\draw [thick, black] (2, 0) -- (2, 2.5);
+		\draw [thick, black] (0, 0) -- (0, 3);
+		\draw [thick, black] (2, 0) -- (2, 3);
 		\node (c2) [Node] at (1,0.25) {\texttt{c} (5)};
 		\node (d2) [Node] at (1,0.75) {\texttt{d} (8)};
-		\node (a2) [Node] at (1,1.25) {\texttt{a} (5)};
-		\node (b2) [Node] at (1,1.75) {\texttt{b} (8)};
 		
 		\draw [thick, black] (3, 0) -- (5, 0);
-		\draw [thick, black] (3, 0) -- (3, 2.5);
-		\draw [thick, black] (5, 0) -- (5, 2.5);
+		\draw [thick, black] (3, 0) -- (3, 3);
+		\draw [thick, black] (5, 0) -- (5, 3);
 		\node (c3) [Node] at (4,0.25) {\texttt{c} (5)};
 		\node (d3) [Node] at (4,0.75) {\texttt{d} (8)};
 		\node (a3) [Node] at (4,1.25) {\texttt{a} (8)};
 		\node (b3) [Node] at (4,1.75) {\texttt{b} (5)};
+		\node (b3) [Node] at (4,2.25) {\texttt{tmp} (5)};
 		
 		\draw [thick, black] (6, 0) -- (8, 0);
-		\draw [thick, black] (6, 0) -- (6, 2.5);
-		\draw [thick, black] (8, 0) -- (8, 2.5);
-		\node (a4) [Node] at (7,0.25) {\texttt{c} (5)};
-		\node (b4) [Node] at (7,0.75) {\texttt{d} (8)};
+		\draw [thick, black] (6, 0) -- (6, 3);
+		\draw [thick, black] (8, 0) -- (8, 3);
+		\node (c3) [Node] at (7,0.25) {\texttt{c} (5)};
+		\node (d3) [Node] at (7,0.75) {\texttt{d} (8)};
+		\node (a3) [Node] at (7,1.25) {\texttt{a} (8)};
+		\node (b3) [Node] at (7,1.75) {\texttt{b} (5)};
+		\node (b3) [Node] at (7,2.25) {\texttt{tmp} (5)};
+		
+		\draw [thick, black] (9, 0) -- (11, 0);
+		\draw [thick, black] (9, 0) -- (9, 3);
+		\draw [thick, black] (11, 0) -- (11, 3);
+		\node (a4) [Node] at (10,0.25) {\texttt{c} (5)};
+		\node (b4) [Node] at (10,0.75) {\texttt{d} (8)};
 		\end{tikzpicture}
+		\smallskip
+		
+		Tekintsünk el a \texttt{tmp} változótól.
 	\end{center}
 	C++ban alapértelmezett a paraméterátadás függvényeknél érték szerint történik.
 	\subsection{Mutatóval történő paraméter átvétel}
@@ -300,18 +301,19 @@ void swapP(int *a, int *b)
 		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
 		\draw [thick, black] (-3, 0) -- (-1, 0);
-		\draw [thick, black] (-3, 0) -- (-3, 2.5);
-		\draw [thick, black] (-1, 0) -- (-1, 2.5);
+		\draw [thick, black] (-3, 0) -- (-3, 3);
+		\draw [thick, black] (-1, 0) -- (-1, 3);
 		\node (c1) [Node] at (-2,0.25) {\texttt{c} (5)};
 		\node (d1) [Node] at (-2,0.75) {\texttt{d} (8)};
 		
 		\draw [thick, black] (0, 0) -- (2, 0);
-		\draw [thick, black] (0, 0) -- (0, 2.5);
-		\draw [thick, black] (2, 0) -- (2, 2.5);
+		\draw [thick, black] (0, 0) -- (0, 3);
+		\draw [thick, black] (2, 0) -- (2, 3);
 		\node (c2) [Node] at (1,0.25) {\texttt{c} (5)};
 		\node (d2) [Node] at (1,0.75) {\texttt{d} (8)};
 		\node (a2) [Node] at (1,1.25) {\texttt{a}};
 		\node (b2) [Node] at (1,1.75) {\texttt{b}};
+		\node (tmp2) [Node] at (1,2.25) {\texttt{tmp} (5)};
 		
 		\path[every node/.style={font=\sffamily\small}]
 			(a2) edge[bend left = 90, thick, ->] node [right] {} (c2);
@@ -319,12 +321,13 @@ void swapP(int *a, int *b)
 			(b2) edge[bend right = 90, thick, ->] node [left] {} (d2);
 		
 		\draw [thick, black] (3, 0) -- (5, 0);
-		\draw [thick, black] (3, 0) -- (3, 2.5);
-		\draw [thick, black] (5, 0) -- (5, 2.5);
+		\draw [thick, black] (3, 0) -- (3, 3);
+		\draw [thick, black] (5, 0) -- (5, 3);
 		\node (c3) [Node] at (4,0.25) {\texttt{c} (8)};
 		\node (d3) [Node] at (4,0.75) {\texttt{d} (5)};
 		\node (a3) [Node] at (4,1.25) {\texttt{a}};
 		\node (b3) [Node] at (4,1.75) {\texttt{b}};
+		\node (tmp3) [Node] at (4,2.25) {\texttt{tmp} (5)};
 		
 		
 		\path[every node/.style={font=\sffamily\small}]
@@ -333,8 +336,8 @@ void swapP(int *a, int *b)
 		(b3) edge[bend right = 90, thick, ->] node [left] {} (d3);
 		
 		\draw [thick, black] (6, 0) -- (8, 0);
-		\draw [thick, black] (6, 0) -- (6, 2.5);
-		\draw [thick, black] (8, 0) -- (8, 2.5);
+		\draw [thick, black] (6, 0) -- (6, 3);
+		\draw [thick, black] (8, 0) -- (8, 3);
 		\node (a4) [Node] at (7,0.25) {\texttt{c} (8)};
 		\node (b4) [Node] at (7,0.75) {\texttt{d} (5)};
 		\end{tikzpicture}
@@ -358,43 +361,49 @@ void swapWrong2(int *a, int *b)
 		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
 		\draw [thick, black] (-3, 0) -- (-1, 0);
-		\draw [thick, black] (-3, 0) -- (-3, 2.5);
-		\draw [thick, black] (-1, 0) -- (-1, 2.5);
+		\draw [thick, black] (-3, 0) -- (-3, 3);
+		\draw [thick, black] (-1, 0) -- (-1, 3);
 		\node (c1) [Node] at (-2,0.25) {\texttt{c} (5)};
 		\node (d1) [Node] at (-2,0.75) {\texttt{d} (8)};
 		
 		\draw [thick, black] (0, 0) -- (2, 0);
-		\draw [thick, black] (0, 0) -- (0, 2.5);
-		\draw [thick, black] (2, 0) -- (2, 2.5);
+		\draw [thick, black] (0, 0) -- (0, 3);
+		\draw [thick, black] (2, 0) -- (2, 3);
 		\node (c2) [Node] at (1,0.25) {\texttt{c} (5)};
 		\node (d2) [Node] at (1,0.75) {\texttt{d} (8)};
 		\node (a2) [Node] at (1,1.25) {\texttt{a}};
 		\node (b2) [Node] at (1,1.75) {\texttt{b}};
+		\node (tmp2) [Node] at (1,2.25) {\texttt{tmp}};
 		
 		\path[every node/.style={font=\sffamily\small}]
 		(a2) edge[bend left = 90, thick, ->] node [right] {} (c2);
 		\path[every node/.style={font=\sffamily\small}]
 		(b2) edge[bend right = 90, thick, ->] node [left] {} (d2);
+		\path[every node/.style={font=\sffamily\small}]
+		(tmp2) edge[bend right = 90, thick, ->] node [left] {} (c2);
 		
 		\draw [thick, black] (3, 0) -- (5, 0);
-		\draw [thick, black] (3, 0) -- (3, 2.5);
-		\draw [thick, black] (5, 0) -- (5, 2.5);
-		\node (c3) [Node] at (4,0.25) {\texttt{c} (5)};
-		\node (d3) [Node] at (4,0.75) {\texttt{d} (8)};
+		\draw [thick, black] (3, 0) -- (3, 3);
+		\draw [thick, black] (5, 0) -- (5, 3);
+		\node (c3) [Node] at (4,0.25) {\texttt{c} (8)};
+		\node (d3) [Node] at (4,0.75) {\texttt{d} (5)};
 		\node (a3) [Node] at (4,1.25) {\texttt{a}};
 		\node (b3) [Node] at (4,1.75) {\texttt{b}};
+		\node (tmp3) [Node] at (4,2.25) {\texttt{tmp}};
 		
 		
 		\path[every node/.style={font=\sffamily\small}]
 		(a3) edge[bend left = 90, thick, ->] node [right] {} (d3);
 		\path[every node/.style={font=\sffamily\small}]
 		(b3) edge[bend right = 90, thick, ->] node [left] {} (c3);
+		\path[every node/.style={font=\sffamily\small}]
+		(tmp3) edge[bend right = 90, thick, ->] node [left] {} (c3);
 		
 		\draw [thick, black] (6, 0) -- (8, 0);
-		\draw [thick, black] (6, 0) -- (6, 2.5);
-		\draw [thick, black] (8, 0) -- (8, 2.5);
-		\node (a4) [Node] at (7,0.25) {\texttt{c} (5)};
-		\node (b4) [Node] at (7,0.75) {\texttt{d} (8)};
+		\draw [thick, black] (6, 0) -- (6, 3);
+		\draw [thick, black] (8, 0) -- (8, 3);
+		\node (a4) [Node] at (7,0.25) {\texttt{c} (8)};
+		\node (b4) [Node] at (7,0.75) {\texttt{d} (5)};
 		\end{tikzpicture}
 	\end{center}
 	\subsection{Referencia szerinti paraméter átvétel}
@@ -422,7 +431,7 @@ void swapRef(int &a, int &b)
 	\begin{note}
 		Egy referenciát mindig inicializálni kell. Csak úgy mint egy konstanst (különben fordítási hibát kapunk.)
 	\end{note}
-	\section{Visszatérési érték problémája}
+	\subsection{Visszatérési érték problémája}
 	Nem primitív (pl. \texttt{int}) típusoknál gyakran megeshet, hogy egy adott ípushoz tartozó pointer mérete kisebb, mint magának az objektumé, így megérheti mindentől függetlenül a paramétert referencia szerint átvenni. Ezen felbátorodva mondhatnánk azt is, hogy referenciával is térjünk vissza (a követekező példában tekintsünk el attól, hogy \texttt{int}-el dolgozunk, bátran képzeljük azt hogy az pl. egy nagyon nagy mátrix)!
 	\begin{lstlisting}
 int& addOne(int &i)
@@ -450,185 +459,164 @@ int& addOne(int &i)
 	
 	\medskip
 	Az olyan memóriaterületre való hivatkozás, mely nincs a program számára lefoglalva, nem definiált viselkedést eredményez.
+	\begin{note}
+		Értelemszerűen pointerekkel ez ugyanúgy probléma.
+	\end{note}
+	\section{Statikus változók/függvények}
+	Statikus változó többféle van -- függően attól, hogy a definíciójukhoz szükséges \texttt{static} kulcsszót milyen kontextusba írjuk, egy másfajta változót kapunk. Működésük sokban hasonlít a globálisokéhoz.
+	\subsection{Fordítási egységre statikus változók}
+	A függvényen és névteren kívül deklarált statikus változók az adott fordítási egységre lokálisak -- élettartamuk a futás elejétől végigtartamig tart, és kizárólagosan az adott fordítási egységben láthatóak.
 	\medskip
 	
-	\section{Kifejezések kiértékelése.}
-	\begin{example}\ 
-		
-		\begin{lstlisting}
+	\fbox{\textbf{main.cpp}}
+	\begin{lstlisting}
 #include <iostream>
 
-char* answer (char *q);
+static int x;
 
 int main()
 {
-	std::cout << answer("Hogy vagy?") << answer("Biztos?") << std::endl;
-	return 0;
+	x = 2;
 }
-
-char* answer (char *q)
-{
-	std::cout << q;
-	static char buffer[80];
-	std::cin.getline(buffer,80);
-	return buffer;
-}
-		\end{lstlisting}
-		Itt már azt is meg akarjuk kérdezni, hogy biztos-e. Itt már találkoztunk a problémával, hogy a kiíratás sorrendje rossz. 
-		
-		\texttt{std::cout $<<$ answer("Biztos?") $<<$ answer("Hogy vagy?") $<<$ std::endl;}
-		
-		Ez már jó. (a kiértékelés nem definiált, de a kiíratási sorrend igen!)
-		
-		Ez az igazán jó megoldás, itt kevesebbet kell filózni:
-		
-		\text{std::cout $<<$ answer("Hogy vagy?");}
-		
-		\texttt{std::cout $<<$ answer("Biztos?");}
-		
-	\end{example}
-	
-	Azonban a statikus változótól még nem szabadultunk meg. Egy másik megoldás lehet a dinamikus memória kezelés.
+	\end{lstlisting}
 	\medskip
 	
-	A dinamikusan lefoglalt memória az ,,átlagos'' stacken lévő objektumokkal szemben a mi felelőségünk teljesen. Nekünk kell őket allokálni, és ha nincs már rá szükségünk, nekünk is kell felszabadítani. c++11ben smart-pointerekkel ezt valamelyest automatizálhatjuk.
-		
-		\begin{lstlisting}
+	\fbox{\textbf{other.cpp}}
+	\begin{lstlisting}
 #include <iostream>
 
-char* answer (char *q);
+static int x;
+
+void f()
+{
+	x = 0;
+}
+	\end{lstlisting}
+	Ha ezt a két fájlt együtt fordítjuk, nem kapunk fordítási hibát, ugyanis a \texttt{main.cpp}-ben lévő \texttt{x} egy teljesen más változó, mint ami az \texttt{other.cpp}-ben van.ű
+	
+	\smallskip
+	Csak úgy mint a globális változókra, fordítási egységen belül bármikor hivatkozhatunk egy statikusra, és hasonló módon inicializálódnak.
+	\begin{lstlisting}
+static int x;
 
 int main()
 {
-	std::cout << answer("Hogy vagy?");
-	std::cout << answer("Biztos?");
+	int x = 4;
+	std::cout << ::x << std::endl; // 0
+}
+	\end{lstlisting}
+	\subsection{Függvényre statikus változók}
+	Azokat a változókat, melyek függvényen belül vannak a \texttt{static} kulcsszóval definiálva, függvényszintű változónak is szokás hívni. Élettartamuk a függvény első hívásától a program futásáig tart, míg láthatóságuk csak az adott függvényen belül van.
+	
+	\begin{lstlisting}
+int f()
+{
+	static int x = 0;
+	++x;
+	return x;
+}
+
+int main() 
+{
+	for(int i = 0; i<5; i++)
+		std::cout << f() << ' '; // 1 2 3 4 5
+}
+	\end{lstlisting}
+	Ahogy az megfigyelhető fent, \texttt{x} csak egyszer inicializálódik, majd a későbbi függvényhívások után egyre növekszik az értéke.
+	\subsection{Fordítási egységre statikus függvények}
+	Nem csak változókat, függvényeket is deklarálhatunk statikusnak, melyek a fordítási egységre statikusak.
+	\begin{lstlisting}
+static int f()
+{
 	return 0;
 }
 
-char* answer (char *q)
+int main() {std::cout << f();} // 0
+	\end{lstlisting}
+	Mint mint a változók, ezek csak az adott fordítási egységen belül érhetőek el.
+	\subsection{Névtelen névterek}
+	Egyszerre több statikus változót és függvényt is tudunk deklarálni ill. definiálni névtelen névterek (\textit{unnamed namespaces}, vagy \textit{anonymous namespaces}) segítségével. Egy név nélküli névteren belül minden változó és függvény olyan, mintha elé ki lenne írva a \texttt{static} kulcsszó.
+	\begin{lstlisting}
+namespace
 {
-	std::cout << q;
-	char* buffer = new char[80];
-	std::cin.getline(buffer,80);
-	return buffer;
+	int x;
+	std::string y;
+	void f() {}
 }
-		\end{lstlisting}
-		Ez így nagyon szép megoldás, de a memória sajnos elúszott. Ahogy említve volt, a \texttt{new} kulcsszóval létrehoztunk a dinamikus tárhelyen egy új változót, de azt soha nem szabadítottuk fel. Ezért a legszebb megoldás még mindig az, hogyha referenciával átadok még egy paramétert, amiben el tudjuk tárolni a választ. Ennél azonban még egyszerűbb megoldás az, ha az \texttt{std::string}-et használjuk.
-		\begin{lstlisting}
-#include <iostream>
+	\end{lstlisting}
+	\begin{note}
+		Osztályra statikus változókról és függvényekről később lesz szó.
+	\end{note}
+	\section{Függvény túlterhelés}
+	Térjünk vissza a korábban megírt swap függvényünkhöz.
+	\begin{lstlisting}
+void swap(int &a, int &b)
+{
+	int tmp = a;
+	a = b;
+	b = tmp;
+}
+	\end{lstlisting}
+	Ez a függvény mind addig jó is, amíg csak \texttt{int}-eket szeretnénk megcserélni, de mi van, ha \texttt{std::string}-eket kéne? A megoldás egyszerű, \textbf{túlterheljük} (\textit{overload}) a \texttt{swap} függvényt.
+	\begin{lstlisting}
+void swap(std::string &a, std::string &b)
+{
+	int tmp = a;
+	a = b;
+	b = tmp;
+}
+	\end{lstlisting}
+	Túlterhelésnek azt nevezzük, amikor két vagy több függvénynek a neve azonos, de a paramétereik különböznek. Tagfüggvényeknél különböző konstansság is számít.
+	\begin{note}
+		A később elhangzó osztályok tagfüggvényeinél a függvény konstanssága is számít (azonos függvény különöző konstanssággal ugyanúgy túlterhelésnek számít).
+	\end{note}
+	\subsection{Operátor túlterhelés}
+	Írjuk meg a \texttt{print} függvényt értelmesebben! Ahogy láttuk a 7. gyakorlat elején, lehetőségünk van függvényeket túlterhelni, és ez operátorokra is igaz. Ha példaként vesszük a lineáris algebrából tanult rendezett valós számhármasokat ($\R^3$), lehetőségünk van arra, hogy a tanultak alapján definiáljuk a köztük értelmezett összeadást.
+	%TODO temporális változók
+	\begin{lstlisting}
+struct LinAlgVector
+{
+	double x1, x2, x3;
+};
 
-std::string answer (char *q);
+LinAlgVector operator+(const LinAlgVector &lhs, const LinAlgVector &rhs)
+{
+	LinAlgVector ret;
+	ret.x1 = lhs.x1 + rhs.x1;
+	ret.x2 = lhs.x2 + rhs.x2; 
+	ret.x3 = lhs.x3 + rhs.x3;
+	return ret;
+}
 
 int main()
 {
-	std::cout << answer("Hogy vagy?");
-	std::cout << answer("Biztos?");
-	return 0;
+	LinAlgVector a, b;
+	a.x1 = 1; a.x2 = 2; a.x3 = 3;
+	b.x1 = 1; b.x2 = 1; b.x3 = 1;
+	
+	LinAlgVector c = a + b; 
+}
+	\end{lstlisting}
+	A \texttt{main} függvényben lévő értékadás ezzel ekvivalens: \texttt{c = operator+(a, b)}, így láthatjuk, hogy az operátorok túlterhelése gyakorlatilag a függvénytúlterhelés speciális esete. 
+	\smallskip 
+	
+	A gyakran kiíratáshoz használt jobb shift operátor (\textit{right shift operator}), a $<<$ is túlterhelhető, mely kihasználható egy általunk létrehozott objektum kiíratásának definiálására. Mivel mi az \texttt{std::cout} változóval szeretnénk majd kiíratni, melynek típusa \texttt{std::ostream}, így a függvényünk első paramétere egy ilyen típus lesz, a második meg egy \texttt{LinAlgVector} típus.
+	
+	\begin{lstlisting}
+/* ... */
+
+std::ostream& operator<<(std::ostream& os, const LinAlgVector &l)
+{
+	os << l.x1 << ' ' << l.x2 << ' ' << l.x3;
+	return os;
 }
 
-std::string answer (std::string q)
+int main()
 {
-	std::cout << q;
-	std::string buffer;
-	std::cin >> buffer;
-	return buffer;
+	/* ... */
+	std::cout << c << std::endl; // 2 3 4
 }
-		\end{lstlisting}
-		
-		Ez a memóriában úgy néz ki, hogy a stacken létrejön egy pointer, heapre (vagy dinamikus tárhelyen) mutató területen tárolja el a buffert, copy konstruktorral adjuk vissza megoldást, a buffer destruktora felszabadítaná a tárhelyet. Ez így igen költséges. c++11ben annyi segítséget kapunk, hogy a move szemantika javít a hatékonyságon
+	\end{lstlisting}
 	
-	\begin{example}
-		\begin{lstlisting}
-		#include <iostream>
-		
-		int main()
-		{
-		int i = 1;
-		std::cout << i << ++i << std::endl;
-		return 0;
-		}
-		\end{lstlisting}
-	\end{example}
-	
-	Ez egy \textbf{nem definiált viselkedés.} Itt látható egy \texttt{$>>$} operátor, ami így is felírható: \texttt{std::cout.operator$<<$(i)}. Ennek a függvényhívásnak van visszatérési értéke, méghozzá \texttt{std::cout}, így a függvényhívás láncolható. Ez itt egy member function, mellyel majdnem minden alaptípus  rendelkezik Ezalól kivétel a \texttt{std::string}, melynek \texttt{operator$>>$}-ja globális.
-	\begin{note}
-		Ennek az is lehet értelme, hogy ne függjön az operátor az osztálytól. Jó példa erre a \texttt{template}, mert annak csak akkor kell példányt létrehoznia, ha meghívják.
-	\end{note}
-	A fenti kódban lévő rész így is felírható:
-	
-	\texttt{std::cout.operator$<<$(i).operator$<<$(++i)}.
-	
-	Az, hogy a második szám 2 lesz, az biztos. De hogy az első mennyi, az nem definiált.
-	
-	\textit{1. ábra.}
-	
-	\begin{example}
-		\texttt{x = k + 2}\quad \quad \texttt{y = k + 2}
-	\end{example}
-	
-	Ebben a példában (jó eséllyel) a fordító kioptimalizálja ezt, és \texttt{k+2}-t csak egyszer számolja ki. A c++ban a nem szabványba foglalt szabályoknak köszönhetően sokkal hatékonyabb programokat kaphatunk, mert a fordítónak nagy szabadsága van abban, hogyan optimalizálja a kódunkat.
-	
-	\begin{example}
-		Itt a cél az lenne, hogy a tömb elemeit feltöltsük növekvő számokkal.
-		
-		\begin{lstlisting}
-		int i = 0;
-		int t[10];
-		while (i < 10)
-		{
-		t[i] = i++;
-		}
-		\end{lstlisting}
-		
-		Azonban ez egy nem definiált viselkedés, mert hiába van ott egy \textbf{post-fix} \texttt{++}\quad operator, az hogy az egyenlőség melyik oldalán levő \texttt{i} értékelődik ki először, az ismét nem definiált.
-	\end{example}
-	
-	Itt leggyakrabban szekvenciapontok használata tud segíteni.
-	
-	\begin{definition}
-		(szekvenciapont) ami elválasztja, hogy mikor minek kell végrehajtódnia futási időben. A szekvenciapont előtt minden kifejezésnek ki kell értékelődnie. Több szekvenciapont létezik: vessző, \texttt{\&\&}, \texttt{||}, \texttt{?\quad :} 
-	\end{definition}
-	\begin{example}
-		\begin{lstlisting}
-		f(i), ++i;
-		i++<10 && f(i);
-		i++<10 || f(i);
-		i++<10 ? f(i) : g(i);
-		\end{lstlisting}
-		Ezek mint definiáltak, minden kifejezést egy szekvenkciapont választ el a másiktól.
-		\begin{lstlisting}
-		f(i++, j++);
-		\end{lstlisting}
-		Itt azonban az, hogy i vagy j értéke növekszik-e meg először, az már nem definiált. Bár valóban található ott vessző, de a vessző mint szekvenciapont nem ekvivalens a függvény paramétereit elválasztó vesszővel.
-	\end{example}
-	\begin{note}
-		Az optimalizálás nagyon fontos szabálya, hogy mindig úgy szabad csak megtörténnie, hogy a program kimenetele ne változzon. 
-	\end{note}
-	\begin{note}
-		Ha hibásra optimalizálja a kódot a compiler, az nagy szívás. Ez leggyakrabban multi-threaded programoknál fordulhat elő.
-	\end{note}
-	
-		
-		\begin{lstlisting}
-		int f() {cout << 'f'; return 2;}
-		int g() {cout << 'g'; return 1;}
-		int h() {cout << 'h'; return 0;}
-		\end{lstlisting}
-		Mi fog történni \texttt{f() == g() == h()} kód írásakor?
-		
-		Itt azon fog múlni a dolog, hogy milyen sorrendben értékelődnek ki az egyenlőség-vizsgáló operátorok. Az operátoroknak van megadott precedenciájuk: erős például a pont, nyíl, [], stb, gyengébb ennél a dereferencia, és így tovább. Azonban az azonos precedenciájú kifejezéseknél kérdéses, milyen sorrendben értékelődnek ki, vagy egyáltaln definiált-e az. Régen fortran-ban ez különösképp problémás volt:
-		
-		\begin{center}
-			\texttt{A*B / C*D}
-		\end{center}Itt nem lehetett tudni, hogy először megszorozza \texttt{A*B}-t, \texttt{D}-vel, és csak utána osztja le \texttt{C}-vel, vagy fordítva.
-		
-		Visszatérve a fenti példára, a végrehajtási sorrend:
-		\texttt{(f() == g()) == h()}. Azaz, a \texttt{==} operátor balről jobbra asszociatív. De milyen sorrendben lesznek kiírva a karakterek? Ez (brace yourselves) nem definiált., hisz az, hogy ezen belül melyik sorrendben fog kiértékelődni a függvényhívás, nincs meghatározva.
-		
-		Van ahol más a zárójelezés, pl. \texttt{!++*++p}. Itt Először előrelépünk a p pointerrel, dereferáljuk, megnöveljük az értékét, és negáljuk. \texttt{!(++(*(++p)))}. Ilyen példa szintén az egyenlőség operátor: \texttt{x = y = z = 3.14}. 
-		\begin{note}
-			Bővebben: \url{http://en.cppreference.com/w/cpp/language/operator_precedence}
-		\end{note}
-	Az optimalizációk azért is segítenek, mert platformspecifikusak gyakran. Úgy csinálja meg a fordítást, hogy az adott gépból a legtöbbet préselje ki.
-	
+	Feltűnhet, hogy a kiírató változót a függvény végén vissza is adjuk, melynek oka az, hogy tudjuk a kiíratást láncolni.
 \end{document}
