@@ -102,7 +102,8 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
 	
-	\section{Tömbök}
+	%TODO jobb és balérték
+	\subsection{Tömbök átadása függvényparaméterként}
 	Próbáljunk meg egy tömböt érték szerint átadni egy függvénynek!
 	\begin{lstlisting}
 #include <iostream>
@@ -179,31 +180,7 @@ int main()
 	g(b); //ok
 }
 	\end{lstlisting}
-	\section{Referencia szerinti paraméter átvétel}
-	Megállapítható, hogy amikor mutatókkal dolgoztunk előző órán, akkor nem változtattuk meg azt, hogy mire mutassanak a pointerek, így azokat konstansként is definiálhatnánk.
-	\begin{lstlisting}
-void swap(int * const a, int * const b)
-{
-	//...
-}
-	\end{lstlisting}
-	Egy kis szintaktikai cukorkával megúszhatjuk azt, hogy folyton kiírjuk a \texttt{* const}-ot (lévén ritkán akarjuk megváltoztatni hogy a tömb hova mutasson). Erre való a {referencia szerinti paraméter átváétel} (\textit{pass by reference}). A referencia úgy működik, mintha egy konstans pointer lenne.
-	\begin{lstlisting}
-void swapRef(int &a, int &b)
-{
-	int tmp = a;
-	a = b;
-	b = tmp;
-}
-	\end{lstlisting} 
-	Ez a két függvény lényegében ekvivalensek. A különbség a referencia és a pointer között csupán annyi, hogy egy referencia nem lehet null.
-	\begin{note}
-		Ez bár ez referencia szerinti átvétel, de itt is történik másolás, a memóriacímet így is érték szerint vesszük át.
-	\end{note}
-	Megjegyzendő, hogy a fenti \texttt{swapRef} függvénynek nem kell memóriacímeket átadni, \texttt{swapRef(a,b)}-t kell írnunk.
-	\begin{note}
-		Egy referenciát mindig inicializálni kell. Csak úgy mint egy konstanst (különben fordítási hibát kapunk.)
-	\end{note}
+	
 	\section{Karakterláncok}
 	Mi lesz a \texttt{"Hello"} sztring típusa?
 	\smallskip
