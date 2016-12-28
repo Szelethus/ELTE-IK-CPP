@@ -206,16 +206,16 @@ int main() {
 		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
 		
-		\node (listHpp) [HeaderName] {list.hpp};
+		\node (listHpp) [HeaderName] {\texttt{list.hpp}};
 		\node (listHppF) [FunctionName, below = 0 mm of listHpp] {\texttt{f() \{\}}};
 		
-		\node (mainCpp) [CppName, below left = of listHpp] {main.cpp};
+		\node (mainCpp) [CppName, below left = of listHpp] {\texttt{main.cpp}};
 		\node (mainCppF) [FunctionName, below  = 0 mm of mainCpp] {\texttt{f() \{\}}};
 		
-		\node (listCpp) [CppName, below right = of listHpp] {main.cpp};
+		\node (listCpp) [CppName, below right = of listHpp] {\texttt{list.cpp}};
 		\node (listCppF) [FunctionName, below  = 0 mm of listCpp] {\texttt{f() \{\}}};
 		
-		\node (exe) [CppName, below = 2.7 cm of listHpp] {exe file};
+		\node (exe) [CppName, below = 2.7 cm of listHpp] {\texttt{exe file}};
 		\node (exeF) [FunctionName, below  = 0 mm of exe] {\texttt{f() ???}};
 		
 		\draw[arrow] (listHppF) -- (mainCpp);
