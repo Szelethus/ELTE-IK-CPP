@@ -293,8 +293,9 @@ int main()
 }
 	\end{lstlisting}
 	\texttt{Fact} 4szer példányosul: \texttt{Fact<5>, \ldots, Fact<1>,} majd a legvégén az általunk specializált \texttt{Fact<0>}-t hívja meg.
-	
-	\smallskip
+	\begin{note}
+		Ahogyan ezt korábban megállapítottunk, egy \textbf{konstans} osztályszintű változót függvénytörzsön belül is inicializálhatunk.
+	\end{note}
 	Ez fel is hívja a figyelmet a template-ek veszélyeit statikus változók használatakor.
 	
 	\begin{lstlisting}
