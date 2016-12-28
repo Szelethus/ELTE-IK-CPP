@@ -344,7 +344,7 @@ List *add(List *head, int data)
 	if (head == 0)
 	{
 		List *ret = new List;
-    List::count++; // !
+	    List::count++; // !
 		ret->data = data;
 		ret->next = 0;
 		return ret;
@@ -358,7 +358,7 @@ void free(List *head)
 	if (head == 0)
 	return;
 	free(head->next);
-  List::count--; // !
+	List::count--; // !
 	delete head;
 }
 
