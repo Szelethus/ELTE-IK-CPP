@@ -37,7 +37,6 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  előadásán. (\today)
 	
-	%TODO jobb és balérték
 	\subsection{Tömbök átadása függvényparaméterként}
 	Próbáljunk meg egy tömböt érték szerint átadni egy függvénynek!
 	\begin{lstlisting}
@@ -55,21 +54,16 @@ int main()
 	f(t);
 }
 	\end{lstlisting}
-	Kimenet: \texttt{20 8} (ezen az implementáción)
+	Kimenet: \texttt{20 8} (implementáció függő)
 	
-	Bár mindkétszer azt hittünk hogy \texttt{t} tömb által foglalt méretét írattuk ki, és azt várnánk hogy a két szám ugyanaz lesz, a valóságban amikor azt érték szerint megpróbáljuk átadni, a \texttt{t} tömb átkonvertálódik a tömb elejére mutató pointerré.
+	Bár azt hihettük, hogy \texttt{t} tömb méretét írattuk ki ket alkalommal, valójában amikor azt érték szerint próbálunk meg átadni egy tömböt, az átkonvertálódik a tömb elejére mutató pointerré.
 	\begin{lstlisting}
 void f(int t[8])
 {
 	std::cout << sizeof(t) << std::endl;
 }
 	\end{lstlisting}
-	Ebben az esetben még mindig 8 lesz a második kiírt szám. Az a tanulság, hogy ha érték szerint akarunk átadni egy tömböt, ahelyett át fog konvertálódni pointerré. Az, hogy ezt szintaktikailag miért tehetjük meg mégis, hogy egy tömböt írunk oda mégis pointert kapunk, 
-	\begin{center}
-		\textit{,,az egy faszság.''}
-		
-		/Horváth Gábor/
-	\end{center}
+	Hiába adunk meg egy méretet a tömbnek a függvény fejlécében, még mindig egy pointer mérete lesz a második kiírt szám. Az a tanulság, hogy ha érték szerint akarunk átadni egy tömböt, az át fog konvertálódni pointerré. A legszebb az lenne, ha a fenti szintaxis nem fordulna le. Ennek azonban történelmi oka van, a C-vel való visszafelé kompatibilitás miatt fordul le. 
 	\begin{note}
 		Tömböt értékül adni a szabvány szerint nem is lehet: \texttt{int *t2[5] = t} nem helyes.
 	\end{note}
@@ -77,7 +71,7 @@ void f(int t[8])
 	\begin{lstlisting}
 #include <iostream>
 
-void f(int *t, int size) //uj parameter!
+void f(int *t, int size) // uj parameter!
 {
 	std::cout << sizeof(t) << std::endl;
 }
@@ -90,41 +84,41 @@ int main()
 }
 	\end{lstlisting}
 	\begin{note}
-		Amennyiben c++11ben programozunk, érdemes az \texttt{std::array}-t használnunk, ami majdnem ugyanaz, mint egy tömb, legalább olyan hatékony, de nem tud pointerré változni és mindig tudja a méretét.
+		Amennyiben C++11ben programozunk, érdemes az \texttt{std::array}-t használnunk, ami olyan, mint egy tömb, de nem tud pointerré konvertálódni és mindig tudja a méretét.
 	\end{note}
-	Ha szeretnénk egy tömböt egy darab paraméterrel átadni, megpróbálhatunk egy tömbre mutató pointert létrehozni. Azonban figyelni kell a szintaktikára, ha \texttt{int *t[5]}-t írunk, egy öt elemű intre mutató pointereket tároló tömböt kapunk.
+	Ha szeretnénk egy tömböt egy darab paraméterként átadni, megpróbálhatunk egy tömbre mutató pointert létrehozni. Azonban figyelni kell a szintaktikára, ha \texttt{int *t[5]}-t írunk, egy öt elemű intre mutató pointereket tároló tömböt kapunk.
 	
 	\medskip
-	Ha valóban tömbre mutató mutatót szeretnék, így csinálhatjuk:
+	Ha tömbre mutató mutatót szeretnék, így csinálhatjuk:
 	\begin{lstlisting}
 void g(int (*t)[5])
 {
 	std::cout << sizeof(t) << std::endl;
 }
 	\end{lstlisting}
-	Azonban ez még mindig 8at fog kiírni (ezen az implementáción!), mert a \texttt{t} az egy sima mutató! Ahhoz, hogy megkapjuk, mire mutat, dereferálnunk kell, így a \texttt{sizeof} paraméterének \texttt{*t}-t kell megadni.
+	Azonban ez még mindig egy pointer méretét fogja kiírni, mert a \texttt{t} az egy sima mutató! Ahhoz, hogy megkapjuk, mire mutat, dereferálnunk kell, így a \texttt{sizeof} paraméterének \texttt{*t}-t kell megadni, ha a tömb méretére vagyunk kíváncsiak.
 	\begin{note}
-		Nyilván, ha refenreciával vennénk át \texttt{t}-t, az is hasonlóan nézne ki:\, \texttt{int (\&t)[5]}.
+		Ha refenreciával vennénk át \texttt{t}-t, az is hasonlóan nézne ki:\, \texttt{int (\&t)[5]}.
 	\end{note}
 	\medskip
 	
-	Ha megnöveljük a tömb méretét eggyel, akkor nem fordul le a kód, mert nem tud a g függvényben egy 5 elemű tömbre mutató mutató 6 elemű tömbre mutató mutatóvá konvertálódni.
+	Ha eltérő méretű tömböt próbálunk meg átadni, akkor nem fordul le a kód, mert nem egy 5 elemű tömbre mutató mutató 6 elemű tömbre mutató mutatóvá konvertálódni.
 	\begin{lstlisting}
 int main()
 {
 	int a[6];
-	g(a); //forditasi hiba!
+  g(&a); //forditasi hiba!
 	int b[5];
-	g(b); //ok
+  g(&b); //ok
 }
 	\end{lstlisting}
 	
 	\section{Literálok}
 	\subsection{Karakterláncok}
-	Mi lesz a \texttt{"Hello"} sztring típusa?
+	Mi lesz a \texttt{"Hello"} karakterlánc literál típusa?
 	\smallskip
 	
-	Egy konstans karakterekből álló 6 méretű tömb (\texttt{const char[6]}). Azért nem 5 elemű, mert a sztring el végén el kell tárolni a végét jelző \texttt{\textbackslash 0} karaktert.
+	Egy konstans karakterekből álló 6 méretű tömb (\texttt{const char[6]}). Azért 6 elemű, mert a karakterlánc literál végén el van tárolva a végét jelző \texttt{\textbackslash 0} karaktert.
 	
 	\begin{center}
 		\setlength{\extrarowheight}{2pt}
@@ -137,37 +131,23 @@ int main()
 	\begin{lstlisting}
 int main()
 {
-	char* = "Hello";
-}
-	\end{lstlisting}
-	A fenti kódban megsértettük a konstans korrektséget, hisz egy nem konstans pointerrel mutatuk egy konstans sztringre. Ennek ellenére, a fenti kód lefordul. Ez azért van, mert az eredeti C-ben nem volt konstans kulcsszó, és a kompatibilitás végett c++ban lehet konstans karaktertömbre nem konstans pointerrel mutatni.
-	\begin{note}
-		Ez egy nagyon rossz dolog, és kerülni kell, amennyire csak lehet. Lefordul, de kapunk rá warningot.
-	\end{note}
-	\begin{lstlisting}
-int main()
-{
-	const char *hello = "Hello";
+	char* hello= "Hello";
 	hello[1] = o;
 }
 	\end{lstlisting}
-	Ha eljászuk azt, hogy az egyik elemet o-ra cseréljük, akkor nem definiált viselkedést kapunk. 
+	A fenti kódban megsértettük a konstans korrektséget, hisz egy nem konstansra mutató pointerrel mutatuk egy konstans karakterlánc literál első elemére. Ennek ellenére, a fenti kód lefordul. Ennek az az oka, hogy az eredeti C-ben nem volt const kulcsszó, a kompatibilitás végett ezért C++ban lehet konstans karakterlánc literál elemire nem konstansra mutató pointerrel mutatni.
+	\begin{note}
+		Ezt a fajta kompatibilitás miatt meghagyott viselkedést kerülni kell. Lefordul, de kapunk rá warningot.
+	\end{note}
+	Ha módosítani próbáljuk a karakterlánc literál értékét, az nem definiált viselkedéshez vezet. 
 	%TODO Sajnos ebből nem tudtam jobb leírást kipofozni tudáshiány végett.
 	
-	Futtatáskor (legalábbis ebben az esetben, hisz nem definiált viselkedésről van szó) futási idejű hibát kapunk, méghozzá szegmentálási hibát. Ennek a magyarázata a követekző: van a gépünknek sima és virtuális memóriája. Megfigyelhető, hogy sokkal több memóriát tudunk használni, mint amennyi ténylegesen van. Ez úgy oldható meg, hogy a virtuális memórián az alkalmazásunk kap egy memóriaterületet. Ezen a memóriacímen vannak olyan adatok is, melyek garantáltan nem változnak: a program kódja, és a fenti \texttt{"Hello"} szint is ilyen. Ezek külön vannak tárolva azok adatoktól, melyek változhatnak. 
+	Futtatáskor linuxon futási idejű hibát kapunk, méghozzá szegmentálási hibát. Ennek az az oka, hogy a konstansok értékei readonly memóriában vannak tárolva, aminek a módosítását nem engedi az operációs rendszer.
+  \medskip
 	
-	Ha ezt a programot mégegyszer elindítjuk, a memóriában kapni fog egy újabb színteret a program, amiben benne lesznek az adatok, melyeket futási időben módosíthat, illetve azok amiket nem. Az operációs rendszerünk azonban van olyan okos, hogy nem rakja be a nem módosítható adatokat még egyszer: a nem változtatható kódot a 2 külön működő azonos program ugyanarra a részére fogja irányítani a virtuális memóriában.
-	
-	\medskip
-	Erre jó példa az, hogy a C-nek a standard könyvtárait közel minden program használja, így olcsóbb úgy megoldani, hogy minden programot ugyanide mutat.
-	
-	\medskip
-	Miért kapunk szegmentálási hibát? A konstansok ezen nem módosítható részen belül vannak. Ha módosítanánk, akkor a másik program futása is változna. Az olyan programokat, amik ilyet próbálnak csinálni, szinte azonnal ki lesznek írtva. Az operációs rendszernek ugyanis nagyon fontos az, hogy a programok egymás futását nem zavarják (\textit{szeparálja} őket).
-	
-	\medskip
-	Ez jól rámutat arra, hogy miért is nem jó az, ha a fenti hibát megengedjük.
-	\subsection{Szám literálok} %TODO tuti jó ez a cím?
-	Függően attól hogy egy számot hogyan írunk c++ban, mást jelenthet:
+	Ez jól rámutat arra, hogy miért is nem jó az, ha a fenti konverziót megengedjük.
+	\subsection{Szám literálok}
+	Függően attól, hogy egy szám literált hogyan írunk C++ban, mást jelenthet:
 	\begin{center}
 		\setlength{\extrarowheight}{2pt}
 		\begin{tabular}{|c|l|}
@@ -203,33 +183,32 @@ int main()
 		Viszonylag kevés esetben éri meg \texttt{float}-ot használni \texttt{double} helyett. Modern CPU-k ugyanolyan hatékonyan dolgoznak mind a kettővel, így érdemesebb a pontosabbat választani. (Ha magát a GPU-t programozzuk, az lehet egy kivétel.)
 	\end{note}
 	
-	Létezik c++ban \texttt{signed} kulcsszó, mely eredetileg a char miatt volt, mert az is egész számokat tartalmazott, de azt nem definiálták külön, hogy a \texttt{char} lehessen vagy ne lehessen signed, ezért az, hogy egy adott platformon lehet-e az, az implementációfüggő.
+	Létezik C++ban \texttt{signed} kulcsszó, mely a char miatt lett bevezetve. A char is egész számokat tartalmaz, de az implementáció függő, hogy a \texttt{char} singed vagy unsigned értéket tartalmaz-e. 
 	\begin{note}
-		Érdemes mindig \texttt{int}et használnunk, hacsak nincs jó okunk arra, hogy \texttt{short}-ot, vagy \texttt{long}-ot írjunk. Az \texttt{int}-el általában a leghatékonyabb a processzor.
+		Érdemes mindig \texttt{int}et használnunk, hanincs jó okunk arra, hogy mást használjunk. Az \texttt{int}-el általában a leghatékonyabb a processzor.
 	\end{note}
-	\section{Struktúrák mérete}
-	A \texttt{sizeof(char)} mindig 1-et ad vissza. A karakter mérete mindig az egység. Minden más típusra a \texttt{sizeof} függvény azt adja vissza, hogy paraméterül megadott dolog mennyi \texttt{char} méretű. 
+	A \texttt{sizeof(char)} mindig 1-et ad vissza. A karakter mérete mindig az egység. Minden más típusra a \texttt{sizeof} függvény azt adja vissza, hogy paraméterül megadott objektum vagy típus mérete hányszorosa a \texttt{char}nak. 
 	
-	A kérdésre, hogy mennyi \texttt{sizeof(char)}, a válasz mindig 1, de hogy ezt valóban hány byte-on tároljuk, az már implementációfüggő.
+  Attól, hogy \texttt{sizeof(char) == 1}, a \texttt{char} mérete byteokban még implementáció függő.
+
+  A lebegőpontos számok mindig rendelkeznek előjellel. 
 	
 	\medskip
-	A \texttt{char} méretén túl minden másnak a \texttt{sizeof}-ja teljesen implementációfüggő, bár a szabvány kimond pár szabályt:
+	A \texttt{char} méretén túl minden másnak a mérete implementációfüggő, bár a szabvány kimond pár relációt:
 	\begin{center}
-		\texttt{sizeof(int) == sizeof(signed) == sizeof(unsigned)}
+		\texttt{sizeof(X) == sizeof(signed X) == sizeof(unsigned X)}
 		\smallskip
 		
-		\texttt{sizeof(float) == sizeof(double) == sizeof(long double)}
+		\texttt{sizeof(float) $\leq$ sizeof(double) $\leq$ sizeof(long double)}
 		\smallskip
 		
 		\texttt{sizeof(short) $\leq$ sizeof(int) $\leq$ sizeof(long)}
 		\smallskip
 		
-		\texttt{sizeof(char) == sizeof(unsigned char) == sizeof(signed char)}
-		\smallskip
-		
 		\texttt{sizeof(char) $\leq$ sizeof(bool)}
 		\smallskip
 	\end{center}
+	\section{Struktúrák mérete}
 	\begin{lstlisting}
 #include <iostream>
 
@@ -247,7 +226,7 @@ int main()
 	std::cout << sizeof(Hallgato) << std::endl;
 }
 	\end{lstlisting}
-	Ezen a gépen a \texttt{double} mérete 8, az \texttt{int} mérete 4, \texttt{Hallgato}-é 16. Ezen azt látjuk, hogy a \texttt{Hallgato} tiszta adat.
+	A gyakorlaton használt gépen a \texttt{double} mérete 8, az \texttt{int} mérete 4, \texttt{Hallgato}-é 16. Ezen azt látjuk, hogy a \texttt{Hallgato} tiszta adat.
 	\begin{lstlisting}
 struct Hallgato
 {
@@ -256,7 +235,7 @@ struct Hallgato
 	int magassag;
 }
 	\end{lstlisting} 
-	Amikor ennek a méretét kérdezzük le (figyeljük meg, hogy változott a sorrend), akkor a válasz már 24. Ennek az oka az, hogy míg az első esetben így volt eltárolva a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
+	Miután átrendeztük a mezők sorrendjét, és újra kiírjuk a struktúra méretét, akkor a válasz 24. Ennek az oka az, hogy míg az első esetben így volt eltárolva a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
 	\begin{figure}[H]
 		\centering
 		\begin{tikzpicture}
@@ -272,7 +251,7 @@ struct Hallgato
 		
 		\end{tikzpicture}
 	\end{figure}
-	Azaz, \texttt{atlag}, illetve \texttt{kor} és \texttt{magassag} pont efértek 1-1 gép szóban. Viszont, ha megcseréljük a sorrendet, ez már nem lesz igaz:
+	Azaz, \texttt{atlag}, illetve \texttt{kor} és \texttt{magassag} pont efértek 1-1 gépi szóban. Viszont, ha megcseréljük a sorrendet, ez már nem lesz igaz:
 	\begin{figure}[H]
 		\centering
 		\begin{tikzpicture}
@@ -288,7 +267,7 @@ struct Hallgato
 		\node (border) [Border, left = -1.26cm of 3] {};
 		\end{tikzpicture}
 	\end{figure}
-	Sajnos itt már szétvágná \texttt{atlag}-ot. Ez nagyon nem hatékony, mert állandóan gondolnia kéne a fordítónak arra, hogy épp hogyan kaparja össze \texttt{atlag}-ot.
+  Itt az \texttt{atlag} két fele két különböző gépi szóba kerülne. Ez a ma használt processzorok számára nem hatékony, hiszen az átlag értékének kiolvasásához vagy módosításához két gépi szót is olvasni vagy módosítani kéne (a legtöbb processzor csak szóhatárról tud hatékonyan olvasni).
 	\begin{figure}[H]
 		\centering
 		\begin{tikzpicture}
@@ -306,16 +285,16 @@ struct Hallgato
 		\node (border) [Border, left = -0.2mm of 1] {};
 		\end{tikzpicture}
 	\end{figure}
-	Ez így sokkal hatékonyabb, bár 3 gép szót használ. Ebben az esetben a kód eltárolja, hogy legyen egy kis \textit{padding } a változó után. Tehát semmi extráért nem kell fizetnünk, de attól még picit több memóriát foglalunk le.
+	A fenti elrendezés hatékonyabb, bár 3 gépi szót használ. Ebben az esetben a fordító \textit{padding}et illeszt be a mező után. Ennek hatására hatékonyan olvasható és módosítható minden mező. Cserébe több memóriát foglal a struktúra.
 	\smallskip
 	
-	A szabvány kimondja, hogy egy \texttt{struct} mérete az adottagok méreteinek összegénél nagyobbegyenlő.
+	A szabvány kimondja, hogy egy \texttt{struct} mérete az adottagok méreteinek összegénél nagyobb vagy egyenlő.
 	\smallskip
 	
 	Az, hogy egy gépi szó mekkora, implementációfüggő.
 	\bigskip
 	
-	Egy \texttt{struct} egyes adattagjaira így hivatkozhatunk:
+	Egy \texttt{struct} egyes adattagjaira a pont operátor segítségével hivatkozhatunk:
 	\begin{lstlisting}
 int main()
 {
