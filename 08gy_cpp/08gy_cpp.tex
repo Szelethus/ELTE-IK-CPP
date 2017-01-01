@@ -119,7 +119,7 @@ List::List(const List &other) : data(other.data), next(0)
 List& List::operator=(const List &other) 
 {
 	if (this == &other)
-	return *this;
+		return *this;
 	delete next;
 	data = other.data;
 	if (other.next) 
@@ -395,7 +395,7 @@ template<typename T>
 List<T> &List<T>::operator=(const List<T> &other) 
 {
 	if (this == &other)
-	return *this;
+		return *this;
 	delete next;
 	data = other.data;
 	if (other.next) 

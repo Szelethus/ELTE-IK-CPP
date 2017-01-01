@@ -187,7 +187,7 @@ int main()
 
 ALMA ALMA ALMA
 	\end{lstlisting}
-	A \texttt{\#define ALMA 5}  parancs azt jelenti, hogy minden \texttt{ALMA} szót ki kell a fájlban \texttt{5}-re.
+	A \texttt{\#define ALMA 5}  parancs azt jelenti, hogy minden \texttt{ALMA} szót ki kell cserélni a fájlban \texttt{5}-re.
 	
 	Az előfeldolgozott szöveget a \texttt{cpp alma.h} parancs kiadása segítségével tekinthetjük meg.
 	
@@ -1026,30 +1026,23 @@ int main()
 %	\end{lstlisting}
 %	%\< egy normálisabban kinéző << operátort eredményez (definíció fent)
 %	
-%	Világos, hogy a fenti kódban nem definiált viselkedés szerepel. Már volt szó arról is, hogy a kiíratáshoz használt \texttt{\<} szimbólum az egy operátor, és az \texttt{<iostream>} könyvtárban található hozzá egy olyan overload, melynek egyik paramétere \texttt{std::ostream\&}, a másik pedig \texttt{int}. Ahogy korábban is említve volt, az első paraméterével vissza is tér, így tudjuk a kiíratást láncolni. A fent leírt kiíratás ezzel lesz ekvivalens:
+%	Világos, hogy a fenti kódban nem definiált viselkedés szerepel. Már volt szó arról is, hogy a kiíratáshoz használt \texttt{\<} szimbólum az egy operátor, és az \texttt{<iostream>} könyvtárban található hozzá egy olyan overload, melynek egyik paramétere \texttt{std::ostream\&}, a másik pedig \texttt{int}. Ahogy korábban is említettük, az első paramétert adja vissza, így tudjuk a kiíratást láncolni. A fent leírt kiíratás ezzel lesz ekvivalens:
 %	\begin{lstlisting}
 %std::cout.operator<<(i).operator<<(i++);
 %	\end{lstlisting}
 %	
-%	Itt látható egy \texttt{\<} operátor, ami így is felírható: \texttt{std::cout.operator$<<$(i)}. Ennek a függvényhívásnak van visszatérési értéke, méghozzá \texttt{std::cout}, így a függvényhívás láncolható. Ez itt egy member function, mellyel majdnem minden alaptípus  rendelkezik Ezalól kivétel a \texttt{std::string}, melynek \texttt{operator$>>$}-ja globális.
-%	\begin{note}
-%		Ennek az is lehet értelme, hogy ne függjön az operátor az osztálytól. Jó példa erre a \texttt{template}, mert annak csak akkor kell példányt létrehoznia, ha meghívják.
-%	\end{note}
-%	A fenti kódban lévő rész így is felírható:
+%	Itt látható egy \texttt{\<} operátor, ami így is felírható: \texttt{std::cout.operator$<<$(i)}. Ennek a függvényhívásnak van visszatérési értéke, méghozzá \texttt{std::cout}, ez teszi lehetővé a láncolást. Ez itt egy tagfüggvény, mely majdnem minden alaptípusra túl van terhelve. 
 %	
-%	
-%	Az, hogy a második szám 2 lesz, az biztos. De hogy az első mennyi, az nem definiált.
-%	
-%	\textit{1. ábra.}
+%	Az biztos, hogy a második kiírt szám értéke 2. De az, hogy az első mennyi, nem definiált.
 %	
 %	\begin{example}
 %		\texttt{x = k + 2}\quad \quad \texttt{y = k + 2}
 %	\end{example}
 %	
-%	Ebben a példában (jó eséllyel) a fordító kioptimalizálja ezt, és \texttt{k+2}-t csak egyszer számolja ki. A c++ban a nem szabványba foglalt szabályoknak köszönhetően sokkal hatékonyabb programokat kaphatunk, mert a fordítónak nagy szabadsága van abban, hogyan optimalizálja a kódunkat.
+%	Ebben a példában (jó eséllyel) a fordító optimalizál, és \texttt{k+2}-t csak egyszer számolja ki. A C++ban szabvány által nem definiált viselkedéseknek köszönhetően sokkal hatékonyabb programokat kaphatunk, mert a fordítónak nagy szabadsága van abban, hogyan optimalizáljon.
 %	
 %	\begin{example}
-%		Itt a cél az lenne, hogy a tömb elemeit feltöltsük növekvő számokkal.
+%		Töltsük fel egy tömb elemeit növekvő sorrendben számokkal.
 %		
 %		\begin{lstlisting}
 %int i = 0;
@@ -1060,13 +1053,13 @@ int main()
 %}
 %		\end{lstlisting}
 %		
-%		Azonban ez egy nem definiált viselkedés, mert hiába van ott egy \textbf{post-fix} \texttt{++}\quad operator, az hogy az egyenlőség melyik oldalán levő \texttt{i} értékelődik ki először, az ismét nem definiált.
+%		A kód viselkedése ismét nem definiált. Hiába van ott egy \textbf{post-fix} \texttt{++}\quad operator. Az, hogy az értékadás melyik oldalán levő \texttt{i} értékelődik ki először, nem specifikált.
 %	\end{example}
 %	
-%	Itt leggyakrabban szekvenciapontok használata tud segíteni.
+%	A szekvenciapontok korrekt használatával lehet kijavítani a fenti kódot.
 %	
 %	\begin{definition}
-%		(szekvenciapont) ami elválasztja, hogy mikor minek kell végrehajtódnia futási időben. A szekvenciapont előtt minden kifejezésnek ki kell értékelődnie. Több szekvenciapont létezik: vessző, \texttt{\&\&}, \texttt{||}, \texttt{?\quad :} 
+%		(Szekvenciapont) meghatározza a kifejezések kiértékelési sorrendjét futási időben. A szekvenciapont előtti kifejezéseknek hamarabb ki kell értékelődnie, mint a szekvenciapont utániaknak. Néhány példa szekvenciapontokra: vessző, \texttt{\&\&}, \texttt{||}, \texttt{?\quad :} 
 %	\end{definition}
 %	\begin{example}
 %		\begin{lstlisting}
@@ -1075,19 +1068,12 @@ int main()
 %i++<10 || f(i);
 %i++<10 ? f(i) : g(i);
 %		\end{lstlisting}
-%		Ezek mint definiáltak, minden kifejezést egy szekvenkciapont választ el a másiktól.
+%		A fenti példák eredményei mind jól definiáltak, a szekvenciapontok miatt egyértelmű a kifejezések eredménye.
 %		\begin{lstlisting}
 %f(i++, j++);
 %		\end{lstlisting}
-%		Itt azonban az, hogy i vagy j értéke növekszik-e meg először, az már nem definiált. Bár valóban található ott vessző, de a vessző mint szekvenciapont nem ekvivalens a függvény paramétereit elválasztó vesszővel.
+%		Itt azonban az, hogy i vagy j értéke növekszik-e meg először, az nem specifikált. Bár valóban található ott vessző, de a vessző operátor mint szekvenciapont nem ekvivalens a függvény paramétereit elválasztó vesszővel.
 %	\end{example}
-%	\begin{note}
-%		Az optimalizálás nagyon fontos szabálya, hogy mindig úgy szabad csak megtörténnie, hogy a program kimenetele ne változzon. 
-%	\end{note}
-%	\begin{note}
-%		Ha hibásra optimalizálja a kódot a compiler, az nagy szívás. Ez leggyakrabban multi-threaded programoknál fordulhat elő.
-%	\end{note}
-%	
 %	
 %	\begin{lstlisting}
 %int f() {cout << 'f'; return 2;}
@@ -1096,25 +1082,19 @@ int main()
 %	\end{lstlisting}
 %	Mi fog történni \texttt{f() == g() == h()} kód írásakor?
 %	
-%	Itt azon fog múlni a dolog, hogy milyen sorrendben értékelődnek ki az egyenlőség-vizsgáló operátorok. Az operátoroknak van megadott precedenciájuk: erős például a pont, nyíl, [], stb, gyengébb ennél a dereferencia, és így tovább. Azonban az azonos precedenciájú kifejezéseknél kérdéses, milyen sorrendben értékelődnek ki, vagy egyáltaln definiált-e az. Régen fortran-ban ez különösképp problémás volt:
-%	
-%	\begin{center}
-%		\texttt{A*B / C*D}
-%	\end{center}Itt nem lehetett tudni, hogy először megszorozza \texttt{A*B}-t, \texttt{D}-vel, és csak utána osztja le \texttt{C}-vel, vagy fordítva.
+%	Itt a kimenet attól is függ, hogy milyen sorrendben értékelődnek ki az egyenlőség-vizsgáló operátorok. Az operátoroknak van megadott precedenciájuk, ami meghatározza mennyire erősen kötnek: erős például a pont, nyíl, [], gyengébb ennél a dereferencia, és így tovább. Azonban az azonos precedenciájú operátoroknál kérdéses, hogy a részkifejezések milyen sorrendben értékelődnek ki. 
 %	
 %	Visszatérve a fenti példára, a végrehajtási sorrend:
-%	\texttt{(f() == g()) == h()}. Azaz, a \texttt{==} operátor balről jobbra asszociatív. De milyen sorrendben lesznek kiírva a karakterek? Ez (brace yourselves) nem definiált., hisz az, hogy ezen belül melyik sorrendben fog kiértékelődni a függvényhívás, nincs meghatározva.
+%	\texttt{(f() == g()) == h()}. Azaz, a \texttt{==} operátor balról jobbra zárójelezendő, tehát balasszociatív. Milyen sorrendben lesznek kiírva a karakterek? Ez nem specifikált, hiszen a függvényhívásokat nem választja el egymástól szekvenciapont.
 %	
 %	Van ahol más a zárójelezés, pl. \texttt{!++*++p}. Itt Először előrelépünk a p pointerrel, dereferáljuk, megnöveljük az értékét, és negáljuk. \texttt{!(++(*(++p)))}. Ilyen példa szintén az egyenlőség operátor: \texttt{x = y = z = 3.14}. 
 %	\begin{note}
 %		Bővebben: \url{http://en.cppreference.com/w/cpp/language/operator_precedence}
 %	\end{note}
-%	Az optimalizációk azért is segítenek, mert platformspecifikusak gyakran. Úgy csinálja meg a fordítást, hogy az adott gépból a legtöbbet préselje ki.
-%	%TODO sectiondivider
 %	\begin{lstlisting}
 %#include <iostream>
 %
-%char* answer (char *q);
+%const char* answer (const char *q);
 %
 %int main()
 %{
@@ -1122,7 +1102,7 @@ int main()
 %	return 0;
 %}
 %
-%char* answer (char *q)
+%const char* answer (const char *q)
 %{
 %	std::cout << q;
 %	static char buffer[80];
@@ -1130,27 +1110,23 @@ int main()
 %	return buffer;
 %}
 %	\end{lstlisting}
-%	Itt már azt is meg akarjuk kérdezni, hogy biztos-e. Itt már találkoztunk a problémával, hogy a kiíratás sorrendje rossz. 
+%	A fenti kódban előfordulhat, hogy a két üzenet kiírásának a sorrendje nem megfelelő. 
 %	
-%	\texttt{std::cout $<<$ answer("Biztos?") $<<$ answer("Hogy vagy?") $<<$ std::endl;}
+%	A pontosvessző szekvenciapont, így a megoldás egyszerű:
 %	
-%	Ez már jó. (a kiértékelés nem definiált, de a kiíratási sorrend igen!)
-%	
-%	Ez az igazán jó megoldás, itt kevesebbet kell filózni:
-%	
-%	\text{std::cout $<<$ answer("Hogy vagy?");}
+%	\texttt{std::cout $<<$ answer("Hogy vagy?");}
 %	
 %	\texttt{std::cout $<<$ answer("Biztos?");}
 %	
-%	Azonban a statikus változótól még nem szabadultunk meg. Egy másik megoldás lehet a dinamikus memória kezelés.
+%	A fenti kódban nem szép, hogy van egy statikus változó a függvényen belül. Azért statikus, hogy a buffer ne szűnjön meg a függvényből való visszatérés után, hiszen abban van a válasz. Egy statikus változó viszont életben van a program befejezéséig, ráadásul az esetleges párhuzamosítást is megakadályozza a későbbiekben.
 %	\medskip
 %	
-%	A dinamikusan lefoglalt memória az ,,átlagos'' stacken lévő objektumokkal szemben a mi felelőségünk teljesen. Nekünk kell őket allokálni, és ha nincs már rá szükségünk, nekünk is kell felszabadítani. c++11ben smart-pointerekkel ezt valamelyest automatizálhatjuk.
+%	A dinamikusan lefoglalt memória kezelése a stacken lévő objektumokkal szemben a programozó felelőssége. Nekünk kell lefoglalni, és ha nincs már rá szükségünk, nekünk is kell felszabadítani. C++11ben smart-pointerekkel ezt valamelyest automatizálhatjuk.
 %	
 %	\begin{lstlisting}
 %#include <iostream>
 %
-%char* answer (char *q);
+%const char* answer (const char *q);
 %
 %int main()
 %{
@@ -1159,7 +1135,7 @@ int main()
 %	return 0;
 %}
 %
-%char* answer (char *q)
+%const char* answer (const char *q)
 %{
 %	std::cout << q;
 %	char* buffer = new char[80];
@@ -1167,11 +1143,12 @@ int main()
 %	return buffer;
 %}
 %	\end{lstlisting}
-%	Ez így nagyon szép megoldás, de a memória sajnos elúszott. Ahogy említve volt, a \texttt{new} kulcsszóval létrehoztunk a dinamikus tárhelyen egy új változót, de azt soha nem szabadítottuk fel. Ezért a legszebb megoldás még mindig az, hogyha referenciával átadok még egy paramétert, amiben el tudjuk tárolni a választ. Ennél azonban még egyszerűbb megoldás az, ha az \texttt{std::string}-et használjuk.
+%	A fenti kódban sajnos a lefoglalt memória elszivárgott. A \texttt{new} kulcsszóval létrehoztunk a dinamikus tárhelyen egy új változót, de azt soha nem szabadítottuk fel. Egy lehetőség lenne az, hogy referencia szerint átadunk egy buffert, amiben el tudjuk tárolni a választ. Annak azonban kényelmetlen a használata. Ennél szebb megoldás, ha az \texttt{std::string}-et használjuk.
 %	\begin{lstlisting}
 %#include <iostream>
+%#include <string>
 %
-%std::string answer (char *q);
+%std::string answer (std::string q);
 %
 %int main()
 %{
@@ -1189,8 +1166,8 @@ int main()
 %}
 %	\end{lstlisting}
 %	
-%	Ez a memóriában úgy néz ki, hogy a stacken létrejön egy pointer, heapre (vagy dinamikus tárhelyen) mutató területen tárolja el a buffert, copy konstruktorral adjuk vissza megoldást, a buffer destruktora felszabadítaná a tárhelyet. Ez így igen költséges. c++11ben annyi segítséget kapunk, hogy a move szemantika javít a hatékonyságon
-	
+%	Ez a memóriában úgy néz ki, hogy a stacken létrejön egy pointer ami egy heapen foglalt bufferre mutat. Az objektum másolásakor a heapen lévő buffer is másolásra kerül, az objektum megsemmisülésekor a heapen lévő buffer felszabadul. A másolások költségesek lehetnek, azonban a fordító optmializációi és a C++11-es move szemantika sokat javít a hatékonyságon.
+%	
 	\section{Pointer aritmetika}
 	\subsection{Konstans korrektség}
 	Térjünk vissza a mutatókhoz. Volt már szó konstans mutatókról, ám konstans\textbf{ra} mutató mutatókról még nem.
@@ -1198,12 +1175,15 @@ int main()
 const int ci = 6;
 int *p = &ci;
 	\end{lstlisting}
-	A fenti kód nem fordul le, mert \texttt{ci} konstans, de \texttt{p} nem egy nem konstansra mutató pointer. Ez sértené a c++ban ismert \textbf{konstans korrektséget} (const correctness). A probléma az lenne, hogy ha fenti értékadás ehlyes lenne, akkor hiába lenne \texttt{ci} konstans, tudnánk módosítani \texttt{p}-n keresztül.
+	A fenti kód nem fordul le, mert \texttt{ci} konstans, de \texttt{p} nem egy nem konstansra mutató pointer. Ez sértené a C++ban ismert \textbf{konstans korrektséget} (const correctness). A probléma forrása az, ha fenti értékadás lefordulna, akkor \texttt{ci} értékét tudnánk módosítani \texttt{p}-n keresztül.
+	
+	\medskip
+	\textbf{Konstans korrektség:} ha egy értéket konstansnak jelölünk, azt nem módosíthatjuk a program futása során. 
 	\begin{lstlisting}
 const int ci = 6;
 const int *p = &ci;
 	\end{lstlisting}
-	Ez már jó lesz, mert a \texttt{p} egy konstansra mutató pointer, azaz tud mutatni olyan változókra, melyek konstansok. Egy konstansra mutató pointer \textbf{nem tudja megváltoztatni} a mutatott memóriacím értékét. Viszont egy konstansra mutató pointer még tud más memóriacímekre mutatni.
+	Ez már lefordul, hiszen a \texttt{p} egy konstansra mutató pointer, azaz mutathat konstans változókra. Egy konstansra mutató pointer \textbf{nem tudja megváltoztatni} a mutatott értéket. Viszont egy konstansra mutató mutatót át lehet állítani egy másik memóriacímre.
 	\begin{lstlisting}
 const int ci = 6;
 const int *p = &ci;
@@ -1211,47 +1191,47 @@ const int *p = &ci;
 int c = 5;
 p = &c;
 	\end{lstlisting}
-	Ez is teljesen szabályos, konstansra mutató pointerrel nem konstans értékre mutathatunk. Ez azonban kellemetlen meglepetéseket is okozhat, hisz \texttt{c} nem konstans, azt továbbra is tudjuk módosítani (csak nem \texttt{p}-n keresztül)! Egy konstans pointer kezelése közben, mely által mutatott terület értékétől nem várnánk hogy változzon, gond nélkül módosulhat a mutatott érték.
+	A fenti kód is szabályos, konstansra mutató pointerrel nem konstans is értékre mutathatunk. Érdemes átgondolni ennek a következményeit, hisz \texttt{c} nem konstans, ezért az értékét továbbra is módosíthatjuk (csak nem \texttt{p}-n keresztül)! Egy konstansra mutató mutató nem azt jelenti, hogy a mutatott érték sosem változhat meg. Csupán annyit jelent, hogy a mutatott értéket ezen a mutatón keresztül nem lehet megváltoztatni.
 	\begin{lstlisting}
 const int *p = &ci;
 int c = 5;
 p = &c;
 c = 5;
 	\end{lstlisting}
-	Szintaktikailag a *-ot sok helyre írhatjuk.
+  A \texttt{const} kulcsszó több helyre is kerülhet.
 	\begin{lstlisting}
 const int *p;
 int const *p;
 	\end{lstlisting}
-	Egy kettő ugyanaz, mint fentebb láthattuk.
+	A fenti két sor ugyanazt jelenti, a mutatott értéket nem lehet megváltoztatni a mutatón keresztül.
 	\begin{lstlisting}
 int * const p;
 const int * const p;
 int const * const p;
 	\end{lstlisting} 
-	Amennyiben a * után van a \texttt{const}, akkor egy \textbf{konstans pointert kapunk}, mely megváltoztathatja a mutatott értéket, de nem mutathat másra (konstans pointer \quad $\not=$\quad konstanra mutató pointer).
-	\subsection{Mutatóra mutató mutatók} %lol
-	Mutatóra mutató mutatók is léteznek, melyeket így tudunk definiálni:
+	Amennyiben a * után van a \texttt{const}, akkor egy \textbf{konstans pointert kapunk}, mely megváltoztathatja a mutatott értéket, de nem mutathat másra (konstans pointer \quad $\not=$\quad konstanra mutató pointer). Egy létezik konstansra mutató konstans mutató is, amin keresztül nem lehet megváltoztatni a mutatott értéket és a mutatót sem lehet máshova átállítani.
+	\subsection{Mutatóra mutató mutatók} 
+	Mutatóra mutató mutatók is léteznek. Néhány példa:
 	\begin{lstlisting}
 int *p;
 int **q = &p;
 int ***r = &q;
 	\end{lstlisting}
-	Példaképp \texttt{q}-en keresztül meg tudjuk változni, \texttt{p} hova mutasson.
+	Példaképp \texttt{q}-n keresztül meg tudjuk változni, \texttt{p} hova mutasson.
 	\begin{lstlisting}
 int c, d;
 int *p = &c;
 int **q = &p;
 *q = &d;
 	\end{lstlisting}
-	Ezeket nagyon durván el lehet bonyolítani, ha konstans pointerekkel is dolgozunk, mellyel meg lehet akadályozni hogy egy pointeren keresztül ne lehessen módosítani hogy egy másik pointer hova mutasson.
+	A megfelelő szinten a mutatók konstansá tételével még bonyolultabb példákat kaphatunk:
 	\begin{lstlisting}
 int c, d;
 int *p = &c;
 int * const *q = &p;
 *q = &d; // forditasi hiba
 	\end{lstlisting}
-	Mivel \texttt{q} egy \texttt{int}-re mutató konstans mutatóra mutató mutató, így csak egy olyan mutatóval tudunk rámutatni, ami egy \texttt{int}-re mutató konstans mutatóra mutató mutatóra mutató.
+	Mivel \texttt{q} egy \texttt{int}-re mutató konstans mutatóra mutató mutató, így csak egy olyan mutatóval tudunk rámutatni, ami egy \texttt{int}-re mutató konstans mutatóra mutató mutatóra mutató mutató.
 	\begin{lstlisting}
 int c, d;
 int *p = &c;
@@ -1259,10 +1239,10 @@ int * const *q = &p;
 int *const ** const r = &q;
 	\end{lstlisting}
 	\begin{note}
-		Megnyugtatás végett, mutatóra mutató mutató (**) még előfordul, de komplikáltabb ritkán.
+		Megnyugtatás végett, ritkán van szükség mutatóra mutató mutatónál bonyolultabb szerkezetre.
 	\end{note}
 	\subsection{Függvény pointerek}
-	C++ban lehetőségünk van arra is, hogy függvényeket adjunk át paraméternek.
+	C++ban lehetőségünk van arra is, hogy függvényeket adjunk át paraméterként.
 	\begin{lstlisting}
 int add(int a, int b)
 {
@@ -1292,14 +1272,14 @@ int main()
 }
 	\end{lstlisting}
 	
-	Itt \texttt{reduce} egy olyan paramétert is vár, mely igazából egy függvény, mely \texttt{int}-et ad vissza, és két \texttt{int}-et vár paraméterül.
+	Itt \texttt{reduce} egy olyan paramétert is vár, mely igazából egy függvény, amely \texttt{int}-et ad vissza, és két \texttt{int}-et vár paraméterül.
 	\begin{note}
 		A szavakba öntés segíthet a megértésben: \texttt{op} egy olyan függvényre mutató mutató, melynek két \texttt{int} paramétere van, és \texttt{int} a visszatérési értéke.
 	\end{note}
 	
-	A kódban feltűnhet, hogy a tömb mellé paraméterben elkértük annak méretét is. Ez azért van, mert a \texttt{t} tömb egy \texttt{int}-re mutató mutatóvá fog konvertálni, ami az első elemre mutat. Ennek hatására értelemszerűen elvesztjük azt az információt, hogy mekkora volt a tömb (a tömbök és paraméterátadás kapcsolátról később bévebben lesz szó). Így át kell adni ezt az információt is. 
+	A kódban feltűnhet, hogy a tömb mellé paraméterben elkértük annak méretét is. Ennek az az oka, hogy a \texttt{t} tömb egy \texttt{int}-re mutató mutatóvá fog konvertálódni a paraméter átadás során, ami a tömb első elemére mutat. Ennek hatására elvesztjük azt az információt, hogy mekkora volt a tömb (a tömbök és paraméterátadás kapcsolátról később bévebben lesz szó). Így át kell adni ezt az információt is. 
 	
-	Mellékesen, függvényeket kezelni csak pointerekkel lehet, és mivel a fordító tudja hogy függvényeket akarunk átadni, a \texttt{\&} jel elhagyható függvényhíváskor, és az \texttt{op} elől is elhagyható a * a paramétereknél.
+	Mellékesen, egy függvény átadásakor csak függvénypointert tudunk átadni. Egy függvénypointeren a függvény meghívása az egyetlen értelmes művelet. Így a \texttt{\&} jel elhagyható függvényhíváskor és az \texttt{op} elől is elhagyható a * a paramétereknél.
 	\begin{lstlisting}
 int reduce(int *start, int size, int initial, int op(int, int)))
 {
@@ -1314,7 +1294,7 @@ int main()
 }
 	\end{lstlisting}
 	\section{Tömbök}
-	A tömbök a c++ alapértelmezett konténere, mellyel egyszerre tömb azonos típusú elemet kezelhetünk. Előzménytárgyakból már megismertük valamennyi funkcionalitását, ám számos veszélyét még nem.
+	A tömb a C++ egy beépített adatszerkezete, mellyel tömb azonos típusú elemet tárolhatunk és kezelhetünk egységesen. Előzménytárgyakból már megismertük valamennyi funkcionalitását, ám számos veszélyét még nem.
 		\begin{lstlisting}
 int main()
 {
@@ -1327,7 +1307,7 @@ int main()
 std::cout << sizeof(i) << std::endl;
 std::cout << sizeof(t) << std::endl;
 		\end{lstlisting}
-		A \texttt{sizeof} operátor megadja a paraméterként megadott típus, vagy objektum esetében annak típusának méretét (bővebben később). Ez minden implementációra specifikus. Azt látjuk, hogy mindig ötszöröse lesz a \texttt{t} az \texttt{i}-nek. Azaz a tömbök tiszta adatok.  Stacken ábrázolja így képzeljük el:
+		A \texttt{sizeof} operátor megadja a paraméterként megadott típus, vagy objektum esetében annak típusának méretét (bővebben később). Ez minden implementációra specifikus. Azt látjuk, hogy mindig ötszöröse lesz a \texttt{t} az \texttt{i}-nek. Azaz a tömbök tiszta adatok.  Stacken ábrázolva így képzeljük el:
 		
 		\begin{figure}[!h]
 			\centering
@@ -1349,17 +1329,17 @@ std::cout << sizeof(t) << std::endl;
 			
 			A \texttt{main} függvény változói.
 		\end{figure}
-		\subsection{Biztonsági rések nem definiált viselkedés következében}
-		Irassuk ki a a tömb elemeit! (de ezt basszuk is el!)
+		\subsection{Biztonsági rések nem definiált viselkedés kihasználásával}
+		Irassuk ki a a tömb elemeit! A példa kedvéért rontsuk el a kódot.
 		\begin{lstlisting}
-for (int i = 0; i < 6; i++) //nem 6 elemes
+for (int i = 0; i < 6; i++) // Hupsz. A csak 5 elem van.
 {
 	std::cout << t[i] << std::endl;
 }
 		\end{lstlisting} 
-		Itt előre látható, hogy túl fogunk indexelni. Ez így egy {nem definiált viselkedés}hez vezet. Várhatóan valamilyen random memóriaszemetet fog kiolvasni (vagy olvashat ki, lévén nem definiált), és sose tudhatjuk pontosan mit.
+		Itt látható, hogy túl fogunk indexelni. Ez {nem definiált viselkedés}hez vezet. Várhatóan memóriaszemetet fog kiolvasni az utolsó elem helyett, de sose tudhatjuk pontosan mi fog történni. Fordítási időben ezt a hibát a fordító nem veszi észre. A gyakorlaton a programot futtatva nem következett be futási idejű hiba.
 		
-		Most növeljük meg az elemeket, és menjünk el egészen 100ig!
+		Most növeljük meg az elemeket, és indexeljünk túl egészen 100ig!
 		\begin{lstlisting}
 for (int i = 0; i < 100; i++)
 {
@@ -1367,7 +1347,7 @@ for (int i = 0; i < 100; i++)
 }
 std::cout << "sajt" << std::endl;
 		\end{lstlisting} 
-		Ez szintén nem definiált. Mivel olyan memóriaterületeket szeretnénk módosítani, melyeket nem foglaltunk le a programunknak, bajba juthatunk. Itt az órán a {sajt} szöveg ki lehet írva, mégis kaptunk szegmentálási hiba (\textit{segmentation fault}) hibaüzenetet az oprendszertől.
+		Ez a program továbbra is nem definiált viselkedést tartalmaz. Mivel több memóriához nyúlunk hozzá indokolatlanul, ezért nagyobb rá az esély, hogy futási idejű hibába ütközzünk. Az órán a {sajt} szöveg ki lett írva, mégis kaptunk egy szegmentálási hibát (\textit{segmentation fault}).
 		
 		\begin{lstlisting}
 for (int i = 0; i < 100000; i++)
@@ -1376,7 +1356,7 @@ for (int i = 0; i < 100000; i++)
 }
 std::cout << "sajt" << std::endl;
 		\end{lstlisting} 
-		Itt már (legalábbis ebben az esetben) előbb vágta magát hanyat a program, mielőtt sajt-ot ki tudta volna íratni. Ez jól demonstrálja, hogy ugyanazt  a hibát követtük el, de más volt a végeredmény. Ezért igazán veszélyesek a nem definiált viselkedések.
+		A túlindexelést tovább fokozva a program még mielőtt sajt-ot ki tudta volna írni, szegmentálási hibával leállt. Ez jól demonstrálja, hogy ugyanolyan jellegű  a hibát követtük el, de mégis más volt a végeredmény. Ez az egyik ok, amiért veszélyesek a nem definiált viselkedések. Mivel számos különböző hibát okozhatnak, ezért a diagnosztizálásuk sem mindig egyszerű. Az alábbi kód szemléltet egy példát, hogyan lehet biztonsági rés a nem definiált viselkedésből.
 		\begin{lstlisting}
 #include <iostream>
 #include <string>
@@ -1396,18 +1376,18 @@ int main()
 	std::cout << "Admin?: " << (isAdmin != 0 ) << std::endl;
 }
 		\end{lstlisting}
-		Ha a programnak \texttt{pityu}-t adunk meg amikor be akarja olvasni \texttt{name}-et, akkor minden a legnagyobb rendben. De mivel a forráskódot ismerjük, azért hogyha nagyon hosszú nevet adnánk (nagyobb mint 5), akkor a túlindexelés miatt ki tudjuk használni a nem definiált viselkedéseket, és az is előfordulhat, hogy az \texttt{isAdmin} memóriacímére írunk, és elérjük hogy akkor is adminnak higgyen minket, ha nem vagyunk azok.
+		Ha a programnak \texttt{pityu}-t adunk meg amikor be akarja olvasni \texttt{name}-et, akkor minden rendben. De mivel a forráskódot ismerjük, azért ha hosszú nevet adnánk (nagyobb mint 5), akkor a túlindexelés miatt ki tudjuk használni a nem definiált viselkedéseket. Az is előfordulhat, hogy az \texttt{isAdmin} memóriacímére írunk, és elérjük, hogy a szoftver adminként authentikáljon valakit, aki nem az.
 		\medskip
 		
-		Hogyan lehet ezeket a hibákat elkerülni? Túl azon, hogy nagyon figyelni kell, vannak programok amik segítenek nekünk. Ehhez használhatunk \texttt{sanitizer}-eket. Ezek picit módosítanak a kódunkon, és amennyiben futási időben bizonyos nem definiált viselkedéseket követne el, pl. itt a túlindexelés, leütné a programunkat. Használatukhoz elég egy extra paranccsal fordítanunk:
+		Hogyan lehet ezeket a hibákat elkerülni? Túl azon, hogy figyelni kell, vannak programok amik segítenek. Ehhez használhatunk \texttt{sanitizer}-eket. Ezek módosítanak a fordító által generált kódon. Létrehoz ellenőrzéseket, amik azelőtt észrevesznek bizonyos nem definiált viselkedéseket, mielőtt azok megtörténnének. Pl. itt a túlindexelés, egy futási idejű hibához és egy jól olvasható hibaüzenethez vezetne. Használatukhoz elég egy extra paranccsal fordítanunk:
 		
 		{\centering\texttt{g++ main.cpp -fsanitize=address}\par }
 		
-		De sajnos ez is csak akkor tud segíteni, ha a probléma előfordul (azaz futási időben, nem fordítási időben ellenőriz). Amennyiben előfordul viszont, elég pontos leírást tudunk kapni arról, hogy merre van a probléma.
+		A sanitizerek csa abban az esetben találnak meg egy hibát, ha a probléma előfordul (azaz futási időben, nem fordítási időben ellenőriz). Amennyiben előfordul, akkor elég pontos leírást tudunk kapni arról, hogy merre van a probléma. Fordítási időben a figyelmeztetések használata segíthet bizonyos hibák elkerülésében.
 		
 		{\centering \texttt{g++ main.cpp -Wall -Wextra} \par}
 		
-		Ez a 2 parancs szintén extra ellenőrzéseket vezet be, de nem változtatják meg a kódot, csak fordítási időben ellenőriznek.
+		A fenti két kapcsoló szintén extra ellenőrzéseket vezet be, de nem változtatják meg a generált kódot.
 	\subsection{Hivatkozás tömb elemeire}
 		\begin{lstlisting}
 #include <iostream>
@@ -1422,9 +1402,9 @@ int main()
 	std::cout << sizeof(t) << std::endl;
 }
 		\end{lstlisting}
-		Könnyű azt hinni (hibásan) hogy a pointerek ugyanazok mint a tömbök. Ez  program jól mutatja, hogy ez nem igaz, mert a tömb tárolja annak méretét is. Számos más különbség is van, viszont egy tömb könnyen konvertálódik pointerré.
+		Könnyű azt hinni (hibásan), hogy a pointerek ekvivalensek a tömbökkel. A fenti program jól szemlélteti, hogy ez nem igaz. A tömb típusa tartalmazza azt az információt, hogy hány elemű a tömb. Egy pointer típusa csak azt az információt tartalmazza, hogy a mutatott elem mekkora. Számos más különbség is van. A tévhit oka az, hogy tömb könnyen konvertálódik első elemre mutató pointerré.
 		
-		Egy tömb adott elemét sokféleképpen le tudjuk kérdezni:
+		Egy tömb adott elemére több módon is hivatkozhatunk:
 		
 		{\centering \texttt{*(p + 3) == *(3 + p) == p[3] == 3[p]} \par}
 		\
@@ -1437,17 +1417,17 @@ int main()
 	return 0;
 }
 		\end{lstlisting}
-		Ez egy alternatív módja egy tömb inicializálásának. Itt több dolog megfigyelendő: Az első \texttt{[]} operátorban nincs méret, mert a fordító az inicializáció alapján meg tudja állapítani, hogy a mátrix azon dimenziója mekkora, de annyira már nem okos, hogy a másodikat is abszolválja.
+		Tekintsük a fenti két dimenziós tömböt. Az első \texttt{[]} jelek közt nincs méret, mert a fordító az inicializáció alapján meg tudja állapítani. A második dimenzió méretének megadása viszont kötelező.
 		
 		\medskip
-		Fontos megjegyezni, hogy a mátrix egy adott elemére még többféleképpen tudunk hivatkozni:
+		Fentebb a tömböknél megadott ekvivalenciát a mátrixra alkalmazva számos indexelési módot le tudunk vezetni:
 		\medskip
 		
 		\begin{center}
 			\texttt{t[1][] == *(*(t+1)+0) == *(1[t]+0) == 0[1[t]] == 0[*(t+1)] == *(t+1)[0] == 1[t][0] } 
 		\end{center}
 	\begin{note}
-		Ahhoz, hogy egy olyan függvényt írjunk ami minden méretű tömböt elfogad paraméterül, a legegyszerűbb megoldás, ha hagyjuk, hogy a tömb átkonvertáljon egy olyan pointerré, ami az első elemre mutat, és átadjuk külön paraméterben a tömb méretét. Bár van megoldás arra is, hogy egy darab "rugalmas" függvényt írjunk, és az egész tömbhöz csak 1 paramétert vegyünk át, annak is komoly hátulütői lehetnek. Majd template-ekkel a 7-8. gyakorlaton lesz részletesen szó, de kb így nézne ki:
+		Ahhoz, hogy egy olyan függvényt írjunk, ami minden méretű tömböt elfogad paraméterül, a legegyszerűbb megoldás, ha hagyjuk, hogy a tömb átkonvertálódjon egy első elemre mutató pointerré, és átadjuk külön paraméterben a tömb méretét. Bár van megoldás arra is, hogy egy darab "rugalmas" függvényt írjunk, és az egész tömbről csak egy paramétert vegyünk át. Majd a 7-8. gyakorlaton lesz részletesen szó, de a következő a szintaxis:
 		\begin{lstlisting}
 template <class T, int ArraySize>
 void ( T (&param)[ArraySize] )
@@ -1456,13 +1436,13 @@ void ( T (&param)[ArraySize] )
 }
 		\end{lstlisting}
 		\smallskip
-		Ez később jobban ki lesz fejtve, de itt egy template paraméter dedukció fog létrejönni, és a fordító kitalálja \texttt{param} méretét. Csak nyilván, mindig amikor egy más méretű tömböt hozunk létre, a fordító példányosítja ezt a függvényt, ami csúnyán meg tudja dobni a bináris kódot (\textit{binary code}).
+		A működésének az elvét még nem baj, ha nem értjük. A háttérben egy template paraméter dedukció fog végbemenni: a fordító kitalálja \texttt{param} méretét. 
 		
 		\smallskip
 		A tömbök átvétele paraméterként azért ilyen körülményes, mert egy tömbnek a méretét fordítási időben ismernünk kell. Ha változó méretű tömböt várnánk paraméterül, az szembemenne ezzel a követelménnyel.  
 	\end{note}
 	\begin{note}
-		Progalapon úgy tanultunk tömböket, hogy változó méretet adtunk meg nekik. Ezt a \texttt{gcc} compiler elfogadja, lefordítja, és jó kódot is csinál belőle, de nem garantált, hogy ezt minden fordító megteszi, ugyanis a c++ szabvány azt mondja ki, hogy a tömb méretének fordítási időben ismertnek kell lennie. Ez jól demonstrálja, hogy a compilerek nem feltételnül követik szorosan a szabványt.
+		Előzmény tárgyakból elképzelhető, hogy azt tanultuk, hogy egy tömb méretének egy változót is megadhatunk. Ezt a \texttt{gcc} fordító elfogadja és jó kódot is generál belőle. De ez egy nem szabványos kiterjesztés, ezért nem garantált, hogy ezt minden fordító megteszi. Ez jól demonstrálja, hogy a fordítók nem mindenben követik szorosan a szabványt.
 	\end{note}
 	\subsection{Tömbök átadása függvényparaméterként}
 	Próbáljunk meg egy tömböt érték szerint átadni egy függvénynek!
@@ -1481,21 +1461,16 @@ int main()
 	f(t);
 }
 	\end{lstlisting}
-	Kimenet: \texttt{20 8} (ezen az implementáción)
+	Kimenet: \texttt{20 8} (implementáció függő)
 	
-	Bár mindkétszer azt hittünk hogy \texttt{t} tömb által foglalt méretét írattuk ki, és azt várnánk hogy a két szám ugyanaz lesz, a valóságban amikor azt érték szerint megpróbáljuk átadni, a \texttt{t} tömb átkonvertálódik a tömb elejére mutató pointerré.
+	Bár azt hihettük, hogy \texttt{t} tömb méretét írattuk ki ket alkalommal, valójában amikor azt érték szerint próbálunk meg átadni egy tömböt, az átkonvertálódik a tömb elejére mutató pointerré.
 	\begin{lstlisting}
 void f(int t[8])
 {
 	std::cout << sizeof(t) << std::endl;
 }
 	\end{lstlisting}
-	Ebben az esetben még mindig 8 lesz a második kiírt szám. Az a tanulság, hogy ha érték szerint akarunk átadni egy tömböt, ahelyett át fog konvertálódni pointerré. Az, hogy ezt szintaktikailag miért tehetjük meg mégis, hogy egy tömböt írunk oda mégis pointert kapunk, 
-	\begin{center}
-		\textit{,,az egy faszság.''}
-		
-		/Horváth Gábor/
-	\end{center}
+	Hiába adunk meg egy méretet a tömbnek a függvény fejlécében, még mindig egy pointer mérete lesz a második kiírt szám. Az a tanulság, hogy ha érték szerint akarunk átadni egy tömböt, az át fog konvertálódni pointerré. A legszebb az lenne, ha a fenti szintaxis nem fordulna le. Ennek azonban történelmi oka van, a C-vel való visszafelé kompatibilitás miatt fordul le. 
 	\begin{note}
 		Tömböt értékül adni a szabvány szerint nem is lehet: \texttt{int *t2[5] = t} nem helyes.
 	\end{note}
@@ -1503,7 +1478,7 @@ void f(int t[8])
 	\begin{lstlisting}
 #include <iostream>
 
-void f(int *t, int size) //uj parameter!
+void f(int *t, int size) // uj parameter!
 {
 	std::cout << sizeof(t) << std::endl;
 }
@@ -1516,43 +1491,44 @@ int main()
 }
 	\end{lstlisting}
 	\begin{note}
-		Amennyiben c++11ben programozunk, érdemes az \texttt{std::array}-t használnunk, ami majdnem ugyanaz, mint egy tömb, legalább olyan hatékony, de nem tud pointerré változni és mindig tudja a méretét.
+		Amennyiben C++11ben programozunk, érdemes az \texttt{std::array}-t használnunk, ami olyan, mint egy tömb, de nem tud pointerré konvertálódni és mindig tudja a méretét.
 	\end{note}
-	Ha szeretnénk egy tömböt egy darab paraméterrel átadni, megpróbálhatunk egy tömbre mutató pointert létrehozni. Azonban figyelni kell a szintaktikára, ha \texttt{int *t[5]}-t írunk, egy öt elemű intre mutató pointereket tároló tömböt kapunk.
+	Ha szeretnénk egy tömböt egy darab paraméterként átadni, megpróbálhatunk egy tömbre mutató pointert létrehozni. Azonban figyelni kell a szintaktikára, ha \texttt{int *t[5]}-t írunk, egy öt elemű intre mutató pointereket tároló tömböt kapunk.
 	
 	\medskip
-	Ha valóban tömbre mutató mutatót szeretnék, így csinálhatjuk:
+	Ha tömbre mutató mutatót szeretnék, így csinálhatjuk:
 	\begin{lstlisting}
 void g(int (*t)[5])
 {
 	std::cout << sizeof(t) << std::endl;
 }
 	\end{lstlisting}
-	Azonban ez még mindig 8at fog kiírni (ezen az implementáción!), mert a \texttt{t} az egy sima mutató! Ahhoz, hogy megkapjuk, mire mutat, dereferálnunk kell, így a \texttt{sizeof} paraméterének \texttt{*t}-t kell megadni.
+	Azonban ez még mindig egy pointer méretét fogja kiírni, mert a \texttt{t} az egy sima mutató! Ahhoz, hogy megkapjuk, mire mutat, dereferálnunk kell, így a \texttt{sizeof} paraméterének \texttt{*t}-t kell megadni, ha a tömb méretére vagyunk kíváncsiak.
 	\begin{note}
-		Nyilván, ha refenreciával vennénk át \texttt{t}-t, az is hasonlóan nézne ki:\, \texttt{int (\&t)[5]}.
+		Ha refenreciával vennénk át \texttt{t}-t, az is hasonlóan nézne ki:\, \texttt{int (\&t)[5]}.
 	\end{note}
 	\medskip
 	
-	Ha megnöveljük a tömb méretét eggyel, akkor nem fordul le a kód, mert nem tud a g függvényben egy 5 elemű tömbre mutató mutató 6 elemű tömbre mutató mutatóvá konvertálódni.
+	Ha eltérő méretű tömböt próbálunk meg átadni, akkor nem fordul le a kód, mert nem egy 5 elemű tömbre mutató mutató 6 elemű tömbre mutató mutatóvá konvertálódni.
 	\begin{lstlisting}
 int main()
 {
 	int a[6];
-	g(a); //forditasi hiba!
+  g(&a); //forditasi hiba!
 	int b[5];
-	g(b); //ok
+  g(&b); //ok
 }
 	\end{lstlisting}
 	
 	\section{Literálok}
 	\subsection{Karakterláncok}
-	Mi lesz a \texttt{"Hello"} sztring típusa?
+	Mi lesz a \texttt{"Hello"} karakterlánc literál típusa?
 	\smallskip
 	
-	Egy konstans karakterekből álló 6 méretű tömb (\texttt{const char[6]}). Azért nem 5 elemű, mert a sztring el végén el kell tárolni a végét jelző \texttt{\textbackslash 0} karaktert.
+	Egy konstans karakterekből álló 6 méretű tömb (\texttt{const char[6]}). Azért 6 elemű, mert a karakterlánc literál végén el van tárolva a végét jelző \texttt{\textbackslash 0} karaktert.
 	
 	\begin{center}
+		\setlength{\extrarowheight}{2pt}
 		\begin{tabular}{|c|c|c|c|c|c|}
 			\hline
 			H&E&L&L&O&$\backslash$0\\
@@ -1562,37 +1538,23 @@ int main()
 	\begin{lstlisting}
 int main()
 {
-	char* = "Hello";
-}
-	\end{lstlisting}
-	A fenti kódban megsértettük a konstans korrektséget, hisz egy nem konstans pointerrel mutatuk egy konstans sztringre. Ennek ellenére, a fenti kód lefordul. Ez azért van, mert az eredeti C-ben nem volt konstans kulcsszó, és a kompatibilitás végett c++ban lehet konstans karaktertömbre nem konstans pointerrel mutatni.
-	\begin{note}
-		Ez egy nagyon rossz dolog, és kerülni kell, amennyire csak lehet. Lefordul, de kapunk rá warningot.
-	\end{note}
-	\begin{lstlisting}
-int main()
-{
-	const char *hello = "Hello";
+	char* hello= "Hello";
 	hello[1] = o;
 }
 	\end{lstlisting}
-	Ha eljászuk azt, hogy az egyik elemet o-ra cseréljük, akkor nem definiált viselkedést kapunk. 
+	A fenti kódban megsértettük a konstans korrektséget, hisz egy nem konstansra mutató pointerrel mutatuk egy konstans karakterlánc literál első elemére. Ennek ellenére, a fenti kód lefordul. Ennek az az oka, hogy az eredeti C-ben nem volt const kulcsszó, a kompatibilitás végett ezért C++ban lehet konstans karakterlánc literál elemire nem konstansra mutató pointerrel mutatni.
+	\begin{note}
+		Ezt a fajta kompatibilitás miatt meghagyott viselkedést kerülni kell. Lefordul, de kapunk rá warningot.
+	\end{note}
+	Ha módosítani próbáljuk a karakterlánc literál értékét, az nem definiált viselkedéshez vezet. 
 	%TODO Sajnos ebből nem tudtam jobb leírást kipofozni tudáshiány végett.
 	
-	Futtatáskor (legalábbis ebben az esetben, hisz nem definiált viselkedésről van szó) futási idejű hibát kapunk, méghozzá szegmentálási hibát. Ennek a magyarázata a követekző: van a gépünknek sima és virtuális memóriája. Megfigyelhető, hogy sokkal több memóriát tudunk használni, mint amennyi ténylegesen van. Ez úgy oldható meg, hogy a virtuális memórián az alkalmazásunk kap egy memóriaterületet. Ezen a memóriacímen vannak olyan adatok is, melyek garantáltan nem változnak: a program kódja, és a fenti \texttt{"Hello"} szint is ilyen. Ezek külön vannak tárolva azok adatoktól, melyek változhatnak. 
+	Futtatáskor linuxon futási idejű hibát kapunk, méghozzá szegmentálási hibát. Ennek az az oka, hogy a konstansok értékei readonly memóriában vannak tárolva, aminek a módosítását nem engedi az operációs rendszer.
+  \medskip
 	
-	Ha ezt a programot mégegyszer elindítjuk, a memóriában kapni fog egy újabb színteret a program, amiben benne lesznek az adatok, melyeket futási időben módosíthat, illetve azok amiket nem. Az operációs rendszerünk azonban van olyan okos, hogy nem rakja be a nem módosítható adatokat még egyszer: a nem változtatható kódot a 2 külön működő azonos program ugyanarra a részére fogja irányítani a virtuális memóriában.
-	
-	\medskip
-	Erre jó példa az, hogy a C-nek a standard könyvtárait közel minden program használja, így olcsóbb úgy megoldani, hogy minden programot ugyanide mutat.
-	
-	\medskip
-	Miért kapunk szegmentálási hibát? A konstansok ezen nem módosítható részen belül vannak. Ha módosítanánk, akkor a másik program futása is változna. Az olyan programokat, amik ilyet próbálnak csinálni, szinte azonnal ki lesznek írtva. Az operációs rendszernek ugyanis nagyon fontos az, hogy a programok egymás futását nem zavarják (\textit{szeparálja} őket).
-	
-	\medskip
-	Ez jól rámutat arra, hogy miért is nem jó az, ha a fenti hibát megengedjük.
-	\subsection{Szám literálok} %TODO tuti jó ez a cím?
-	Függően attól hogy egy számot hogyan írunk c++ban, mást jelenthet:
+	Ez jól rámutat arra, hogy miért is nem jó az, ha a fenti konverziót megengedjük.
+	\subsection{Szám literálok}
+	Függően attól, hogy egy szám literált hogyan írunk C++ban, mást jelenthet:
 	\begin{center}
 		\setlength{\extrarowheight}{2pt}
 		\begin{tabular}{|c|l|}
@@ -1628,33 +1590,32 @@ int main()
 		Viszonylag kevés esetben éri meg \texttt{float}-ot használni \texttt{double} helyett. Modern CPU-k ugyanolyan hatékonyan dolgoznak mind a kettővel, így érdemesebb a pontosabbat választani. (Ha magát a GPU-t programozzuk, az lehet egy kivétel.)
 	\end{note}
 	
-	Létezik c++ban \texttt{signed} kulcsszó, mely eredetileg a char miatt volt, mert az is egész számokat tartalmazott, de azt nem definiálták külön, hogy a \texttt{char} lehessen vagy ne lehessen signed, ezért az, hogy egy adott platformon lehet-e az, az implementációfüggő.
+	Létezik C++ban \texttt{signed} kulcsszó, mely a char miatt lett bevezetve. A char is egész számokat tartalmaz, de az implementáció függő, hogy a \texttt{char} singed vagy unsigned értéket tartalmaz-e. 
 	\begin{note}
-		Érdemes mindig \texttt{int}et használnunk, hacsak nincs jó okunk arra, hogy \texttt{short}-ot, vagy \texttt{long}-ot írjunk. Az \texttt{int}-el általában a leghatékonyabb a processzor.
+		Érdemes mindig \texttt{int}et használnunk, hanincs jó okunk arra, hogy mást használjunk. Az \texttt{int}-el általában a leghatékonyabb a processzor.
 	\end{note}
-	\section{Struktúrák mérete}
-	A \texttt{sizeof(char)} mindig 1-et ad vissza. A karakter mérete mindig az egység. Minden más típusra a \texttt{sizeof} függvény azt adja vissza, hogy paraméterül megadott dolog mennyi \texttt{char} méretű. 
+	A \texttt{sizeof(char)} mindig 1-et ad vissza. A karakter mérete mindig az egység. Minden más típusra a \texttt{sizeof} függvény azt adja vissza, hogy paraméterül megadott objektum vagy típus mérete hányszorosa a \texttt{char}nak. 
 	
-	A kérdésre, hogy mennyi \texttt{sizeof(char)}, a válasz mindig 1, de hogy ezt valóban hány byte-on tároljuk, az már implementációfüggő.
+  Attól, hogy \texttt{sizeof(char) == 1}, a \texttt{char} mérete byteokban még implementáció függő.
+
+  A lebegőpontos számok mindig rendelkeznek előjellel. 
 	
 	\medskip
-	A \texttt{char} méretén túl minden másnak a \texttt{sizeof}-ja teljesen implementációfüggő, bár a szabvány kimond pár szabályt:
+	A \texttt{char} méretén túl minden másnak a mérete implementációfüggő, bár a szabvány kimond pár relációt:
 	\begin{center}
-		\texttt{sizeof(int) == sizeof(signed) == sizeof(unsigned)}
+		\texttt{sizeof(X) == sizeof(signed X) == sizeof(unsigned X)}
 		\smallskip
 		
-		\texttt{sizeof(float) == sizeof(double) == sizeof(long double)}
+		\texttt{sizeof(float) $\leq$ sizeof(double) $\leq$ sizeof(long double)}
 		\smallskip
 		
 		\texttt{sizeof(short) $\leq$ sizeof(int) $\leq$ sizeof(long)}
 		\smallskip
 		
-		\texttt{sizeof(char) == sizeof(unsigned char) == sizeof(signed char)}
-		\smallskip
-		
 		\texttt{sizeof(char) $\leq$ sizeof(bool)}
 		\smallskip
 	\end{center}
+	\section{Struktúrák mérete}
 	\begin{lstlisting}
 #include <iostream>
 
@@ -1672,7 +1633,7 @@ int main()
 	std::cout << sizeof(Hallgato) << std::endl;
 }
 	\end{lstlisting}
-	Ezen a gépen a \texttt{double} mérete 8, az \texttt{int} mérete 4, \texttt{Hallgato}-é 16. Ezen azt látjuk, hogy a \texttt{Hallgato} tiszta adat.
+	A gyakorlaton használt gépen a \texttt{double} mérete 8, az \texttt{int} mérete 4, \texttt{Hallgato}-é 16. Ezen azt látjuk, hogy a \texttt{Hallgato} tiszta adat.
 	\begin{lstlisting}
 struct Hallgato
 {
@@ -1681,7 +1642,7 @@ struct Hallgato
 	int magassag;
 }
 	\end{lstlisting} 
-	Amikor ennek a méretét kérdezzük le (figyeljük meg, hogy változott a sorrend), akkor a válasz már 24. Ennek az oka az, hogy míg az első esetben így volt eltárolva a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
+	Miután átrendeztük a mezők sorrendjét, és újra kiírjuk a struktúra méretét, akkor a válasz 24. Ennek az oka az, hogy míg az első esetben így volt eltárolva a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
 	\begin{figure}[H]
 		\centering
 		\begin{tikzpicture}
@@ -1697,7 +1658,7 @@ struct Hallgato
 		
 		\end{tikzpicture}
 	\end{figure}
-	Azaz, \texttt{atlag}, illetve \texttt{kor} és \texttt{magassag} pont efértek 1-1 gép szóban. Viszont, ha megcseréljük a sorrendet, ez már nem lesz igaz:
+	Azaz, \texttt{atlag}, illetve \texttt{kor} és \texttt{magassag} pont efértek 1-1 gépi szóban. Viszont, ha megcseréljük a sorrendet, ez már nem lesz igaz:
 	\begin{figure}[H]
 		\centering
 		\begin{tikzpicture}
@@ -1713,7 +1674,7 @@ struct Hallgato
 		\node (border) [Border, left = -1.26cm of 3] {};
 		\end{tikzpicture}
 	\end{figure}
-	Sajnos itt már szétvágná \texttt{atlag}-ot. Ez nagyon nem hatékony, mert állandóan gondolnia kéne a fordítónak arra, hogy épp hogyan kaparja össze \texttt{atlag}-ot.
+  Itt az \texttt{atlag} két fele két különböző gépi szóba kerülne. Ez a ma használt processzorok számára nem hatékony, hiszen az átlag értékének kiolvasásához vagy módosításához két gépi szót is olvasni vagy módosítani kéne (a legtöbb processzor csak szóhatárról tud hatékonyan olvasni).
 	\begin{figure}[H]
 		\centering
 		\begin{tikzpicture}
@@ -1731,16 +1692,16 @@ struct Hallgato
 		\node (border) [Border, left = -0.2mm of 1] {};
 		\end{tikzpicture}
 	\end{figure}
-	Ez így sokkal hatékonyabb, bár 3 gép szót használ. Ebben az esetben a kód eltárolja, hogy legyen egy kis \textit{padding } a változó után. Tehát semmi extráért nem kell fizetnünk, de attól még picit több memóriát foglalunk le.
+	A fenti elrendezés hatékonyabb, bár 3 gépi szót használ. Ebben az esetben a fordító \textit{padding}et illeszt be a mező után. Ennek hatására hatékonyan olvasható és módosítható minden mező. Cserébe több memóriát foglal a struktúra.
 	\smallskip
 	
-	A szabvány kimondja, hogy egy \texttt{struct} mérete az adottagok méreteinek összegénél nagyobbegyenlő.
+	A szabvány kimondja, hogy egy \texttt{struct} mérete az adottagok méreteinek összegénél nagyobb vagy egyenlő.
 	\smallskip
 	
 	Az, hogy egy gépi szó mekkora, implementációfüggő.
 	\bigskip
 	
-	Egy \texttt{struct} egyes adattagjaira így hivatkozhatunk:
+	Egy \texttt{struct} egyes adattagjaira a pont operátor segítségével hivatkozhatunk:
 	\begin{lstlisting}
 int main()
 {
@@ -1752,15 +1713,15 @@ int main()
 }
 	\end{lstlisting}      
 	
-	\section{A c++ memóriamodellje}
-	A c++ szabvány 3 memóriatípust különít el. Ezek közül főleg a stack-et használtuk eddig.
+	\section{A C++ memóriamodellje}
+	A C++ szabvány több memóriatípust különít el. Ezek közül főleg a stack-et használtuk eddig.
 	\begin{center}
 		\begin{tabular}{|c|}
 			\\
 			\\
 			\\
 			\\
-			stack\\
+			Stack\\
 			\\
 			\hline
 		\end{tabular}\quad 
@@ -1768,7 +1729,7 @@ int main()
 			\hline
 			\quad \quad \\
 			\\
-			Globális/statikus\\
+			Globális/Statikus\\
 			\\
 			\hline
 		\end{tabular}\quad 
@@ -1776,19 +1737,19 @@ int main()
 			\hline
 			\quad \quad \\
 			\\
-			Heap/free storage\\
+			Heap/Free store\\
 			\\
 			\hline
 		\end{tabular}
 	\end{center}
 	\subsection{Stack}
-	A második gyakorlaton már volt szó részletesebben a stack működéséről. Jusson eszünkbe egy nagyon fontos tulajdonsága: azok a változók, amelyekre már többet nem tudunk hivatkozni, automatikusan megsemmisülnek, így nem kell a létrehozással és a megsemmisítéssel külön bajlódnunk.
+	A második gyakorlaton már volt szó részletesebben a stack működéséről. Jusson eszünkbe egy nagyon fontos tulajdonsága: a blockok végén a változók automatikusan megsemmisülnek. Ebben az esetben nem a programozó feladata a memória felszabadítása.
 	\smallskip
 	
 	A stack-en létrehozott változókat szokás \textbf{automatikus változók}nak (\textit{automatic variable}) is hívni.
 	
 	\smallskip
-	Vegyük példaként a második gyakorlatról már ismerős kódrészletet.
+	Tekintsük a második gyakorlatról már ismerős kódrészletet.
 	
 	\begin{lstlisting}
 #include <iostream>
@@ -1802,19 +1763,15 @@ int f()
 
 int main()
 {
-	std::cout << f() << std::endl;
-	std::cout << f() << std::endl;
-	std::cout << f() << std::endl;
-	std::cout << f() << std::endl;
-	std::cout << f() << std::endl;
+  for(int i = 0; i < 5; ++i)
+	  std::cout << f() << std::endl;
 }
 	\end{lstlisting}
 	Kimenet: \texttt{1 1 1 1 1}
 	\smallskip
 	
-	A stacken lérehozott változók kezelése nagyon kényelmes, mert jól látható, mikor jönnek jönnek létre, mikor semmisülnek meg, stb. Azonban fordulhat elő olyan, hogy nem szeretnénk, hogy minden alkalommal megsemmisüljön a fenti példában az \texttt{x}, ilyenkor kiút lehet a statikus változók használata.
+  A stacken lérehozott változók kezelése nagyon kényelmes, mert jól látható, mikor jönnek jönnek létre, mikor semmisülnek meg. Azonban előfordulhat, hogy nem szeretnénk, hogy az \texttt{x} változó élettartama megszűnjön a block végén. Ilyenkor egy lehetőség a statikus változók használata.
 	\subsection{Globális/statikus tárhely}
-	%TODO globális változók
 	Írjuk át a fenti \texttt{f} függvényt, hogy \texttt{x} ne automatikus, hanem \textbf{statikus változó} (\textit{static variable}) legyen!
 	\begin{lstlisting}
 int f()
@@ -1828,23 +1785,27 @@ int main() {/*...*/}
 	\end{lstlisting}
 	Kimenet: \texttt{1 2 3 4 5}
 	
-	Ebben az esetben azonban a függvény első hivásától a program futásának végéig benne marad a memóriában az \texttt{x}, így mindig egyre nagyobb számokat ad majd \texttt{f()} vissza.
+  Ebben az esetben azonban a függvény első hivásától a program futásának végéig benne marad a memóriában az \texttt{x}, így mindig egyre nagyobb számokat ad majd \texttt{f()} vissza. Az \texttt{x} inicializációja egyszer történik meg, a függvény első hívásakor. 
 	\begin{note}
-		Nem igazán szeretjük a \texttt{static} változókat. Például a multithread programok különösen tudnak szenvedni tőle, mert nehéz, vagy lehetetlen átlátni, hogy mikor mire változik az értékük.
+		Nem szeretjük a \texttt{static} változókat. Például a több szálú programok esetén különösen kerülendő ez a programozási stílus.
 	\end{note}
-	Amennyiben azt szeretnénk hogy \texttt{x} ne is semmisüljön meg azonnal, de statikus se legyen, létrehozhatjuk úgy, hogy a megsemmisítéséről is nekünk kell gondoskodni.
-	\subsection{Heap/free storage}
-	A heap-en létrehzoott változókat \textbf{dinamikus változók}nak (\textit{dynamic variable}) is szokás szokás hívni. A heap segítségével nagyon nagy szabadságra tehetünk szert, azonban ez a szabadság kötelességekkel is jár.
+
+  A globális változók és a statikus változók a memória ugyanazon területén jönnek létre. Ezért hívjuk ezt a területet globális/statikus tárhelynek.
+
+  \medskip
+	Amennyiben azt szeretnénk, hogy \texttt{x} ne semmisüljön meg a block végén, de ne is maradjon a program futásának a végéig a memóriában, arra is van lehetőség. Ebben az esetben viszont a programozó felel a memória kezeléséért.
+	\subsection{Heap/Free store}
+	A heapen létrehzoott változókat \textbf{dinamikus változók}nak (\textit{dynamic variable}) is szokás szokás hívni. A heap segítségével nagy szabadságra tehetünk szert, azonban ez a szabadság nagy felelősséggel is jár.
 	\begin{lstlisting}
 int main()
 {
-	int *p = new int(5);
+	int *p = new int(2);
 	delete p;
 }
 	\end{lstlisting}
-	Fentebb láthatjuk hogyan lehet egy változót a heap-en létrehozni. Ehhez használatos a \texttt{new} operátor, a heapen lefoglalandó memória típusa (ez esetben \texttt{int}), és konstruktor paraméterek (itt példaképp 5 kezdőértékkel inicializálink). Fontos, hogy a stack-et teljesen nem kerültük meg, mert szükségünk van egy pointerre, mely a heap-en kezelt címre mutat (\texttt{p}).
+	Fentebb láthatjuk hogyan lehet egy intnek lefoglalni helyet a heapen. Fontos, hogy a stack-et nem kerültük meg, mert szükségünk van egy pointerre, mely a heap-en lefoglalt címre mutat (\texttt{p}).
 	
-	Ezt a címet a \texttt{delete} operátorral tudjuk felszabadítani.
+	A mutató által mutatott területet a \texttt{delete} operátorral tudjuk felszabadítani.
 	\begin{figure}[!h]
 		\centering
 		\begin{tikzpicture}
@@ -1869,23 +1830,23 @@ int main()
 		\end{tikzpicture}
 	\end{figure}
 	
-	A heapen nincs a változóknak nevük, így mindig szükségünk lesz egy mutatóra, hogy tudjunk rá hivatkozni. \textbf{Ha egyszer létrehozunk valamit a heap-en, nekünk is kell gondoskodni arról, hogy felszabadítsuk.} Az egyik leggyakoribb hiba a dinamikus memóriakezelésnél, ha a memóriát nem szabadítjuk fel, ilyenkor a lefoglalt memóriaterületre hivatkozni már nem lehet de lefoglalva marad, mondhatni elszivárog (\textit{memory leak}). 
+	A heapen nincs a lefoglalt területnek nevük, így mindig szükségünk lesz egy mutatóra, hogy tudjunk rá hivatkozni. \textbf{Ha egyszer lefoglalunk valamit a heap-en, gondoskodni kell arról, hogy felszabadítsuk.} Az egyik leggyakoribb hiba a dinamikus memóriakezelésnél, ha a memóriát nem szabadítjuk fel. Ilyenkor a lefoglalt memóriaterületre hivatkozni már nem tudunk de lefoglalva marad: elszivárog (\textit{memory leak}). 
 	\smallskip
 	
-	Bár az operációs rendszer erre szokott figyelni, és megpróbál minden, a program által lefoglalt memóriát felszabadítani a dutás befejeztével, de nem mindenható, előfordulhat hogy ez nem elég teljeskörú, és ilyenkor az a memóriaterületek újraindításig lefoglalva maradnak.
+	Bár az operációs rendszer megpróbál minden, a program által lefoglalt memóriát felszabadítani a futás befejeztével, de nem mindenható. Előfordulhat, hogy egyes platformokon újraindításig nem szabadul fel a memória. Emellett ameddig a program fut, több memóriát fog használni, mint amennyire szüksége van. Ez növelheti a szerverpark költségeit vagy ronthatja a felhasználói élményt.
 	\medskip
 	
-	A dinamikus lefoglalt memória szabályos felszabadítását számos dolog nehezíti. Fényes példa erre a kivételkezelés, melynél hamarabb félbreszakítódik a függvény mintsem hogy felszabadítson minden memóriát. Azonban ha nagyon ügyelünk erre, előfordulhat hogy nem figyelünk, és egy memóriaterületet kétszer szabadítunk fel, ami nem definiált viselkedés.
+	A dinamikusan lefoglalt memória szabályos felszabadítását számos dolog nehezíti. Fényes példa erre a kivételkezelés, melynél hamarabb megszakadhat a függvény végrehajtása mintsem, hogy felszabadítson minden memóriát. Előfordulhat, hogy egy memóriaterületet kétszer szabadítunk fel, ami nem definiált viselkedés.
 	\medskip
 	
-	Előfordulhat, hogy egy már felszabadított memóriaterületre akarunk írni. Sajnos iylen hibát könnyű ejteni, hisz a \texttt{delete} a \texttt{p} által mutatott memóriaterületet, nem a \texttt{p}-t fogja törölni.
+  Előfordulhat, hogy egy már felszabadított memóriaterületre akarunk írni vagy onnan olvasni. Sajnos ilyen jellegű hibát könnyű véteni, hisz a \texttt{delete} a \texttt{p} által mutatott memóriaterületet, nem a \texttt{p}-t fogja törölni. A \texttt{p} továbbra is használható.
 	\begin{note}
 		A nullpointer törlésekor nem történik semmi (\textit{no-op}).
 	\end{note}
 	\begin{note}
-		Amint elvesztettük az utolsó mutatót, ami egy adott lefoglalt memóriacímre mutat, az közel garantáltan elszivárgott memória. A szabvány nem foglal magában semmilyen lehetőséget ezeknek a visszaszerzésére (és könnyen látható, hogy ha meg is oldjuk, a szabványtól függetlenül hogy ezeket a memóriacímeket összevadásszuk, az igen költséges lenne).
+		Amint elvesztettük az utolsó mutatót, ami egy adott lefoglalt memóriacímre mutat, az garantáltan elszivárgott memória. A szabvány nem foglal magában semmilyen lehetőséget ezeknek a visszaszerzésére.
 	\end{note}
-	Láthatjuk, hogy a heap használata macerás, hibaforrásokkal teli, ráadásul az allokálás (memória lefoglalás) még lassabb is. De miért használjuk mégis? Nos, ha egy mód van rá, ne tegyük. Ha meg lehet oldani, hogy a stack-en el tudjunk tárolni valamit, tegyük azt. A stacken azonban nem lehet mindent létrehozni, továbbá nagyon véges, hamar be tud telni (\textit{stack overflow}), illetve kevésbé tudjuk kontrollálni a memóriát. A heap-en e téren sokkal nagyobb a szabadságunk.
+	Láthatjuk, hogy a heap használata hibalehetőségekkel teli, ráadásul az allokálás (memória lefoglalás) még lassabb is, mintha a stack-et használnánk. De miért használjuk mégis? Ha meg lehet oldani, hogy a stack-en tudjunk tárolni valamit, tegyük azt. A stacken azonban véges, hamar be tud telni (\textit{stack overflow}), illetve kötött a változók élettartama. A heap-en e téren sokkal nagyobb a szabadságunk.
 	\section{Osztályok felépítése}
 	A következő pár gyakorlaton egy láncolt listát fogunk implementálni, mely jól demonstrálja majd a dinamikus memóriakezelés veszélyeit is.
 	
@@ -1949,7 +1910,7 @@ int main()
 	delete head->next->next;
 }
 	\end{lstlisting}
-	Ezen a ponton mondhatjuk azt hogy készen vagyunk, hisz \texttt{List} használható láncolt listaként (bár valóban igen kényelmetlen).
+	Ezen a ponton készen vagyunk, hisz \texttt{List} használható láncolt listaként (bár valójában igen kényelmetlen).
 	\medskip
 	
 	\begin{figure}[!h]
@@ -1977,7 +1938,7 @@ int main()
 		\draw [arrow] (headNode) -- (7node);
 		\end{tikzpicture}
 	\end{figure}
-	Sajnos a törlést sikerült picit elcsesznünk: először kitörljük a fejelemet (mely az első elemre mutat), viszont az első elem segítségével tudnánk a többi elemre is hivatkozni, így mire a második listaelemet törölnénk, \texttt{head} már egy felszabadított memóriaterületre mutat, amit törlés utáni használatnak (\textit{use after delete}) szokás nevezni, és az egy nem definiált viselkedés.
+	Sajnos a törlést rossz: először törljük a fejelemet (mely az első elemre mutat), viszont az első elem segítségével tudnánk a többi elemet elérni, így mikor a második listaelemet törölnénk, \texttt{head} már egy felszabadított memóriaterületre mutat. Ezt törlés utáni használatnak (\textit{use after delete}) szokás nevezni és nem definiált viselkedés.
 	
 	A megoldás:
 	\begin{lstlisting}
@@ -1986,12 +1947,12 @@ delete head->next;
 delete head;
 	\end{lstlisting}
 	\begin{note}
-		A heap-en arra is figyelni kell, hogy jó sorrendben szabadítsuk fel a dolgokat. Könnyen lábonlőhetjük magunkat azzal, hogy egy kitörlünk valamit, ami hivatkozik egy másik memóriacímre, így azt a címet vagy elleakeljük, vagy ráhivatkozással nem definiált viselkedésbe keveredünk.
+		A heap-en arra is figyelni kell, hogy jó sorrendben szabadítsuk fel a memóriát. Ha rossz sorrendben szabadítjuk fel az objektumokat, könnyen a fentihez hasonló hibát vagy memória szívárgást okozhatunk.
 	\end{note}
-	A változók a stacken fordított sorrendben semmisülnek meg, pont emiatt.
+	A változók a stacken a létrehozás sorrendjéhez képest fordított sorrendben semmisülnek meg, pont emiatt.
 	\medskip
 	
-	Ez a ,,láncolt lista'' eddig eléggé gyér. A fő baj az, hogy nagyon sokat kell írni, méghozza lényegében ugyanazt, és nem feltétlenül kéne. Ez sért alap programozási gondolatmenetet, a DRY-t : \textit{Dont Repeat Yourself}. Itt sokszor írjuk le közel ugyanazt -- erre kell hogy legyen egy egyszerűbb megoldás. Írjunk függvényt az új listaelem létrehozásához!
+	Ez a ,,láncolt lista'' eddig elég szegényes. A fő gond az, hogy nagyon sokat kell írni a használatához. Ez sért egy programozási elvet, a DRY-t : \textit{Dont Repeat Yourself}. Itt sokszor írjuk le közel ugyanazt -- erre kell, hogy legyen egy egyszerűbb megoldás. Írjunk függvényt az új listaelem létrehozásához!
 	\begin{lstlisting}
 List *add(List *head, int data)
 {
@@ -2006,10 +1967,10 @@ List *add(List *head, int data)
 	return head;
 }
 	\end{lstlisting}
-	Ez egy olyan rekurzív függvény, mely addig hívja meg saját magát, míg a paraméterként kapott lista végére nem ér (azaz nem lesz \texttt{head} egy nullpointer). Amikor oda elér, létrehoz egy új listaelemet, ráfűzi a lista végére, és az új elem pointer adattagját (\texttt{next}) nullpointerré teszi.
+	Ez egy olyan rekurzív függvény, mely addig hívja saját magát, míg a paraméterként kapott lista végére nem ér (azaz a \texttt{head} egy nullpointer). Amikor oda elér, létrehoz egy új listaelemet és azt visszaadja. A rekurzió felszálló ágában a lista megfelelő elemeit összekapcsolja. 
 	\medskip
 	
-	Nem ártana egy függvény a felszabadítsára is.
+	Írjunk egy függvényt a lista által birtokolt memória felszabadítására is.
 	\begin{lstlisting}
 void free(List *head)
 {
@@ -2019,11 +1980,11 @@ void free(List *head)
 	delete head;
 }
 	\end{lstlisting}
-	Itt a rekurzió addig fog menni, amíg az utolsó elemhez el nem érünk, ami nullpointer. Itt simán visszatérünk, aztán fordított sorrendben kitörlünk minden elemet.
+	Itt a rekurzió szintén a lista végéig megy. A rekurzió felszálló ágában történik a listaelemek felszabadítása. Ennek az oka, hogy a felszabadítás a megfelelő sorrendben történjen meg.
 	\begin{note}
-		A rekurzív függvények nem olyan hatékonyak, mint az iterativ (pl. \texttt{for} vagy \texttt{while} ciklus) társaik, továbbá a sok függvényhívás könnyen stack overflow-hoz vezetnek. Azonban jó agytornák, és segíthetnek az alapötletben. Egy rekurzív függvényt mindig át lehet írni iteratívvá.
+		A rekurzív függvények nem olyan hatékonyak, mint az iterativ (pl. \texttt{for} vagy \texttt{while} ciklus) társaik. Továbbá a sok függvényhívás könnyen stack overflow-hoz vezetnek. Azonban jó agytornák, és segíthetnek az alapötletben. Egy rekurzív függvényt mindig át lehet írni iteratívvá.
 	\end{note}
-	Beszéljünk arról, mennyi a teher a felhasználón. Eddig tudnia kellett, milyen sorrendben kell felszabadítani midnent, de most már elég arra figylenie, hog lista használata után meg kell hívnia a \texttt{free} függvényt. A felhasználó így kisebb eséllyel követ el hibát, jobban tud figyelni arra, ami valóban a dolga. Legyenek a függvényeink és osztályaink olyanok, hogy \textbf{könnyű legyen őket jól használni, és nehéz legyen rosszul}.
+	Beszéljünk arról, mennyi a teher a felhasználón. Eddig tudnia kellett, milyen sorrendben kell felszabadítani az elemeket a listán belüle, de most már elég arra figylenie, hog lista használata után meghívja a \texttt{free} függvényt. A felhasználó így kisebb eséllyel követ el hibát, több energiája marad arra, hogy az előtte álló problémát megoldja. Legyenek a függvényeink és osztályaink olyanok, hogy \textbf{könnyű legyen őket jól használni, és nehéz legyen rosszul}.
 	
 	\subsection{Osztályra statikus változók}
 	Teszteljünk!
@@ -2038,12 +1999,12 @@ int main()
 	free(head);
 }
 	\end{lstlisting}
-	A program lefordult, és (nálunk) tökéletesen le is futott. Azonban ha történt memory leak, az egy nem definiált viselkedés, így nem lehetünk benne biztosak, hogy valóban nem történt szivárgás. Egy lehetséges módszer, amivel megvizsgálhatjuk ezt, a statikus változók használata.
+	A program lefordult, és a gyakorlaton tökéletesen le is futott. Azonban, ha történt memory leak vagy double free, esetleg use after free, az nem definiált viselkedés. Ezért nem lehetünk benne biztosak, hogy valóban nem történt memóriakezeléssel kapcsolatos hiba. A sanitizerek segítségével megyőződhetünk róla, hogy nem követtünk el ilyen jellegű hibát.
 	
 	\smallskip
 	Az osztályon belül statikusként deklarált változókat osztályszintű változóknak is hívjuk, ugyanis minden, az osztályhoz tartozó objektum ugyanazon a statikus változón ,,osztozkodik''. Ha az egyiken keresztül azt a változót módosítjuk, a többiben módosulni fog. Élettartamuk és láthatóságuk a program elejétől végéig tart.
 	
-	Hozzunk létre \texttt{List}-ben egy számlálót, ami számon tartja mennyi objektumot hoztunk belőle létre, és semmisítettünk meg!
+	Hozzunk létre \texttt{List}-ben egy számlálót, ami számon tartja mennyi objektumot hoztunk belőle létre, és semmisítettünk meg! Ezzek a trükkel megnézhetjük, hogy elfelejtettünk-e felszabadítani listaelemet.
 	\begin{lstlisting}
 struct List
 {
@@ -2053,12 +2014,14 @@ struct List
 	static int count; // !
 };
 
+int List::count = 0;
+
 List *add(List *head, int data)
 {
 	if (head == 0)
 	{
 		List *ret = new List;
-		head->count++; // !
+	    List::count++; // !
 		ret->data = data;
 		ret->next = 0;
 		return ret;
@@ -2072,7 +2035,7 @@ void free(List *head)
 	if (head == 0)
 	return;
 	free(head->next);
-	head->count--; // !
+	List::count--; // !
 	delete head;
 }
 
@@ -2084,35 +2047,28 @@ int main()
 	head = add(head, 2);
 	
 	free(head);
-	std::cout << head->count; // !
+	std::cout << List::count; // !
 }
 	\end{lstlisting}
-	Azonban kaptunk egy fordítási hibát, miszerint hiányzik \texttt{count} definíciója -- Ahogy fent is említve volt, itt csak \textit{deklaráltuk}, de nem \texttt{definiáltuk} \texttt{count}-ot, így ezt tegyük is meg gyorsan.
 	
-	Osztályszintű változókat csak osztályon kívül tudunk definiálni (ezek alól kivételt képeznek az osztályszintű konstans változók):
+	Osztályszintű változókat csak osztályon kívül tudunk definiálni (ezek alól kivételt képeznek az osztályszintű konstans változók), ezért látható az osztály után a következő sor:
 	\begin{lstlisting}
-int List::count;
+int List::count = 0;
 	\end{lstlisting}
-	Figyeljük meg, hogy \texttt{count}-nak nem adtunk kezdőértéket, hisz minden statikus változó (számok esetében) alapértelmezetten 0-ra incializál.
-	\smallskip
 	
-	Mivel azonban ez a változó minden \texttt{List} objektummal közös, így nem muszáj egy változón keresztül hivatkozunk rá, a \texttt{List::count} kifejezéssel is megtehetjük.
-	\medskip
-	
-	Ezzel a kis módosítással meg is kapjuk a kívánt kimenetet, \texttt{0}. Ez alapján tudhatjuk, hogy minden objektum törlésre került.
+	Ezzel a kis módosítással meg is kapjuk a kívánt kimenetet: \texttt{0}. Ez alapján tudhatjuk, hogy minden objektum törlésre került.
 	\begin{note}
-		A későbbiekben úgy tekintünk \texttt{List}-re, mintha ezeket a módosításokat nem ejtettük volna meg.
+		A fenti módosítások csak gyakorlás célját képezték, az elkészítedő listának nem része a számláló.
 	\end{note}
-	Ha azonban egy elemet kétszer töröltünk, az lehet, hogy nem derül ki. Ennek kiszűrésében segíthet, ha ezzel a paranccsal fordítjuk a kódunkat:
+	Ha azonban egy elemet kétszer töröltünk, egyet meg elszivárogtattunk, az nem feltétlen nem derül ki. Ilyenkos a sanitizerek segíthetnek:
 	\begin{center}
 		\texttt{g++ list.cpp -fsanitize=address -g}
 	\end{center}
-	E segítségével úgy fordul a kód, hogy futási időjű ellenőrzéséket tesz bele a fordító, hogy nem szivárog-e a memória, vagy nem töröltük-e valamit kétszer (a \texttt{-g} a szebb hibaüzenetekhez kell). Ha ez bekövetkezne, megállítja a program futását, és ,,jól'' átlátható hibaüzenetet ad (bővebben: 3. gyakorlat anyaga). 
-	
+  A sanitizerekről bővebben lásd a 3. gyakorlat anyagát.
 	\medskip
-	Ez a láncolt lista még mindig messze áll egy jó struktúrától. Szerencsére nem csak adattagokat, de függvényeket is tudunk struct-okba írni, melyek alapértelmezetten hozzáférnek az adott objektum adattagjaihoz.
+	Határozott előrelépést értünk el, de van még hova fejleszteni a listánkat. Szerencsére nem csak adattagokat, de tagfüggvényeket is tudunk struct-okba írni.
 	\subsection{Konstruktorok}
-	Próbáljuk megoldani azt, hogy ne kelljen egy listaelem adattagjainak mindig külön sorban értéket adni!
+	Egy trükkel megoldható, hogy tömörebb szintaxissal tudjuk inicializálni a listaelemeinket.
 	\begin{lstlisting}
 struct List
 {
@@ -2125,10 +2081,10 @@ struct List
 	A fenti tagfüggvényt, vagy metódust \textbf{konstruktor}nak (\textit{constructor}, vagy röviden \textit{ctor}) hívjuk. A konstruktorok hozzák létre az objektumokat; vannak paraméterei, és nincs visszatérési értéke. A fenti konrtruktor még egy alapértelmezett paraméterrel is rendelkezik - ha mi csak egy \texttt{int} paraméterrel hívjuk meg a konstruktort, akkor a \texttt{\_next}-et alapértelmezetten nullpointernek veszi.
 	
 	\medskip
-	Azonban a struktúránk működött eddig is, mégse írtunk konstruktort. Azonban az mindig kell a létrehozáshoz, hogyan lehet ez? Úgy, hogy a fordító a hiányzó kulcsfontosságú függvényeket megírja nekünk, létrehoz egy un. \textbf{default konstruktort} (többek között), ha mi explicit nem írtunk semmilyet, melynek nincsenek paraméterei, és minden adattagot alapértelmezetten hoz létre. Fontos azonban, hogyha mi írunk egy konstruktort, akkor a fordító már nem fog generálni ilyet.
+	Azonban a struktúránk működött eddig is, pedig nem írtunk konstruktort. Ha konstruktorra szükség van objektum létrehozáshoz, akkor hogyan lehet ez? Úgy, hogy a fordító a hiányzó kulcsfontosságú függvényeket legenerálja nekünk. Létrehoz (többek között) egy un. \textbf{default konstruktort}, ha mi explicit nem hoztunk létre konstruktort. A default konstruktor 0 paraméterrel meghívható. Fontos azonban, ha mi írunk egy konstruktort, akkor a fordító már nem fog generálni ilyet.
 	
 	\medskip
-	A kódban van továbbá egy un. \textbf{inicializációs lista}. Ez az a rész, ami a konstruktor paraméterei után kettőspont után következik. Az inicializációs lista elkerülhető néha, de nem éri meg általában. Ugyanis ha ezt írnánk:
+	A konstruktor fejléce után található egy un. \textbf{inicializációs lista}. Az inicializációs lista hasonló jelentéssel bír, mint a következő kód:
 	\begin{lstlisting}
 List(int _data, List *_next = 0)
 {
@@ -2136,21 +2092,19 @@ List(int _data, List *_next = 0)
 	next = _next;
 }
 	\end{lstlisting}
-	%TODO Ez szerintem nem igaz így.
-	akkor mire a kapcsos zárójeles részhez érünk, addigra a \texttt{data} és a \texttt{next} létre lenne hozva, és utána kapna csak értéket. A fenti inicializációs listában az elemet a megadott értékkel inicializálódnak, és nem csak később kapnak értéket.
+  Az inicializációs lista használata azonban hatékonyabb.
+	Mire a konstruktor törzséhez érünk, addigra az adattagoknak inicializálva kell lenniük. A trözsben ezért már inicializált értékeket írunk felül, ami erőforráspazarlás. Primitív típusok esetén ez nem jelent problémát, összetett típusok esetén viszont számottevő lehet.
 	\begin{note}
-		A létrehozás és értékadás 2 lépés, az inicializálás csak 1.
+    A konstruktor törzsében történő értékadás 2 lépés (mivel előtte egy alapértelmezett konstruktor már inicializálta az objektumot), az inicializálás csak 1.
 	\end{note}
-	Fontos megjegyzés, hogy az a struktúra elemei mindig megadott sorrendben inicializálódnak. Tehát, bármilyen sorrendben írjuk mi az inicializációs listát, mindig először a \texttt{data}, és utána a \texttt{next} fog inicializálódni, hacsak nem cseréljük fel a sorrendjüket a struct-ban.
+	Fontos megjegyzés, hogy az a struktúra elemei a meződ definiálásának a sorrendjében inicializálódnak. Tehát, bármilyen sorrendben írjuk mi az inicializációs listát, mindig először a \texttt{data}, és utána a \texttt{next} fog inicializálódni.
 	\subsection{Destrukorok}
-	Ahogy gondoskodtunk a listaelemek létrehozásáról, gondoskodhatnánk annak megfelelő megsmmisüléséről is.
+	Ahogy gondoskodtunk a listaelemek létrehozásáról, gondoskodhatnánk annak megfelelő megsemmisüléséről is.
 	\begin{lstlisting}
 struct List
 {
-	//ctor (construktor)
 	List(int data, List *next = 0) : data(data), next(next) {}
-	//dtor (destructor)
-	~List()
+	~List() // dtor
 	{
 		delete next;
 	}
@@ -2159,10 +2113,10 @@ struct List
 	List *next;
 };
 	\end{lstlisting}
-	Az fenti tagfüggvényt, melynél a hullámvonalat közvetlenül a struktúra neve követi \textbf{destruktor}nak (\textit{destruktor}, röviden \textit{dtor}) nevezzük. A destruktor mindig az objektum élettartamának végén hívódik meg, és gondoskodik az adattagok megsemmisítéséről. Lévén az élettartam végén hívódik meg ez a függvény, lehetőséget teremt nekünk arra, hogy a dinamikusan lefoglalt memóriacímeket felszabadítsuk.
+	Az fenti tagfüggvényt, melynél a hullámvonalat közvetlenül a struktúra neve követi \textbf{destruktor}nak (\textit{destruktor}, röviden \textit{dtor}) nevezzük. A destruktor mindig az objektum élettartamának végén hívódik meg, és gondoskodik a megfelelő erőforrások felszabadításáról. 
 	
 	\medskip
-	Ez is egy rekurzív függvény: a \textbf{next} törlésekor megpróbál kitörölni egy \texttt{List} típusú elemet, ami megint meghívja ezt a destruktort, stb. A lista végén a \texttt{next} egy nullpointer, azzal nem tesz semmit, a destuktor futása befejeződik, és fordított irányban kitöröl mindent.
+	A destruktort is rekurzívan írtuk meg: a \textbf{next} által mutatott memóriaterület felszabadításakor meghívja \texttt{List} típusú elem destruktorát. A lista végén a \texttt{next} egy nullpointer, azon a delete hívás nem csinál semmit.
 	
 	\medskip
 	Teszteljünk!
@@ -2177,31 +2131,19 @@ int main()
 	Most úgy alakítottuk át a kódot, hogy amikor létrehozzuk a listát, akkor a fejelemet a stacken hozzuk létre, melynek értéke 8, és a pointer része nullpointer. Később az \texttt{add} függvénnyel létrehozunk a heapen egy olyan listaelemet, mely 7-et tárol, és pointer része nullpointer, és az eredeti lista fejét ráállítjuk erre.
 	\medskip
 	
-	Itt sikeresen elértük azt, hogy a lista első eleme a stack-en, de minden más eleme a heap-en legyen. Mivel olyan struktrát írtunk, mely gondoskodik arról, hogy minden dinamikusan lefoglalt területet felszabadítson, mindent csak egyszer töröl, jó sorrendben, egy  \textit{RAII} (\textit{Resource acquisition is initialization}) osztályt írtunk. Ez Bjorne-nek egy
-	\begin{center}
-		\textit{,,iszonyatosan szar''}
-		
-		/Horváth Gábor/
-	\end{center}
-	acronymje. Azt mondja ki, hogy a nyelv által garantált módon pontosan tudjuk hogy az objektumok mikor jönnek létre, mikor semmisülnek meg, stb.
+	Itt sikeresen elértük, hogy a lista első eleme a stack-en, de minden más eleme a heap-en legyen. Mivel olyan struktrát írtunk, mely gondoskodik arról, hogy minden dinamikusan lefoglalt területet felszabadítson, mindent csak egyszer töröl, jó sorrendben, egy  \textit{RAII} (\textit{Resource acquisition is initialization}) osztályt írtunk. Ez Bjarne-nek egy elég szerencsétlenül választott acronymje. A lényege, hogy az adott osztály a megfelelő erőforrásokat lefoglalja magának, majd a destruktor gondoskodik az erőforrások felszabadításáról. Minden erőforrást egy stack-en lévő objektumhoz kötünk, mivel azok garantáltan automatikusan fel fognak szabadulni, a destruktoruk le fog futni. Jelen esetben a lista fejeleme, ami a stack-en van, felelős azért, hogy a heap-re allokált listaelemek felszabaduljanak a program futásának a végeztével. Így a felhasználónak már a free hívásra sem kell figyelnie.
 	
-	Bjorne továbbá kijelentette, hogy a c++ legjobban garbage kollektált nyelv, mert nincs benne garbage. Ha jól programozunk, akkor az objektumok mindig eltakarítanak maguk után. 
+	Bjarne híres mondása, hogy a C++ szemétgyüjtéssel rendelkező nyelv, mert nem generál szemetet. A jól megírt objektumok mindig eltakarítanak maguk után. 
 	\medskip
 	
-	Sikerült azt is elérnünk, hogy ez nagyon hatékony legyen, hiszen a ha nem így konstruktor/destruktor trükközéssel dogloznánk, akkor kézzel kéne írni, ami ennél nem lenne gyorsabb, csak kényelmetlenebb.
+	A konstruktor/destruktor használata ugyanolyan hatékony, mintha kézzel kezeltük volna a memóriát.
 	
 	\medskip
-	Csináljunk az \texttt{add} függvényből metódust!
+	Csináljunk az \texttt{add} függvényből tagfüggvényt!
 	\begin{lstlisting}
 struct List
 {
-	List(int data, List *next = 0) : data(data), next(next) {}
-	~List()
-	{
-		delete next;
-	}
-	
-	
+  // ...	
 	void add(int data) //eltunt egy parameter!
 	{
 		if (next == 0)
@@ -2224,12 +2166,12 @@ int main()
 	head.add(2);
 }
 	\end{lstlisting}
-	Ez a nyelv egyik szépsége, hisz a felhasználónak nem kell tudnia, mi megy a háttérben, sőt, még értenie se kell, mi történik a belső implementációban.
+	A nyelv egyik szépsége, hogy a felhasználónak nem kell tudnia, hogy hogyan reprezentáltuk a listát. A listát az a felhasználó is tudja használni, aki nem ismeri a heap-et, nem hallott még soha láncolt adatszerkezetekről. A későbbiekben a lista prerezentációja kicserélhető akár egy vektor szerű adatszerkezetre anélkül, hogy a felhasználói kódot módosítani kellene.
 	\medskip
 	
 	\subsection{Másoló konstruktor}
 	
-	A fordító nagyon sokmindent megír a structunkba: konstruktoron és destruktoron kívül még \textbf{másoló konstruktor}t (\textit{copy constructor}) is ír. A másoló konstruktor egy olyan konstrukor, melynek egyetlen paramétere egy azonos típusú objektum. Azonban ez alapértelmezetten bitről bitre másol Ez mit jelent?
+	A fordító sok kódot generál a structunkba: konstruktoron és destruktoron kívül még \textbf{másoló konstruktor}t (\textit{copy constructor}) is. A másoló konstruktor egy olyan konstrukor, melynek egyetlen paramétere egy azonos típusú objektum. Ez alapértelmezetten minden adattagot lemásol az adott adattag másoló konstruktora segítségével. Primitív típusoknál ez bitről bitre másolást jelent. Mi ennek a következménye?
 	\begin{lstlisting}
 int main()
 {
@@ -2241,7 +2183,7 @@ int main()
 	} //itt lefut cHead destruktora
 }
 	\end{lstlisting}
-	Fentebb létrehoztunk egy új listát \texttt{head} mintájára. Nyilván, a másolatnak a destruktora hamarabb lefut. Futtatáskor (ha sanitizerrel fordítunk) egy kilométer hibaüzenetet kapunk: többször próbáltuk meg ugyanazt a memóriaterületet felszabadítani. Ennek az az oka, hogy a \texttt{cHead}-ben lévő pointer \textbf{ugyanarra} a listára fog mutatni (lévén a bitről bitre történő másolásnál a pointerek ugyanazt a memóriacímet adják értékül egymásnak), és a \texttt{cHead} megsemmisülése után a \texttt{head} is megpróbálja a már kitörölt listát kitörölni.
+	Fentebb létrehoztunk egy új listát \texttt{head} mintájára. A másolatnak a destruktora hamarabb lefut. Ha sanitizerrel fordítunk, futáskor hibaüzenetet kapunk: felszabadított memóriaterületet szeretnénk használni. Ennek az az oka, hogy a \texttt{cHead}-ben lévő pointer \textbf{ugyanarra} a listára fog mutatni (lévén a bitről bitre történő másolás történt a pointernél). A \texttt{cHead} megsemmisülése után a \texttt{head} destruktora megpróbál beleolvasni a már felszabadított memóriaterületbe.
 	
 	%\resizebox{\textwidth}{!}{%
 	\begin{figure}[!h]
@@ -2276,7 +2218,7 @@ int main()
 	\end{figure}
 	%}
 	
-	Kerüljük ki a hibát, és írjunk saját copy konstruktort!
+	A megoldás egy saját másoló konstruktor bevezetése!
 	
 	
 \begin{lstlisting}
@@ -2305,7 +2247,7 @@ int main()
 	}
 }
 \end{lstlisting}
-	Mint a korábbi függvényeink, ez is rekurzióval működik: a \texttt{new List(*other.next)} újra és újra meghívja a copy konstruktort, amíg az other.next nem lesz nullpointer.
+	Mint a korábbi függvényeink, ez is rekurzív: a \texttt{new List(*other.next)} újra meghívja a copy konstruktort, ha az other.next nem nullpointer.
 	\begin{figure}[!h]
 		\centering
 		\begin{tikzpicture}
@@ -2340,7 +2282,7 @@ int main()
 	\medskip
 	Ezzel meg is oldottuk a problémát. 
 	
-	Figyelem, ez egy \textbf{copy konstruktor, nem értékadás operátor!} Itt a \texttt{cHead} még nincs létrehozva, amikor head-el \textbf{inicializálni} próbáljuk. Ha az egyenlőségjel bal oldalán lévő objektum még nem jött létre, mint itt, akor a copy konstruktor hívódik meg. Ellenkező esetben értékadás operátor.
+	Figyelem, ez egy \textbf{copy konstruktor, nem értékadás operátor!} Itt a \texttt{cHead} még nincs létrehozva, amikor head-el \textbf{inicializáljuk}. Ha az egyenlőségjel bal oldalán lévő objektum még nem jött létre, mint itt, akor a copy konstruktor hívás történik. Ellenkező esetben értékadás operátor.
 	\begin{lstlisting}
 List cHead = head; //copy ctor
 
@@ -2368,6 +2310,7 @@ struct List
 	List& operator=(const List &other)
 	{
 		delete next;
+		data = other.data;
 		if (other.next) // if(other.next) == if(other.next != 0)
 		{
 			next = new List(*other.next);
@@ -2604,7 +2547,7 @@ private:
 };
 \end{lstlisting}
 	Oké, ez viccnek talán jó, de könnyű látni, ha mondjuk 3 darab \texttt{cursor} kéne, akkor bajba lennénk, és hosszútávon nem ez a jó hozzáállás. Ez nem elég ahhoz, hogy komplex feladatokat meg tudjunk írni. \textbf{Munkahelyen ilyet ne írjunk!} Töröljük is ki gyorsan, és írjunk egy iterátort!
-	\subsection{Iterátorok.}
+	\subsection{Iterátorok}
 	Az iterátorok a pointerek általánosítása, segítségükel tudunk végigiterálni egy konténer elemein (azaz velük tudjuk lekérdezni a konténer elemeit). Ehhez szükségünk van arra, hogy tudjuk hol kezdődik és végződik a konténerünk. E láncolt lista esetében hozzá tudunk férni az első elemhez (az lesz ugye \texttt{head} a fenti példákban) és tudjuk hogy mindig nullpointerrel végződik. Legyen az iterátunk neve \texttt{Iterator}!
 \begin{lstlisting}
 class List
@@ -2739,9 +2682,9 @@ class List
 	\begin{lstlisting}
 void print(List &l)
 {
-	for(Iterator it = l.begin(); it != begin(); ++it)
+	for(Iterator it = l.begin(); it != l.end(); ++it)
 	{
-		std::cout << *i << ' ';
+		std::cout << *it << ' ';
 	}
 	std::cout << std::endl;
 }
@@ -3116,8 +3059,9 @@ int main()
 }
 	\end{lstlisting}
 	\texttt{Fact} 4szer példányosul: \texttt{Fact<5>, \ldots, Fact<1>,} majd a legvégén az általunk specializált \texttt{Fact<0>}-t hívja meg.
-	
-	\smallskip
+	\begin{note}
+		Ahogyan ezt korábban megállapítottunk, egy \textbf{konstans} osztályszintű változót függvénytörzsön belül is inicializálhatunk.
+	\end{note}
 	Ez fel is hívja a figyelmet a template-ek veszélyeit statikus változók használatakor.
 	
 	\begin{lstlisting}
@@ -3310,7 +3254,7 @@ List::List(const List &other) : data(other.data), next(0)
 List& List::operator=(const List &other) 
 {
 	if (this == &other)
-	return *this;
+		return *this;
 	delete next;
 	data = other.data;
 	if (other.next) 
@@ -3586,7 +3530,7 @@ template<typename T>
 List<T> &List<T>::operator=(const List<T> &other) 
 {
 	if (this == &other)
-	return *this;
+		return *this;
 	delete next;
 	data = other.data;
 	if (other.next) 
@@ -5222,7 +5166,6 @@ public:
 	Forrásként felhasználtam \textsc{Brunner} Tibor honlapján talált információkat: \url{http://bruntib.web.elte.hu/read.php?3,52}.
 	
 	\subsection{C++11, privát öröklődés, privát adattagok használata, slicing}
-	Ez szekció inkább veszélyekre hívja fel a figyelmet. Ez nem órán hangzott el, magamtól írtam, így is tekintsünk rá!
 	
 	\medskip
 	C++11-ben lehetőségünk van picit kényelmesebbé tenni az életünket, például az \texttt{override} kulcsszóval, mely garantálja, hogy az adott függvény felülír egy másikat.

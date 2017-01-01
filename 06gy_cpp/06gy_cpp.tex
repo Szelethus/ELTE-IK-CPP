@@ -56,6 +56,7 @@ struct List
 	List& operator=(const List &other)
 	{
 		delete next;
+		data = other.data;
 		if (other.next) // if(other.next) == if(other.next != 0)
 		{
 			next = new List(*other.next);
@@ -292,7 +293,7 @@ private:
 };
 \end{lstlisting}
 	Oké, ez viccnek talán jó, de könnyű látni, ha mondjuk 3 darab \texttt{cursor} kéne, akkor bajba lennénk, és hosszútávon nem ez a jó hozzáállás. Ez nem elég ahhoz, hogy komplex feladatokat meg tudjunk írni. \textbf{Munkahelyen ilyet ne írjunk!} Töröljük is ki gyorsan, és írjunk egy iterátort!
-	\subsection{Iterátorok.}
+	\subsection{Iterátorok}
 	Az iterátorok a pointerek általánosítása, segítségükel tudunk végigiterálni egy konténer elemein (azaz velük tudjuk lekérdezni a konténer elemeit). Ehhez szükségünk van arra, hogy tudjuk hol kezdődik és végződik a konténerünk. E láncolt lista esetében hozzá tudunk férni az első elemhez (az lesz ugye \texttt{head} a fenti példákban) és tudjuk hogy mindig nullpointerrel végződik. Legyen az iterátunk neve \texttt{Iterator}!
 \begin{lstlisting}
 class List
@@ -427,9 +428,9 @@ class List
 	\begin{lstlisting}
 void print(List &l)
 {
-	for(Iterator it = l.begin(); it != begin(); ++it)
+	for(Iterator it = l.begin(); it != l.end(); ++it)
 	{
-		std::cout << *i << ' ';
+		std::cout << *it << ' ';
 	}
 	std::cout << std::endl;
 }
@@ -464,7 +465,7 @@ public:
 		return !(*this == other);
 	}
 	Iterator operator++();
-	int operator*(); const //nem referenciaval ter vissza!
+	int operator*() const; //nem referenciaval ter vissza!
 private:
 	const List *p; //konstanra mutato pointer!
 };
@@ -486,12 +487,12 @@ class List
 Iterator Iterator::operator++() {//...}
 int& Iterator::operator*() {//...}
 
-Iterator Iterator::operator++()
+ConstIterator ConstIterator::operator++()
 {
 	p = p->next;
 	return *this;
 }
-int Iterator::operator*() const
+int ConstIterator::operator*() const
 {
 	return p->data;
 }
