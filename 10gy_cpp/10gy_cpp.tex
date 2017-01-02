@@ -117,7 +117,7 @@ class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
 
 typedef std::vector<int>::const_iterator VectIt;
 
-VectIt findSecond(VectIt begin, VectIt end, const Val &v)
+VectIt findSecond(VectIt begin, VectIt end, const int &v)
 {
 	while(begin != end && *begin != v)
 	{
@@ -177,18 +177,6 @@ typename std::vector<T>::const_iterator
 	\begin{lstlisting}
 template <class InputIt, class Val>
 InputIt findSecond(InputIt begin, InputIt end, const Val &v)
-{
-	//...
-}
-	\end{lstlisting}
-	Ezzel lényegében készen vagyunk, azonban egy apró módosítással elérhetjük hogy véletlenül se adjunk át olyan elemet harmadik paraméterként, mellyel a dereferált iterátor nem hasonlítható össze.
-	\begin{note}
-		Ez leginkább az \texttt{std::iterator}-ból való öröklés alkalmazását próbálja demonstrálni.
-	\end{note}
-	\begin{lstlisting}
-template <class InputIt>
-InputIt findSecond(InputIt begin, InputIt end, 
-				   const typename InputIt::value_type &v)
 {
 	//...
 }
