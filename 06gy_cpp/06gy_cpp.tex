@@ -142,7 +142,7 @@ List& operator=(const List &other)
 	
 	Egy \texttt{T} típus \textbf{reguláris típus}, ha van neki:
 	\begin{enumerate}
-		\item defualt konstruktora
+		\item default konstruktora
 		\item destruktora
 		\item értékadás operátora, továbbá
 		\begin{lstlisting}
@@ -150,13 +150,13 @@ T b;
 T a;
 a = b;
 		\end{lstlisting}
-		Ekkor \texttt{a} ekvivalens \texttt{b}-vel, és ha \texttt{a}-t módosítjuk, akkot \texttt{b} nem változik, és viszont.
+		Ekkor \texttt{a} ekvivalens \texttt{b}-vel, és ha \texttt{a}-t módosítjuk, akkor \texttt{b} nem változik, és viszont.
 		\item másoló konstruktora, továbbá
 		\begin{lstlisting}
 T b;
 T a = b;
 		\end{lstlisting}
-		Ekkor \texttt{a} ekvivalens \texttt{b}-vel, és ha \texttt{a}-t módosítjuk, akkot \texttt{b} nem változik, és viszont.
+		Ekkor \texttt{a} ekvivalens \texttt{b}-vel, és ha \texttt{a}-t módosítjuk, akkor \texttt{b} nem változik, és viszont.
 		\item egyenlőségvizsgálat (\texttt{operator==}) (Ha nincs, akkor az adott típust félig regulárisnak nevezzük)
 	\end{enumerate}
 	\subsection{Adattagok védettsége}
@@ -328,7 +328,7 @@ private:
 
 class List {//...};
 	\end{lstlisting}
-	A fordító eyek után a csillaggal jelölt sorban nem fog arra panaszkodni, hogy a \texttt{List} egy ismeretlen azonosító. A forward deklaráció azt mondja a fordítónak, hogy a \texttt{List} később, akár egy másik fordítási egységben definiálva lesz. Amennyiben nem akarjuk dereferálni \texttt{p}-t, elég csupán a forward deklarálni!
+	A fordító ezek után a csillaggal jelölt sorban nem fog arra panaszkodni, hogy a \texttt{List} egy ismeretlen azonosító. A forward deklaráció azt mondja a fordítónak, hogy a \texttt{List} később, akár egy másik fordítási egységben definiálva lesz. Amennyiben nem akarjuk dereferálni \texttt{p}-t, elég csupán a forward deklarálni!
 	
 	\medskip
 	Még hiányzik a \texttt{++} és a \texttt{*} operátor.
@@ -362,7 +362,7 @@ private:
 
 class List {//...};
 \end{lstlisting}
-  Amennyiben az előbb említett operátorokat az \texttt{Iterátor}on belül fejtjük ki, a fordító dob egy hibaüzenetet, miszerint a \texttt{List} egy un. \textit{incomplete type}. A forward deklaráció miatt a fordító tudja már, hogy a \texttt{List} az egy osztály. De nem tudja ellenőrizni, hogy \texttt{next} adattaggal rendelkezik-e az osztály. Ezért ezeket a tagfüggvényeket a \texttt{List} kifejtése után kell írni.
+  Amennyiben az előbb említett operátorokat az \texttt{Iterátor}on belül fejtjük ki, a fordító dob egy hibaüzenetet, miszerint a \texttt{List} egy un. \textit{incomplete type}. A forward deklaráció miatt a fordító tudja már, hogy a \texttt{List} az egy osztály. De nem tudja ellenőrizni, hogy \texttt{next} adattaggal rendelkezik-e. Ezért ezeket a tagfüggvényeket a \texttt{List} kifejtése után kell írni.
 \begin{lstlisting}
 class List;
 
@@ -420,7 +420,7 @@ void print(List &l)
 	std::cout << std::endl;
 }
 	\end{lstlisting}
-	Ez a függvény, csak úgy mint az \textit{STL} függvények is, balról zárt, jobbról nyitott $[\ )$ intervallummal dolgozik. Azaz az \texttt{end()} már nem eleme a listának, az az utolsó \textit{utáni} elem (\texttt{past-the-end iterator}).
+	Ez a függvény, csak úgy mint az \textit{STL} függvények is, balról zárt, jobbról nyitott $[\ )$ intervallummal dolgozik. Azaz az \texttt{end()} már nem eleme a listának, az az utolsó {utáni} elem (\textit{past-the-end iterator}).
 	
 	\medskip
 	Nézzük meg, hogy miért jobb az iterátor, mint a felsoroló. Annyi \texttt{Iterator}-t hozunk létre, amennyit csak akarunk, nem vagyunk korlátozva a \texttt{cursor}ok darabszáma által. Az iterátorok emellett tetszőlegesen tárolhatóak, átadhatóak függvényeknek. Nincs elrejtve az objektum belsejébe. Továbbá, tudjuk módosítani a listában található elemeket anélkül, hogy a lista reprezentációját ismernünk kellene. Egy iterátorokat használó kód módosítása nélkül megváltoztatható a lista belső reprezentációja. Ez lehetővé teszi azt, hogy több programozó csapatban dolgozzon, egymástól független kódrészleteket úgy tudjon módosítani, hogy ne kelljen egymás kódját átírni.
@@ -487,7 +487,7 @@ int ConstIterator::operator*() const
 		Ami lehet \texttt{const}, az \textbf{legyen} \texttt{const}!
 	\end{note}
 
-	Egy \texttt{const List} típusú objektumon csak a konstans metódusok hívhatóak meg, így a meghívott \texttt{begin()} visszatérési értékének típusa \texttt{ConstIterator} lesz. Egy nem konstans \texttt{List} objektumnál \texttt{Iterator} viszont iterátor lesz.
+	Egy \texttt{const List} típusú objektumon csak a konstans metódusok hívhatóak meg, így a meghívott \texttt{begin()} visszatérési értékének típusa \texttt{ConstIterator} lesz. Egy nem konstans \texttt{List} objektumnál viszont \texttt{Iterator} lesz.
 	\begin{lstlisting}
 int main()
 {
