@@ -449,7 +449,7 @@ public:
 	{
 		return !(*this == other);
 	}
-	Iterator operator++();
+	ConstIterator operator++();
 	int operator*() const; //nem referenciaval ter vissza!
 private:
 	const List *p; //konstanra mutato pointer!
@@ -466,6 +466,8 @@ class List
 	{
 		return ConstIterator(0);	
 	}
+	
+	friend class ConstIterator;
 	//...
 };
 
@@ -495,7 +497,7 @@ int main()
 	head.add(7);
 	head.add(2);
 	{
-		ConstIterator cit = it.begin(); //hiba
+		ConstIterator cit = head.begin(); //hiba
 	}
 }
 	\end{lstlisting}
@@ -513,8 +515,60 @@ public:
 	
 	Meglepő lehet, hogy az értékadás egy új konstruktor bevezetését követően le fog fordulni. A \texttt{head.begin()} a fenti esetben egy \texttt{Iterator}-t ad vissza, mivel \texttt{head} nem konstans! Eztán a fordító az imént megírt konstruktor segítségével az \texttt{Iterator} típusú változóból készít egy \texttt{ConstIterator} típusút. Ezzel \textit{implicit kódon átkonvertálja} \texttt{Iterator}-t \texttt{ConstIterator}-rá, és utána hívja meg a másoló konstruktort. 
 	
+	\subsection{Konverziós operátor}
+	Más útja is létezik annak, hogy át lehessen konvertálni egy \texttt{Iterator} típusú objektumot \texttt{ConstIterator} típusúvá, ha létrehozunk egy un. \textbf{konverziós operátor}t (\textit{conversion operator} vagy \textit{user defined conversion}). 
+	\begin{lstlisting}
+// ...
+class ConstIterator; //forward deklaracio itt szukseges
+
+class Iterator
+{
+public:
+	// ...
+	operator ConstIterator() const;
+	// ...
+};
+
+class ConstIterator{//...}
+
+Iterator::operator ConstIterator() const
+{
+	return ConstIterator(p);
+}
+// ...
+	\end{lstlisting}
+	A fenti függvény segítségével a fordító végre tudja majd hajtani a konverziót implicit módon. 
+	\begin{lstlisting}
+ConstIterator cit2 = head.begin(); //ok
+	\end{lstlisting}	
+	Amennyiben azt szeretnénk, hogy a konverzió létezzen, de implicit módon ne lehessen végrehajtani, használhatjuk az \texttt{explicit} kulcsszót:
+	\begin{lstlisting}
+class Iterator
+{
+public:
+	// ...
+	explicit operator ConstIterator() const;
+	// ...
+};
+	\end{lstlisting}
+	Ennek követeztében explicit módon jeleznünk kell, hogy \texttt{ConstIterator} típusra szeretnénk konvertálni.
+	\begin{lstlisting}
+int main()
+{
+	List head(8);
+	ConstIterator cit1 = head.begin(); // hiba
+	ConstIterator cit2 = ConstIterator(head.begin()); // ok
+	ConstIterator cit3 = static_cast<ConstIterator>(head.begin()); // ok
+}
+	\end{lstlisting}
+	\begin{note}
+		A fent látható \texttt{static\_cast}-ról később lesz részletesen szó.
+	\end{note}
+	\begin{note}
+		A fenti módosítások ismét csak gyakorlás célját képezték, az elkészítedő listának nem lesz része a konverziós operátor.
+	\end{note}
 	\subsection{Explicit konstruktorok}
-	Azt, hogy az egy paraméteres konstruktorokat a fordító implicit konverzióra felhasználja a fenti módon, megtilthatjuk, ha \texttt{explicit} kulcsszót írunk a konstruktorok elé.
+	Azt, hogy az egy paraméteres konstruktorokat a fordító implicit konverzióra felhasználja a fenti módon, megtilthatjuk itt is, ha \texttt{explicit} kulcsszót írunk a konstruktor elé.
 	
 \begin{lstlisting}
 class ConstIterator
@@ -525,7 +579,7 @@ public:
 	//...
 }
 \end{lstlisting}
-	Jelen esetben nem akarjuk ezt a konverziót megtiltani, lévén az \texttt{Iterator} és a \texttt{ConstIterator} hasonló feladatot lát el. Nézzük meg az eddigi kódjainket. Okozhat valahol meglepetést egy konverzió? A \texttt{List} egyik konstruktra gyanús lehet. Ha egy függvény listát vár paraméterül, egy darab \texttt{int}-et is elfogad, hisz a \texttt{List} konstruktorát felhasználva tudott volna csinálni abból az \texttt{int}-ből egy egy elemű listát! Ezt elkerülendő, tegyük a \texttt{List} konstruktorát \texttt{explicit}-té.
+	Jelen esetben nem akarjuk a konverziót megtiltani, lévén az \texttt{Iterator} és a \texttt{ConstIterator} hasonló feladatot lát el. Nézzük meg az eddigi kódjainket. Okozhat valahol meglepetést egy konverzió? A \texttt{List} egyik konstruktra gyanús lehet. Ha egy függvény listát vár paraméterül, egy darab \texttt{int}-et is elfogad, hisz a \texttt{List} konstruktorát felhasználva tudott volna csinálni abból az \texttt{int}-ből egy egy elemű listát! Ezt elkerülendő, tegyük a \texttt{List} konstruktorát \texttt{explicit}-té.
 	\begin{lstlisting}
 class List
 {
