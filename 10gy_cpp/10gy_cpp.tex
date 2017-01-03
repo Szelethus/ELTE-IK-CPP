@@ -36,13 +36,13 @@
 		10. óra.
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor és \textsc{Horváth} Gábor előadásán. (\today)
-	\section{Iterátor típusok}
-	Korábban már elhangzott, hogy az általunk implementált \texttt{List}-hez tartozó \texttt{Iterator} és \texttt{ConstIterator} un. forward iterátorok. A forward iterator egy iterátor típus -- ebből több is van, és elengedhetetlenek az STL algoritmusok megértéséhez. 4 iterátor típust különböztetünk meg: input iterator, forward iterator, bidirectional iterator és random access iterator.
+	\section{Iterátor kategóriák}
+	Korábban már elhangzott, hogy az általunk implementált \texttt{List}-hez tartozó \texttt{Iterator} és \texttt{ConstIterator} un. forward iterátorok. A forward iterator egy iterátor kategória -- ebből több is van, és elengedhetetlenek az STL algoritmusok megértéséhez. 4 iterátor típust különböztetünk meg: input iterator, forward iterator, bidirectional iterator és random access iterator.
 	\begin{itemize}
-		\item Az \textbf{input iterator} típusokon legalább egyszer végig lehet menni egy irányba, továbbá rendelkeznek \texttt{++}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
-		\item A \textbf{forward iterator} típusokon többször is végig lehet menni, de csak egy irányba. Továbbá rendelkeznek \texttt{++}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
-		\item A \textbf{bidirectional iterator} típusokon többször is végig lehet menni, mindkét irányba. Továbbá rendelkeznek \texttt{++}, \texttt{$--$}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
-		\item A \textbf{random access iterator} típusokon többször is végig lehet menni, mindkét irányba, ezen felül a két iterátor között bármelyik elemre azonnal lehet hivatkozni. Továbbá rendelkeznek \texttt{++}, \texttt{
+		\item Az \textbf{input iterator}-okon legalább egyszer végig lehet menni egy irányba, továbbá rendelkeznek \texttt{++}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
+		\item A \textbf{forward iterator}-okon többször is végig lehet menni, de csak egy irányba. Továbbá rendelkeznek \texttt{++}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
+		\item A \textbf{bidirectional iterator}-okon többször is végig lehet menni, mindkét irányba. Továbbá rendelkeznek \texttt{++}, \texttt{$--$}, \texttt{*}, \texttt{==} és \texttt{!=} operátorral.
+		\item A \textbf{random access iterator}-okon többször is végig lehet menni, mindkét irányba, ezen felül a két iterátor között bármelyik elemre azonnal lehet hivatkozni. Továbbá rendelkeznek \texttt{++}, \texttt{
 		$--$}, \texttt{*}, \texttt{==}, \texttt{!=}, \texttt{$-$} (két iterátor távolságát adja meg), összeadás \texttt{int}-el (paraméterként kapott mennyiségű elemmel előrelépés), kivonás \texttt{int}-el (hátralépés) operátorral/függvénnyel.
 	\end{itemize}
 	E listán látható, hogy pl. egy random access iterator sokkal flexibilisebb, és gyorsabb is, hisz bármikor bármelyik elemhez hozzáférhetünk, míg a mi listánk forward iteratora sokkal limitáltabb.
@@ -53,7 +53,7 @@
 		\setlength{\extrarowheight}{2pt}
 		\begin{tabular}{|l|l|}
 			\hline
-			STL konténer&Iteratorának típusa\\
+			STL konténer&Iteratorának kategóriája\\
 			\hline
 			\hline
 			\texttt{std::vector} & \multirow{2}{*}{\texttt{random access iterator}}\\
@@ -185,7 +185,7 @@ InputIt findSecond(InputIt begin, InputIt end, const Val &v)
 	Az STL algoritmusok iterátorokkal dolgoznak, azonban az, hogy minek az iterátorát használják, egyáltalán nem fontos tudniuk: elegendő annyi, hogy rendelkeznek azokkal az operátorokkal, melyeket fent felsoroltunk. Így például a mi listánk iterátorát ugyanúgy megadhatnánk a fenti függvények, mint egy \texttt{std::vector<int>}-ét.
 	
 	\medskip
-	A korábban elhangzottak alapján implementáljunk egy függvényt, mely egy iterátort léptet előre: Amennyiben a paraméterként kapott iterátor kategóriája bidirectional iterator, egyesével lépegessünk a kívánt helyre, random access iterator esetén egyből ugorjunk oda.
+	A korábban elhangzottak alapján implementáljunk egy függvényt, mely egy iterátort léptet előre: Amennyiben a paraméterként kapott iterátor kategóriája bidirectional iterator, egyesével lépegessünk a kívánt helyre, random access iterator esetén egyből ugorjunk oda.  Ehhez használjuk ki azt, amit fentebb láttunk: az \texttt{std::iterator}-ból való öröklés hatására már le tudjuk kérdezni az iterátorunk kategóriáját!
 	\begin{lstlisting}
 template<typename BDIT> 
 BDIT algorithm(BDIT it, int pos, std::bidirectional_iterator_tag) 
@@ -223,14 +223,13 @@ int main()
 	std::cout << *advance(l.begin(), 3) << std::endl; // Slow 6
 }  
 	\end{lstlisting}
-	\medskip
 	\begin{note}
 		Az \texttt{std::vector} és \texttt{std::list}-nél felmerült iterátor lépegetésre találtunk megoldást: a fentihez hasonló működésű \texttt{std::advance} alkalmazható e célra.
 	\end{note}
-	Így tudjuk elérni azt, hogy különböző iterátor típusokra különböző algoritmust használjunk (bár nyilván ez jóval hatékonyabban van megoldva a standard könyvtárban).
+	Így tudjuk elérni azt, hogy különböző iterátor kategóriára különböző algoritmust használjunk (bár nyilván ez jóval hatékonyabban van megoldva a standard könyvtárban).
 	\medskip
 	
-	Ezek ismerétében vágjunk bele az STL algoritmusokba!
+	Ezek ismeretében vágjunk bele az STL algoritmusokba!
 	\begin{note}
 		Cppreference-en megfigyelhető, hogy irtózatosan sok algoritmus van -- csak úgy mint a konténereknél, a fontosabb algoritmusokról lesz szó, míg a többivel való ismerkedés gyakorlás végett az olvasóra bízom.
 	\end{note}
