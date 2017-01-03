@@ -35,34 +35,200 @@
 		
 		12. óra.
 	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor gyakorlatán. (\today)
+	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  gyakorlatán. (\today)
 	\medskip
 	
-	
-	%TODO 023 beugro pdf
 	%TODO magyarázatok
-	{\LARGE \textbf{Nincs még kész!}}
 	\section{Beugró kérdések}
-	EZek sose fordulhatnak már elő.
-	\begin{enumerate}
-		\item Implementációfüggő
-		\item \texttt{bool == char}
-		\item 10 (8as számrendszer miatt)
-		\item \texttt{\#elseif}
-		\item \texttt{public}, ugyanis a register azt jelenti, hogy a változót a \texttt{register}be tárolja, azonabn ezt jobban tudja a fordító, így nem érdemes kiírni. az \texttt{auto} azt jelenti hogy a változó stacken legyen, ez régebben implicit módon mindehol ott volt, de mostmár nem, sőt, c++11ben msát is jelent.
-		\item 5
-		\item Az első az igaz, továbbá sok egyéb dolgot is generál még.
-		\item nem definiált, mert y még nem volt inicializálva.
-		\item \texttt{std::list}
-		\item 1
-		\item AZ objektumnak csak a konstans tagfüggvényei hívhatók meg
-		\item polimorf osztályra van szükség, mert csak mutatókon tudjuk használni. Ha referencián használnánk, és null-t adna vissza, akkor kivételt dob, mert a referencia nem leht null
-		\item második
-		\item harmadik a jó, mert lehet egy függvényen kívüli függvény, és az uccsó szintaktikusan rosszz.
-		\item utolsó.
+	A következő kérdések egy régebbi, kiszivárgott C++ beugróból lettek beemelve. Így értelemszerűen ezekkel a kérdésekkel az olvasó nem fog semmiképpen se találkozni. Alaposabb magyarázatot nem fűztem a megoldásokhoz, ugyanis azok a jegyzet alapos megértése után triviálisak.
+	\begin{enumerate}[1.)]
+		\item  Hány byte-on tárol a C++ egy short int-et?
+		\begin{enumerate}
+			\item 1
+			\item implementációfüggő
+			\item 8
+			\item 2
+		\end{enumerate}
+		\textbf{Válasz:} Implementációfüggő.
+		\item Melyik reláció \textbf{hamis} az alábbiak közül?
+		\begin{enumerate}
+			\item \texttt{sizeof(char) == sizeof(signed char)}
+			\item \texttt{sizeof(short) <= sizeof(long int)}
+			\item \texttt{sizeof(bool) == sizeof(char)}
+			\item \texttt{sizeof(float) <= sizeof(long double)}
+		\end{enumerate}
+		\textbf{Válasz:} \texttt{bool == char}
+		\item Mennyi a 012 konstans értéke?
+		\begin{enumerate}
+			\item 12
+			\item 0.12
+			\item 18
+			\item 10
+		\end{enumerate}
+		\textbf{Válasz:} 10
+		\item Melyik nem preprocesszor direktíva?
+		\begin{enumerate}
+			\item \texttt{\#define}
+			\item \texttt{\#else}
+			\item \texttt{\#elif}
+			\item \texttt{\#elseif}
+		\end{enumerate}
+		\textbf{Válasz:} \texttt{\#elseif}
+		\item Melyik kulcsszó \textbf{nem} a tárolási osztályt specifikálja egy deklarációban ill.
+		definícióban?
+		\begin{enumerate}
+			\item \texttt{static}
+			\item \texttt{auto}
+			\item \texttt{register}
+			\item \texttt{public}
+		\end{enumerate}
+		\textbf{Válasz:} \texttt{public}, ugyanis a register azt jelenti, hogy a változót a \texttt{register}be tárolja, azonban azt hogy milyen változót hol érdemes tárolni, jobban tudja a fordító, így nem érdemes kiírni. Az \texttt{auto} azt jelenti hogy a változó stacken legyen, ez régebben implicit módon mindehol ott volt, de mostmár nem, sőt, c++11ben mást is jelent.
+		
+		\item Az \texttt{X::f()} függvényhívás során mit ír ki a program?
+		\begin{lstlisting}
+int i = 1;
+namespace X
+{
+	int i = 2;
+	void f()
+	{
+		int a = i;
+		int i = a + X::i + ::i;
+		std::cout << i << std::endl;
+	}
+}
+		\end{lstlisting}
+		\begin{enumerate}
+			\item 1
+			\item semmit, fordítási hiba keletkezik
+			\item 5
+			\item 4
+		\end{enumerate}
+		\textbf{Válasz:} 5
+		\item Melyik igaz az alábbiak közül?
+		\begin{lstlisting}
+struct X
+{
+	X(int i = 0) {}
+};
+		\end{lstlisting}
+		\begin{enumerate}
+			\item A fenti struct-nak van default konstruktora.
+			\item A fenti struct-nak csak default konstruktora van.
+			\item A fenti struct-nak nincs default konstruktora.
+			\item A fenti struct-nak nincs copy konstruktora.
+		\end{enumerate}
+		\textbf{Válasz:} Az első az igaz, továbbá sok egyéb dolgot is generál még.
+		\item Az alábbi példában a \texttt{Foo f(10);} konstruktor hívása után mennyi lesz \texttt{f.x} értéke?
+		\begin{lstlisting}
+struct Foo
+{
+	int x, y;
+	Foo(int i):y(i),x(y++) {}
+};
+		\end{lstlisting}
+		\begin{enumerate}
+			\item 11
+			\item 0
+			\item nem definiált
+			\item 10
+		\end{enumerate}
+		\textbf{Válasz:} Nem definiált.
+		\item Melyik típusnak van push\_front tagfüggvénye?
+		\begin{enumerate}
+			\item \texttt{std::set}
+			\item \texttt{std::list}
+			\item \texttt{std::stack}
+			\item \texttt{std::vector}
+		\end{enumerate}
+		\textbf{Válasz:} \texttt{std::list}
+		\item Mi lesz az \texttt{a} változó értéke a függvényhívás után?
+		\begin{lstlisting}
+int a = 1, b = 2;
+void f(int x, int y)
+{
+	int t = x;
+	x = y;
+	y = t;
+}
+f(a,b);
+		\end{lstlisting}
+		\begin{enumerate}
+			\item 1
+			\item 2
+			\item nem definiált
+			\item semmi, fordítási hiba keletkezik
+		\end{enumerate}
+		\textbf{Válasz:} 1
+		\item Melyik állítás igaz egy konstans objektum esetében?
+		\begin{enumerate}
+			\item Az objektumnak csak private adattagja lehet.
+			\item Az objektumnak csak azok a tagfüggvényei hívhatóak meg, amelyek nem
+			módosítják az adattagjait.
+			\item Az objektumnak csak a konstans tagfüggvényei hívhatóak meg.
+			\item Az objektum csak default konstruktorral hozható létre.
+		\end{enumerate}
+		\textbf{Válasz:} Az objektumnak csak a konstans tagfüggvényei hívhatók meg.
+		\item Melyik állítás igaz az alábbiak közül?
+		\begin{enumerate}
+			\item A \texttt{dynamic\_cast} soha nem dob kivételt.
+			\item A \texttt{dynamic\_cast} használatához nem lehet statikus adattagja az osztálynak.
+			\item A \texttt{dynamic\_cast} használatához polimorf osztályokra van szükség.
+			\item A \texttt{dynamic\_cast} fordítás idejű típuskonverziót végez.
+		\end{enumerate}
+		\textbf{Válasz:} Polimorf osztályra van szükség a használatához.
+		\item Mi a paraméterdedukció?
+		\begin{enumerate}
+			\item Az az eljárás, amikor referencia-szerinti paraméterátadásra cseréljük az
+			érték-szerintit.
+			\item Az az eljárás, amikor a fordítóprogram levezeti a template paramétereket a
+			függvényhívásból.
+			\item Az az eljárás, amikor linker feloldja a külső függvényhívások paramétereit.
+			\item Az az eljárás, amikor default paraméterekkel látjuk el a függvény
+			paramétereket.
+		\end{enumerate}
+		\textbf{Válasz:} Az az eljárás, amikor a fordítóprogram levezeti a template paramétereket a
+		függvényhívásból.
+		\item Az alábbiak közül melyik függvényhívással lehet ekvivalens az alábbi
+		(csillaggal jelölt) operátorhívás?
+		\begin{lstlisting}
+class Matrix
+{
+	// ...
+};
+Matrix a,b;
+a + b; // (*)
+		\end{lstlisting}
+		\begin{enumerate}
+			\item \texttt{a.operator+(a,b);}
+			\item \texttt{b.operator+(a);}
+			\item \texttt{operator+(a,b);}
+			\item \texttt{Matrix.operator+(a,b);}
+		\end{enumerate}
+		\textbf{Válasz:} A harmadik a jó, mert lehet egy függvényen kívüli függvényhívás a csillagozott rész.
+		\item Melyik állítás igaz az alábbiak közül?
+		\begin{enumerate}
+			\item Egy \texttt{int* const} típusú pointer mérete 8 byte.
+			\item A \texttt{sizeof(int) == sizeof(int* const)} reláció mindig igaz.
+			\item Egy \texttt{int* const} típusú pointer nem változtathatja meg a mutatott értéket.
+			\item Egy \texttt{int* const} típusú pointer mutathat változóra.
+		\end{enumerate}
+		\textbf{Válasz:} Utolsó.
 	\end{enumerate}
 	\section{Mintaviszga megoldás}
-	Írjunk header fájlt, mely ezzel jól fordul:
+	\subsection{Az írásbeli vizsga menete}
+	A vizsga írásbeli részénél a feladat egy header fájl elkészítése, mellyel egy előre megadott cpp fájl helyesen fordul. Amennyiben a program szabványos, azaz lefordul és nem okoz nem definiált viselkedést, kiírja a vizsgázó osztályzatát.
+	
+	A cpp fájl leellenőrzi hogy a header fájlban leírtak helyen oldják meg a feladatot, azonban lehetnek szélsőséges esetek, melyek nem vizsgál. Így a sikeres futás után \textbf{sem} biztos, hogy a header fájl a kiírt jegyet megéri.
+	
+	A kiírt jegy emelett nem ,,íródik jóvá'' azonnal: a vizsgázónak meg kell védenie a munkáját, azaz bizonyítania kell hogy a leírtakat, és a félév során tanultakat valóban érti. Amennyiben erre képtelen, úgy a jegye romlik, szélsőséget esetben elégtelenre is akár.
+	
+	A header fájl csak is kizárólag a C++98-as szabványnak megfelelő kódot tartalmazhat, ellentkező esetben csak akkor, ha a vizsgázó később meg tudja mutatni, hogy 98-as szabvány szerint mi lenne a megoldás.
+	\subsection{Feladatleírás}
+	A feladat az, hogy írjunk egy osztályt, mely egy billentyűzetet szimulál. Megfigyelhető a lenti C++ kód alapján, hogy \texttt{line\_editor} lesz a konténer neve, valamint hogy 2 template paraméterrel rendelkezik. Az felhasználónak képesnek kell lennie, arra, hogy a billentyűleütéseit kiirattassa majd a konzolra, sőt, akár arra is, hogy egy adott szövegnek ne csak végére, hanem elejére is írhasson.
+	\medskip
+	
+	\fbox{\textbf{lemain.cpp}}
 \begin{lstlisting}
 #include <iostream>
 #include "lineedit.h"
@@ -206,26 +372,37 @@ int main()
 }
 \end{lstlisting}
 
-	Én most kiszedtem a kommenteket, de minden blokk (tehát pl. a 2-es és 3as közötti) ki van kommentezve.
-	
-	A feladat az, hogy egy billentyűzetet szimuláljon. TUdjuk hogy \texttt{line\_editor} a konténer neve, és látjuk, hogy 2 template paraméterrel rendelkezik. Ezen kívül van egy \texttt{press} függvény, mely egy billentyt rak be, \texttt{home()} a sor elejére ugrik, és \texttt{enter} új sort kezd.
-	\subsection{2-es}
-	Hozzuk létre a szükséges header fájlt, melyet MINDIG a header guard-dal kezdünk. Lévén az osztály neve és template paraméterei adottak:
+	\begin{note}
+		Én most kiszedtem a kommenteket, de minden blokk (tehát pl. a 2-es és 3as közötti) ki van kommentezve.
+	\end{note}
+	\subsection{1-es}
+	Ahhoz hogy a program egyáltalán leforduljon, és kiírja hogy \texttt{Your mark is 1}, létre kell hoznunk egy header fájlt. Fent látható, hogy ennek milyen nevűnek kell lennie: \texttt{lineedit.h}. Az is megfigyelhető, hogy ez a header kapásból kétszer van beillesztve, így (ahogy minden header fájlnál is szokás) írjunk egy header guardot.
 	\begin{lstlisting}
 #ifndef LINE_EDIT_H
 #define LINE_EDIT_H
 
+#endif 
+	\end{lstlisting}
+	Így már van egy 1esünk.
+	\subsection{2-es}
+	A ketteshez már létre kell hoznunk magát az osztályt, és ahogy korábban megállapítottuk, 2 template paraméter kell ehhez: az első egy konténer, amiben a felhasználó egy adott sor tartalmát fogja visszakapni, a második pedig a tárolandó típus.
+	\begin{lstlisting}
 template <typename Cont, typename CharT>
 class line_editor
 {
 
 };
-
-#endif 
 	\end{lstlisting}
+	
+	A 2-eshez az alábbi függvényeket kell majd megírnunk:
+	\begin{itemize}
+		\item \texttt{press}: A \texttt{CharT} típsú kapott paramétert eltárolja.
+		\item \texttt{home}: Az adott sor elejére ugrik (nem vár paramétert).
+		\item \texttt{enter}: Új sort kezd, és a meglevőt visszaadja egy \texttt{Cont} típusú objektumban eltárolva (nem vár paramétert).
+	\end{itemize}
 	Kéne egy konténert választani, melyben eltároljuk a karaktereket. Itt logikus választás az \texttt{std::list}, mert gyakran kell majd szúrnunk a sor közepébe.
 	\begin{note}
-		Hazsnálhatnánk vectort is, sőt bármit, melyet védéskor kellőképpen meg tudunk indokolni.
+		Használhatnánk \texttt{std::vector}-t is, sőt bármit, melyet védéskor kellőképpen meg tudunk indokolni.
 	\end{note}
 \begin{lstlisting}
 #include <list>
@@ -236,7 +413,7 @@ class line_editor
 	std::list<CharT> line;
 };
 \end{lstlisting}
-	A következő kérdés, hogyan reprezentáljuk a kurzort, mely jelzi hova kell beszúrni. Erre praktikus megoldás lehet egy iterátor használata.
+	A következő kérdés, hogyan reprezentáljuk a kurzort, mely jelzi hova szúrjon majd be a \texttt{press} függvény. Erre praktikus megoldás lehet egy iterátor használata.
 
 \begin{lstlisting}
 template <typename Cont, typename CharT>
@@ -246,9 +423,11 @@ class line_editor
 	typename std::list<CharT>::iterator cursor;
 };
 \end{lstlisting}
-
-	Írjuk fel a szükséges függvényeket.
+	Felmerül az is, kell-e konstruktor, destruktor, copy konstruktor és értékadó operátor? 
 	
+	Ezt az elsőt nem ártana megírnunk: azonban \texttt{line}-t és \texttt{cursor}-t mivel inicializáljuk? Megállapítható, hogy az \texttt{std::list} default konstruktora számunkra megfelelő, így azzal külön foglalkoznunk nem kell. \texttt{cursor}-t állítsuk a sor végére.
+	
+	Mivel mi dinamikusan nem foglaltunk le memóriát, és csak reguláris típusokat tárolunk, így a többi 3 függvényre nincs szükségünk.
 \begin{lstlisting}
 template <typename Cont, typename CharT>
 class line_editor
@@ -260,18 +439,29 @@ public:
 	
 	void press(CharT c)
 	{
+		//...
 	}
-	
 	void home()
 	{
-		cursor = line.begin();
+		//...
 	}
 	Cont enter()
 	{
+		//...
 	}
 };
 \end{lstlisting}
-	Mivel az iterátor könnyen invalidálódhat ha új elemt szúrunk be, így az \texttt{insert} az \texttt{std::list}-nél visszaad egy iterátort az új elemre, így érdemes a \texttt{cursor}-t erre beállítani, és egyel előrébb vinni, hgoy a sor végén leghyünk.
+	\begin{note}
+		Megfigyelhető, hogy \texttt{press} érték szerint veszi át a paraméterét -- nem kötelező így, de bárhogyan is tesszük, meg kell indokolni. Ebben az esetben lehet rá számítani, hogy a felhasználó csak primitív típusokat akar majd tárolni, legalábbis nem túl komplikáltakat, így az érték szerinti átvétel itt várhatóan hatékonyabb lesz.
+	\end{note}
+	A fentiek közül a \texttt{home} függvény talán a legegyszerűbb: állítsuk \texttt{cursor}-t a sor elejére!
+	\begin{lstlisting}
+void home()
+{
+	cursor = line.begin();
+}
+	\end{lstlisting}
+	Térjünk \texttt{press}-re: mivel az iterátor könnyen invalidálódhat ha új elemet szúrunk be, az \texttt{insert} az \texttt{std::list}-nél visszaad egy iterátort az új elemre, így érdemes a \texttt{cursor}-t erre beállítani, és egyel előrébb vinni, hogy a következő beszúrás is az új elem után követekezzen be.
 	\begin{lstlisting}
 void press(CharT c)
 {
@@ -279,34 +469,30 @@ void press(CharT c)
 	cursor++;
 }
 	\end{lstlisting}
-	Az enternél vissza kell adnunk egy, a tempalte paraméterként megadott konténer típususával megyező kontért, mert tartalmazza az eddig begépelt elemeket, majd törli a listát. Mivel minden STL konténer rendelkezik olyan konstruktorral, mely egy iterátor párt vár, és ez alapján a két iterátor közti elemeket beszúrja, így ezt bátran írhatjuk:
+	Az \texttt{enter}-nél vissza kell adnunk egy, a template paraméterként megadott konténer típususával megyező kontért, mert tartalmazza az eddig begépelt elemeket, majd törli a listát. Mivel minden STL konténer rendelkezik olyan konstruktorral, mely egy iterátor párt vár, és ez alapján a két iterátor közti elemeket be tudja szúrni, így ezt bátran írhatjuk:
 	\begin{lstlisting}
 Cont enter()
 {
-	Cont tmp(line.begin(), line.end());
+	Cont ret(line.begin(), line.end());
 	line.clear();
 	cursor = line.end();
-	return tmp;
+	return ret;
 }
 	\end{lstlisting}
-	%TODO google dat
-
-	Azt, hgoy mi szerint (érték, referencia) veszünk át, szintén meg kell indokolni.
-	
-	Ez a típus reguláris, így nem kell egyéb függvényeket megírnom.
-	%TODO példál
-	
+	Ezzel a kettesünk is készen van.
 	\subsection{3-as}
-	Szükségünk lesz egy \texttt{insert} metódusra, mely ki be kapcsolja az \texttt{insert} billentyűt.
+	Szükségünk lesz egy \texttt{insert} tegfüggvényre, mely ki-be kapcsolja az insert billentyűt (amennyiben ez nem ismerős, az insert meghívásának hatására nem a kurzor után kell majd beszúrni elemeket, hanem a kurzor utáni elemeket kell majd felülírni).
+	
+	Ehhez szükségünk lesz egy logikai változóra is, melyet alapértelmezetten állítsunk hamisra, és módosítanunk kell majd \texttt{press}-t is.
 \begin{lstlisting}
 template <typename Cont, typename CharT>
 class line_editor
 {
-	std::list<CharT> line;
-	typename std::list<CharT>::iterator cursor;
-	
+	//...
 	bool isInsert;
 public:
+	line_editor() : cursor(line.end()), isInsert(false) {}
+	
 	void insert()
 	{
 		isInsert = !isInsert;
@@ -323,29 +509,38 @@ public:
 };
 \end{lstlisting}
 	\subsection{4-es}
-	Megfigyelhetjük, hogy itt már csak 1 template paraméter kell. EZ azt jelenti, hogy default template arguemntumotkéne alklamaznunk, mely megegyezik a konténer által tárolt típussal.
+	Megfigyelhetjük, hogy a 4-eshez már a \texttt{line\_edit} osztályt csak 1 template paraméterrel is tudnunk kell példányosítani. Ez azt jelenti, hogy a második template paraméternek kell egy alapértelmezett behelyettesítést biztonsítani, melynek meg kell egyeznie a \texttt{Cont} által tárolt típussal.
 \begin{lstlisting}
-template <typename Cont, typename CharT = Cont::value_type>
+template <typename Cont, typename CharT = typename Cont::value_type>
 class line_editor
 {
 	//...
 };
 \end{lstlisting}
-	 Mivel guglizni lehet, nem kell megijedni, ha nem tudjuk mit kéne csinálni. ELőfordulhat olyan, hogy olyan dologgal tlaálkozunk szembe, amit se EA-n, se GY-n nem mondtak el, ez azért van ,mert ennek a tárgynak vélja az, hogy ezekkel is meg tudjunk közdeni.
+	\begin{note}
+		A fenti kettős \texttt{typename} talán összezavaró lehet -- a másodikra a dependent scope miatt van szükség.
+	\end{note}
+	\begin{note}
+		Mivel internetet lehet használmi, nem kell megijedni, ha nem tudjuk ezt hogyan kéne egyből megcsinálni. Előfordulhat olyan, hogy olyan dologgal találkozunk vizsgán szembe, amit se előadáson, se gyakorlaton nem mondtak el: ez azért van ,mert ennek a tárgynak célja az, hogy ezekkel is meg tudjunk küzdeni.
+	\end{note}
 	 
-	Ezen kívül két új metódust is meg kéne írnunk.
+	Ezen kívül két új tagfüggvényt is meg kéne írnunk:
+	\begin{enumerate}
+		\item \texttt{backspace}: Az \texttt{cursor} mögötti elemet törli ki.
+		\item \texttt{del}: A \texttt{cursor} előtti elemet törli.
+	\end{enumerate}
 \begin{lstlisting}
-template <typename Cont, typename CharT = Cont::value_type>
+template <typename Cont, typename CharT = typename Cont::value_type>
 class line_editor
 {
 	//...
 public:	
-	void backspace() //kitorol egy karaktert
+	void backspace()
 	{
 		cursor--;
 		del();
 	}
-	void del() //kovetkezo elem torlese
+	void del()
 	{
 		cursor = line.erase(cursor);
 	}
@@ -353,23 +548,35 @@ public:
 };
 \end{lstlisting}
 	\subsection{5-ös}
-	Meg kell írnunk egy swap függvényt, mely 2, különböző template paraméterrel rendelkező line\_editort megcserél.
+	Meg kell írnunk egy swap függvényt, mely 2, különböző template paraméterrel rendelkező \texttt{line\_editor}-t megcserél.
 	\begin{lstlisting}
+//...
 #include <algorithm>
-	
-template <class T, class U>
-void swap(line_editor<T,U> &le)
+
+class line_editor
 {
-	std::swap(line, le.line);
-	std::swap(cursor, le.cursor);
-	std::swap(isInsert, le.isInsert);
-}
+	//...
+public:
+	//...
+	template <class T, class U>
+	void swap(line_editor<T,U> &le)
+	{
+		std::swap(line, le.line);
+		std::swap(cursor, le.cursor);
+		std::swap(isInsert, le.isInsert);
+	}
+};
 	\end{lstlisting}
-	Itt hibát kapunk, mivel ezek más típusok, így private-ok az adattagok egymás felé.
+	Azonban fordítási hibát kapunk, hisz egy különböző template pareméterekkel rendelkező \texttt{line\_editor} külön típusnak számít, így gondoskodunk kell arról is, hogy minden \texttt{line\_editor} barát legyen.
 	\begin{lstlisting}
-template <class T, class U>
-friend class line_editor;
+class line_editor
+{
+	//...
+public:
+	//...
+	template <class T, class U>
+	friend class line_editor;
+};
 	\end{lstlisting}
-	Ezzel elértük, hogy bármilyen template paraméterre, minden line editor haver legyen
-%TODO linkek
+	Így az ötöst is elértük.
 \end{document}
