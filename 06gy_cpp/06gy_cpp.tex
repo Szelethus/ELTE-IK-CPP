@@ -328,10 +328,10 @@ private:
 
 class List {//...};
 	\end{lstlisting}
-	A fordító már a csillagozott sornál nem fog problémázni, hogy nem tudja mi az a \texttt{List} - arra számít hogy valamikor (akár egy másik fordítási egységben) \texttt{List} definiálva lesz. Amennyiben nem akarjuk dereferálni \texttt{p}-t, elég csupán a forward deklarálni, ki sem kell fejtenünk az osztály bővebben később!
+	A fordító eyek után a csillaggal jelölt sorban nem fog arra panaszkodni, hogy a \texttt{List} egy ismeretlen azonosító. A forward deklaráció azt mondja a fordítónak, hogy a \texttt{List} később, akár egy másik fordítási egységben definiálva lesz. Amennyiben nem akarjuk dereferálni \texttt{p}-t, elég csupán a forward deklarálni!
 	
 	\medskip
-	Még hiányzik a \texttt{++} és a \texttt{*} operátorunk.
+	Még hiányzik a \texttt{++} és a \texttt{*} operátor.
 \begin{lstlisting}
 class List;
 
@@ -362,8 +362,7 @@ private:
 
 class List {//...};
 \end{lstlisting}
-%TODO operator++ miért nem referenciával tér vissza?
-	És itt az előbb említett problémába bele is ütköztünk: a fordító siránkozik, hogy a \texttt{List} egy un. \textit{incomplete type}. Ugyanis az tudja hogy van osztály hogy \texttt{List}, de az, hogy \texttt{next} adattag, nem tudja micsoda. Ezért ezeket a tagfüggvényeket a lista után kell írni.
+  Amennyiben az előbb említett operátorokat az \texttt{Iterátor}on belül fejtjük ki, a fordító dob egy hibaüzenetet, miszerint a \texttt{List} egy un. \textit{incomplete type}. A forward deklaráció miatt a fordító tudja már, hogy a \texttt{List} az egy osztály. De nem tudja ellenőrizni, hogy \texttt{next} adattaggal rendelkezik-e az osztály. Ezért ezeket a tagfüggvényeket a \texttt{List} kifejtése után kell írni.
 \begin{lstlisting}
 class List;
 
@@ -371,11 +370,11 @@ class Iterator
 {
 public:
 	Iterator(List *_p) : p(_p) {}
-	bool operator==(Iterator &other)
+	bool operator==(Iterator &other) const
 	{
 		return p == other.p;
 	}
-	bool operator!=(Iterator &other)
+	bool operator!=(Iterator &other) const
 	{
 		return !(*this == other);
 	}
@@ -397,7 +396,7 @@ int& Iterator::operator*()
 	return p->data;
 }
 \end{lstlisting}
-	Itt még mindig hisztizni fog a fordító: \texttt{next} és \texttt{data} annyira private, hogy még az \texttt{Iterator} se fér hozzá! Erre megoldás, hogyha \textbf{barát} (\textit{friend}) osztállyá tesszük.
+  Felmerül még egy probléma: a \texttt{next} és \texttt{data} private adattagok. Az \texttt{Iterator} nem fér hozzá! Erre megoldás, ha \textbf{barát} (\textit{friend}) osztállya lesz az Iterátor a \texttt{List}nek.
 	\begin{lstlisting}
 class List
 {
@@ -409,7 +408,8 @@ class List
 	A barátként deklarált osztályok és függvények hozzá tudnak férni az osztály privát adattagjaihoz is.
 	
 	\smallskip
-	Az így kapott iterátorunkkal végig tudunk menni a lista elemein, hozzá tudunk férni az adattagjaihoz. Így már azt is megtehetjük, hogy \texttt{print()}-et tagfüggvény helyett sima globális függvénnyé tesszük.
+	Az így kapott iterátorunkkal be tudjuk járni a lista elemeit, hozzá tudunk férni a listában tárolt adatokhoz. Így már a \texttt{print()}-et tagfüggvény helyett szabad függvényként is megírhatjuk.
+  Amennyiben lehetőségünk van egy függvényt szabad (osztályon kívüli) függvényként megírni, érdemes élni a lehetőséggel. Ezáltal az osztályaink kisebbek és könnyebben érthetőek lesznek.
 	\begin{lstlisting}
 void print(List &l)
 {
@@ -420,15 +420,15 @@ void print(List &l)
 	std::cout << std::endl;
 }
 	\end{lstlisting}
-	Ez a függvény, csak úgy mint az \textit{STL} függvények is (majd lesz még boncolgatva az, hogy mi az az \textit{STL}), balról zárt, jobbról nyitott $[\ )$ intervallummal dolgoznak. Azaz az \texttt{end()} már nem eleme a listának, az az utolsó \textit{utáni} elem (\texttt{past-the-end iterator}).
+	Ez a függvény, csak úgy mint az \textit{STL} függvények is, balról zárt, jobbról nyitott $[\ )$ intervallummal dolgozik. Azaz az \texttt{end()} már nem eleme a listának, az az utolsó \textit{utáni} elem (\texttt{past-the-end iterator}).
 	
 	\medskip
-	Megint nyertünk! Annyi \texttt{Iterator}-t hozunk létre, amennyit csak akarunk, nem vagyunk korlátozva egy darab \texttt{cursor} által. Továbbá, elég azt írni, hogy \texttt{.begin(), .end()}, nem kell tudnunk, mi van az implementáció mélyén, \textbf{sőt}, a belső implementáció változhat is, akkor se lesz baj. Két programozó így teljesen jól együtt tud dolgozni.
+	Nézzük meg, hogy miért jobb az iterátor, mint a felsoroló. Annyi \texttt{Iterator}-t hozunk létre, amennyit csak akarunk, nem vagyunk korlátozva a \texttt{cursor}ok darabszáma által. Az iterátorok emellett tetszőlegesen tárolhatóak, átadhatóak függvényeknek. Nincs elrejtve az objektum belsejébe. Továbbá, tudjuk módosítani a listában található elemeket anélkül, hogy a lista reprezentációját ismernünk kellene. Egy iterátorokat használó kód módosítása nélkül megváltoztatható a lista belső reprezentációja. Ez lehetővé teszi azt, hogy több programozó csapatban dolgozzon, egymástól független kódrészleteket úgy tudjon módosítani, hogy ne kelljen egymás kódját átírni.
 	
 	\medskip
-	Megfigyelhető, hogy \texttt{print} nem módosítja a paraméterként kapott listát, így átvehetnénk konstansként is. Ennek az eredménye egy kilóméter fordítási hiba: amit az \texttt{end} és \texttt{begin} visszaad, nem konstans, azaz ezeken keresztül tudjuk módosítani az objektumot. Valahogy törekednünk kéne arra, hogy a konstans korrektséget betartsuk.
+	Megfigyelhető, hogy \texttt{print} nem módosítja a paraméterként kapott listát, így átvehetnénk konstansk referenciával is. Ennek az eredménye fordítási hiba: az \texttt{end} és \texttt{begin} nem konstans metódusok, hiszen ami iterátort visszaad, azokon keresztül tudjuk módosítani az objektumot.
 	\subsection{Konstans iterátorok}
-	Erre a megoldás, ha konstans iterátort írunk, ami egy konstansra mutató mutató általánosítása.
+	Erre a megoldás, ha konstans iterátort is írunk, ami egy konstansra mutató mutató általánosítása.
 \begin{lstlisting}
 class List;
 
@@ -441,7 +441,7 @@ class ConstIterator
 {
 public:
 	Const Iterator(const List *_p) : p(_p) {}
-	bool operator==(ConstIterator &other) const //a metodus konstans!
+	bool operator==(ConstIterator &other) const
 	{
 		return p == other.p;
 	}
@@ -482,12 +482,12 @@ int ConstIterator::operator*() const
 	return p->data;
 }
 \end{lstlisting}
-	Azon a metódusok, amik után \texttt{const} van írva (ld. fenti példa) nem tudják megváltoztatni az osztály adattagjait. Ezeket a metódusokat \textbf{konstans metódusok}nak (\textit{const method}) hívják. Egy konstans objektumon csak akkor lehet meghívni egy metódust, ha az a metódus konstans.
+	Azon metódusok, amik után \texttt{const} kulcsszó szerepel (ld. fenti példa) nem tudják megváltoztatni az adott osztály adattagjait. Ezeket a metódusokat \textbf{konstans metódusok}nak (\textit{const method}) hívják. Egy konstans objektumon csak akkor lehet meghívni egy metódust, ha az a metódus konstans.
 	\begin{note}
 		Ami lehet \texttt{const}, az \textbf{legyen} \texttt{const}!
 	\end{note}
 
-	Egy \texttt{const List} típusú objektum a konstans függvényt fogja meghívni, így \texttt{begin()} visszatérési értékének típusa \texttt{ConstIterator} lesz, míg egy nem konstans \texttt{List} objektumnál \texttt{Iterator} lenne. Érdemes egyébként minden metódust, mely nem változtatja az adattagokat konstansként deklarálni. 
+	Egy \texttt{const List} típusú objektumon csak a konstans metódusok hívhatóak meg, így a meghívott \texttt{begin()} visszatérési értékének típusa \texttt{ConstIterator} lesz. Egy nem konstans \texttt{List} objektumnál \texttt{Iterator} viszont iterátor lesz.
 	\begin{lstlisting}
 int main()
 {
@@ -499,7 +499,7 @@ int main()
 	}
 }
 	\end{lstlisting}
-	Két különböző típust nem tudunk egymásnak értékül adni, azonban ez a két típus közel megyezik, így egy új konstrukorral ezt könnyen tudnánk orvosolni.
+	Két különböző típust nem tudunk egymásnak értékül adni, ha nem létezik köztük konverzió. Mivel nem konstansra mutató mutató konvertálódhat konstansra mutató mutatóvá, ezért természetes lenne hasonló konverziót az iterátorok közt is bevezetni. Ezt egy új konstruktor segítségével tehetjük meg:
 	\begin{lstlisting}
 class ConstIterator
 {
@@ -509,12 +509,12 @@ public:
 	//...
 }
 	\end{lstlisting}
-	Itt már csak annyi probléma lesz, hogy \texttt{Iterator}-nak a \texttt{p} adattagja privát. Így tegyük ezt a két osztályt baráttá!
+	Emlékezzünk, hogy az \texttt{Iterator}-nak a \texttt{p} adattagja privát. A forduló kódhoz egy friend deklaráció bevezetése szükséges!
 	
-	Azonban az meglepő lehet, hogy ez a kód lefordul. Hiszen \texttt{head.begin()} egy \texttt{Iterator}-t ad vissza, hiszen \texttt{head} nem konstans! Ezt a fordító úgy oldja meg, hogy az így kapott \texttt{Iterator} típusú változóval használja a \texttt{ConstIterator} konstruktorát, ezzel \textit{implicit kódon átkonvertálja} \texttt{Iterator}-t \texttt{ConstIterator}-rá, és utána hívja meg a másoló konstruktort. 
+	Meglepő lehet, hogy az értékadás egy új konstruktor bevezetését követően le fog fordulni. A \texttt{head.begin()} a fenti esetben egy \texttt{Iterator}-t ad vissza, mivel \texttt{head} nem konstans! Eztán a fordító az imént megírt konstruktor segítségével az \texttt{Iterator} típusú változóból készít egy \texttt{ConstIterator} típusút. Ezzel \textit{implicit kódon átkonvertálja} \texttt{Iterator}-t \texttt{ConstIterator}-rá, és utána hívja meg a másoló konstruktort. 
 	
 	\subsection{Explicit konstruktorok}
-	Ezt megtilthatjuk a fordítónak, ha az \texttt{explicit} kulcsszót betesszük a konstruktor elé.
+	Azt, hogy az egy paraméteres konstruktorokat a fordító implicit konverzióra felhasználja a fenti módon, megtilthatjuk, ha \texttt{explicit} kulcsszót írunk a konstruktorok elé.
 	
 \begin{lstlisting}
 class ConstIterator
@@ -525,12 +525,12 @@ public:
 	//...
 }
 \end{lstlisting}
-	Persze, ezt itt nem akarjuk megtiltani, lévén az \texttt{Iterator} és a \texttt{ConstIterator} majdnem ugyanaz, itt szeretnénk ha tudna implicit konvertálódni. De mi az, ami nagyon nagy hiba volt? A \texttt{List}-nél kellett volna használni ezt! Ha lenne egy függvény, ami egy listát vár paraméterül, egy darab \texttt{int}-et is elfogadott volna, hisz a \texttt{List} konstruktorát felhasználva tudott volna csinálni abból az \texttt{int}-ből egy egy elemű listát! Így gyorsan tegyük a \texttt{List} konstruktorát \texttt{explicit}-té.
+	Jelen esetben nem akarjuk ezt a konverziót megtiltani, lévén az \texttt{Iterator} és a \texttt{ConstIterator} hasonló feladatot lát el. Nézzük meg az eddigi kódjainket. Okozhat valahol meglepetést egy konverzió? A \texttt{List} egyik konstruktra gyanús lehet. Ha egy függvény listát vár paraméterül, egy darab \texttt{int}-et is elfogad, hisz a \texttt{List} konstruktorát felhasználva tudott volna csinálni abból az \texttt{int}-ből egy egy elemű listát! Ezt elkerülendő, tegyük a \texttt{List} konstruktorát \texttt{explicit}-té.
 	\begin{lstlisting}
 class List
 {
 	//...
-	explicit List(const int _data, List *_next) : data(_data), next(_next) {}
+	explicit List(const int _data, List *_next = 0) : data(_data), next(_next) {}
 	//...
 }
 	\end{lstlisting}
