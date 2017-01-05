@@ -21,7 +21,7 @@
 	basicstyle=\ttfamily,
 	%identifierstyle=\color{blue},
 	keywordstyle=\bfseries\color{green!40!black},
-	stringstyle=\color{orange!70!black},
+	stringstyle=\color{orange},
 	emph=std,
 	emphstyle = \color{blue},
 	tabsize = 4
@@ -568,10 +568,10 @@ int main()
 
 int f()
 {
-	int x = 0; //x letrejon
+	int x = 0; //x létrejön
 	++x;
 	return x;
-} //x megsemmisul
+} //x megsemmisül
 
 int main()
 {
@@ -685,8 +685,8 @@ int main()
 	\end{lstlisting}
 	A fenti példában \texttt{p} egy mutató (\textit{pointer}), mely egy \texttt{int} típusra mutat. Ahhoz, hogy értéket tudjunk adni egy mutatónak, egy memóriacímet kell neki értékül adni, erre való a \textbf{címképző operátor} (\&). Ha a mutató által \textit{mutatott értéket} szeretnénk módosítani, akkor dereferálnunk kell a \textbf{dereferáló operátor}ral (*).
 	\begin{lstlisting}
-int *p = &c; //referaljuk c-t
-*p = 4; //dereferaljuk p-t
+int *p = &c; //referáljuk c-t
+*p = 4; //dereferáljuk p-t
 p = &d;
 *p = 7;
 	\end{lstlisting}
@@ -1507,7 +1507,7 @@ void f(int t[8])
 	\begin{lstlisting}
 #include <iostream>
 
-void f(int *t, int size) // uj parameter!
+void f(int *t, int size) // új paraméter!
 {
 	std::cout << sizeof(t) << std::endl;
 }
@@ -2173,7 +2173,7 @@ int main()
 struct List
 {
   // ...	
-	void add(int data) //eltunt egy parameter!
+	void add(int data) //eltűnt egy paraméter!
 	{
 		if (next == 0)
 		{
@@ -2316,7 +2316,7 @@ int main()
 List cHead = head; //copy ctor
 
 List cHead;
-cHead = head; //ertekadas
+cHead = head; //értekadás
 	\end{lstlisting}
 	
 	\subsection{Értékadó operátor}
@@ -2802,7 +2802,7 @@ public:
 	Más útja is létezik annak, hogy át lehessen konvertálni egy \texttt{Iterator} típusú objektumot \texttt{ConstIterator} típusúvá, ha létrehozunk egy un. \textbf{konverziós operátor}t (\textit{conversion operator} vagy \textit{user defined conversion}). 
 	\begin{lstlisting}
 // ...
-class ConstIterator; //forward deklaracio itt szukseges
+class ConstIterator; //forward deklaráció itt szükséges
 
 class Iterator
 {
@@ -2992,7 +2992,7 @@ int main()
 	A template-eknek adhatunk meg alapértelmezett értéket.
 
 \begin{lstlisting}
-template <typename T = void> //alapertelmezett parameter
+template <typename T = void> //alapértelmezett paraméter
 struct X
 {
 	void f()
@@ -3066,7 +3066,7 @@ int main()
 {
 	int n;
 	std::cin >> n;
-	f<n>(); //hiba, n nem ismert forditasi idoben
+	f<n>(); //hiba, n nem ismert fordítási időben
 }
 	\end{lstlisting}
 	Ez nyilvánvaló, hisz a template-eknek az a funkciója, hogy a fordító generáljon pélkányokat azok alapján, és a fordítási idő végeztével erre nincs lehetőség.
@@ -3904,7 +3904,7 @@ int main()
 	for (int i = 0; i<1000; i++)
 		v.push_back(i);
 		
-	*it = 10; // nem definialt viselkedes
+	*it = 10; // nem definiált viselkedés
 }
 	\end{lstlisting}
 	Az invalidáció elkerülése végett számos tagfüggvény egy iterátorral tér vissza, erre lehet példa az \texttt{insert}, mely az új elemre, vagy az \texttt{erase}, mely az utolsó eltávolított elem rákövetkezőjére hivatkozik.
@@ -4143,7 +4143,7 @@ int main()
 	\begin{lstlisting}
 bool contains(const std::map<std::string, int> &m)
 {
-	//m["c++"]; forditasi hiba: [] operator nem konstans fuggveny.
+	//m["c++"]; fordítási hiba: [] operator nem konstans függvény.
 	return m.find("C++") != m.end();
 }
 	\end{lstlisting}
@@ -4765,7 +4765,7 @@ protected:
 	int y;
 public:
 	Sikidom(int x, int y) : x(x), y(y) {}
-	virtual double terulet() const //virtualis!
+	virtual double terulet() const //virtuális!
 	{
 		//...
 	}
@@ -4820,7 +4820,7 @@ public:
 	\begin{lstlisting}
 int main()
 {
-	Sikidom s; //nem ok, forditasi ideju hiba
+	Sikidom s; //nem ok, fordítási idejű hiba
 	Kor k; //ok
 	Sikidom *sp = &k;
 	Sikidom &sr = k;
@@ -4947,7 +4947,7 @@ class Rombusz : public Negyszog
 {
 public:
 	double terulet() = 0; 
-	//nem jut eszembe a keplet, igy legyen ez is tisztan virtualis.
+	//nem jut eszembe a képlet, így legyen ez is tisztán virtuális.
 };
 
 class Deltoid : public Negyszog
@@ -4986,7 +4986,7 @@ public:
 	virtual double terulet() = 0;
 };
 
-class Rombusz : virtual public Negyszog //virtualis!
+class Rombusz : virtual public Negyszog //virtuális öröklés!
 {
 public:
 	double terulet() = 0; 
@@ -5083,7 +5083,7 @@ int main()
 	\begin{lstlisting}
 void f(Sikidom *s)
 {
-	Kor *k = dynamic_cast<Kor*>(s); //korkent szerentenk hasznalni
+	Kor *k = dynamic_cast<Kor*>(s); //körkent szeretnénk használni
 }
 	\end{lstlisting}
 	Ebben a kódrészletben megpróbáljuk \texttt{s}-t átkonvertálni \texttt{Kor} pointer típusra. Megfigyelhető, hogy kacsacsőrbe írtuk azt a típust, amelyre konvertálunk, és utána gömbölyű zárójelbe azt, melyből konvertálnánk.
@@ -5099,7 +5099,7 @@ Kor *k = dynamic_cast<Kor*>(*s);
 	\begin{lstlisting}
 class Base 
 {
-	virtual int f(){} //polimorfizmus szukseges
+	virtual int f(){} //polimorfizmus szükseges
 };
 class DerivedOne : virtual public Base {};
 class DerivedTwo : virtual public Base {};
@@ -5108,7 +5108,7 @@ class DerivedLast : public DerivedOne, public DerivedTwo {};
 int main()
 {
 	DerivedLast *dlp = new DerivedLast;
-	Base *bp = dynamic_cast<Base*>(dlp); //upcast, dynamic_cast folosleges
+	Base *bp = dynamic_cast<Base*>(dlp); //upcast, dynamic_cast fölösleges
 	DerivedOne *dop = dynamic_cast<DerivedOne*>(bp); //downcast
 	DerivedTwo *dtp = dynamic_cast<DerivedTwo*>(dop); //sidecast
 	delete dlp;
@@ -5249,7 +5249,7 @@ class Base final
 	virtual void f();
 };
 
-class Derived : public Base {}; //forditasi ideju hiba
+class Derived : public Base {}; //fordítási idejű hiba
 	\end{lstlisting}
 	Amennyiben örököltünk egy osztályból, mely privát adattagokat tartalmaz, azokhoz nem fogunk tudni hozzáférni. Ilyenkor rá vagyunk kényszerülve get/set függvények alkalmazására, ha azok meg vannak írva (szempont lehet megírásuk szempontjából ez is).
 	
@@ -5274,7 +5274,7 @@ public:
 class Derived2 : private Derived
 {
 public:
-	int f() {x = 2;} //forditasi ideju hiba
+	int f() {x = 2;} //fordítási idejű hiba
 };
 	\end{lstlisting}
 	Továbbá ha az öröklődési láncban privát öröklődés van, akkor már a bázis pointerével nem lehet a leszármazottra hivatkozni (\texttt{Base *b = Derived} fordítási idejű hibát ad).
