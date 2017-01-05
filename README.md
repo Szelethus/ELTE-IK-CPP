@@ -6,7 +6,6 @@ Maga a compiled pdf az bátran bárkivel megosztható ;)
 ## Pótlandó dolgok
 
 * Implicit konverziók
-* user defined converson
 * using namespace std;
 * UML diagramok 11 gyakhoz
 * Kiértékelési sorrend
