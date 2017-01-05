@@ -15,26 +15,34 @@
 	belowcaptionskip=1\baselineskip,
 	breaklines=true,
 	frame=L,
-	xleftmargin=\parindent,
-	language=C,
+	language=C++,
 	showstringspaces=false,
-	basicstyle=\footnotesize\ttfamily,
+	basicstyle=\ttfamily,
+	%identifierstyle=\color{blue},
 	keywordstyle=\bfseries\color{green!40!black},
-	commentstyle=\itshape\color{purple!40!black},
-	identifierstyle=\color{blue},
 	stringstyle=\color{orange},
+	emph=std,
+	emphstyle = \color{blue},
+	tabsize = 4
 }
 
 \lstdefinestyle{customasm}{
 	belowcaptionskip=1\baselineskip,
 	frame=L,
-	xleftmargin=\parindent,
 	language=[x86masm]Assembler,
-	basicstyle=\footnotesize\ttfamily,
+	basicstyle=\ttfamily,
 	commentstyle=\itshape\color{purple!40!black},
 }
 
-\lstset{escapechar=@,style=customc}
+\lstset{
+	escapechar=@,
+	style=customc,
+	literate =  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+	{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+	{ö}{{\"o}}1 {ü}{{\"u}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+	{ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+	{€}{{\euro}}1 {£}{{\pounds}}1	
+}
 \usepackage{hyperref}
 
 \begin{document}
@@ -382,7 +390,7 @@ int main()
 	\end{lstlisting}
 	
 	A \texttt{g++ -save-temps hello.cpp} paranccsal fordítva a temporális fájlokat is meg tudjuk nézni -- hello.s lesz az assembly fájl neve, mely a fordító a kódunk alapján generált. Kiolvasható benne ez a két sor:
-	\begin{lstlisting}
+	\begin{lstlisting}[style = customasm]
 movl 	$5, (%esp)
 call	__Z9factoriali
 	\end{lstlisting}
@@ -393,7 +401,7 @@ call	__Z9factoriali
 	
 	\medskip
 	Amennyiben azonban \texttt{g++ -save-temps hello.cpp -O2} paranccsal fordítunk, az optimalizált assembly kódból kiolvasható, hogy a kód (kellően friss gcc-vel) a faktoriális kiszámolása helyett a végeredményt (120at) tartalmazza. 
-	\begin{lstlisting}
+	\begin{lstlisting}[style = customasm]
 movl	$120, (%esp)
 	\end{lstlisting}
 	Így, mivel az eredmény már fordítási időben kiszámolásra került, futási időben nem kell ezzel plusz időt tölteni.
