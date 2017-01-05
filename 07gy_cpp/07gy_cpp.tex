@@ -185,7 +185,7 @@ int main()
 	A template-eknek adhatunk meg alapértelmezett értéket.
 
 \begin{lstlisting}
-template <typename T = void> //alapertelmezett parameter
+template <typename T = void> //alapértelmezett paraméter
 struct X
 {
 	void f()
@@ -259,7 +259,7 @@ int main()
 {
 	int n;
 	std::cin >> n;
-	f<n>(); //hiba, n nem ismert forditasi idoben
+	f<n>(); //hiba, n nem ismert fordítási időben
 }
 	\end{lstlisting}
 	Ez nyilvánvaló, hisz a template-eknek az a funkciója, hogy a fordító generáljon pélkányokat azok alapján, és a fordítási idő végeztével erre nincs lehetőség.

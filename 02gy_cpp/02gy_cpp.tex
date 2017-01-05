@@ -111,10 +111,10 @@ int main()
 
 int f()
 {
-	int x = 0; //x letrejon
+	int x = 0; //x létrejön
 	++x;
 	return x;
-} //x megsemmisul
+} //x megsemmisül
 
 int main()
 {
@@ -228,8 +228,8 @@ int main()
 	\end{lstlisting}
 	A fenti példában \texttt{p} egy mutató (\textit{pointer}), mely egy \texttt{int} típusra mutat. Ahhoz, hogy értéket tudjunk adni egy mutatónak, egy memóriacímet kell neki értékül adni, erre való a \textbf{címképző operátor} (\&). Ha a mutató által \textit{mutatott értéket} szeretnénk módosítani, akkor dereferálnunk kell a \textbf{dereferáló operátor}ral (*).
 	\begin{lstlisting}
-int *p = &c; //referaljuk c-t
-*p = 4; //dereferaljuk p-t
+int *p = &c; //referáljuk c-t
+*p = 4; //dereferáljuk p-t
 p = &d;
 *p = 7;
 	\end{lstlisting}

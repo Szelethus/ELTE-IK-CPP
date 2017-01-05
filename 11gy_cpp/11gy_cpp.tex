@@ -214,7 +214,7 @@ protected:
 	int y;
 public:
 	Sikidom(int x, int y) : x(x), y(y) {}
-	virtual double terulet() const //virtualis!
+	virtual double terulet() const //virtuális!
 	{
 		//...
 	}
@@ -269,7 +269,7 @@ public:
 	\begin{lstlisting}
 int main()
 {
-	Sikidom s; //nem ok, forditasi ideju hiba
+	Sikidom s; //nem ok, fordítási idejű hiba
 	Kor k; //ok
 	Sikidom *sp = &k;
 	Sikidom &sr = k;
@@ -396,7 +396,7 @@ class Rombusz : public Negyszog
 {
 public:
 	double terulet() = 0; 
-	//nem jut eszembe a keplet, igy legyen ez is tisztan virtualis.
+	//nem jut eszembe a képlet, így legyen ez is tisztán virtuális.
 };
 
 class Deltoid : public Negyszog
@@ -435,7 +435,7 @@ public:
 	virtual double terulet() = 0;
 };
 
-class Rombusz : virtual public Negyszog //virtualis!
+class Rombusz : virtual public Negyszog //virtuális öröklés!
 {
 public:
 	double terulet() = 0; 
@@ -532,7 +532,7 @@ int main()
 	\begin{lstlisting}
 void f(Sikidom *s)
 {
-	Kor *k = dynamic_cast<Kor*>(s); //korkent szerentenk hasznalni
+	Kor *k = dynamic_cast<Kor*>(s); //körkent szeretnénk használni
 }
 	\end{lstlisting}
 	Ebben a kódrészletben megpróbáljuk \texttt{s}-t átkonvertálni \texttt{Kor} pointer típusra. Megfigyelhető, hogy kacsacsőrbe írtuk azt a típust, amelyre konvertálunk, és utána gömbölyű zárójelbe azt, melyből konvertálnánk.
@@ -548,7 +548,7 @@ Kor *k = dynamic_cast<Kor*>(*s);
 	\begin{lstlisting}
 class Base 
 {
-	virtual int f(){} //polimorfizmus szukseges
+	virtual int f(){} //polimorfizmus szükseges
 };
 class DerivedOne : virtual public Base {};
 class DerivedTwo : virtual public Base {};
@@ -557,7 +557,7 @@ class DerivedLast : public DerivedOne, public DerivedTwo {};
 int main()
 {
 	DerivedLast *dlp = new DerivedLast;
-	Base *bp = dynamic_cast<Base*>(dlp); //upcast, dynamic_cast folosleges
+	Base *bp = dynamic_cast<Base*>(dlp); //upcast, dynamic_cast fölösleges
 	DerivedOne *dop = dynamic_cast<DerivedOne*>(bp); //downcast
 	DerivedTwo *dtp = dynamic_cast<DerivedTwo*>(dop); //sidecast
 	delete dlp;
@@ -698,7 +698,7 @@ class Base final
 	virtual void f();
 };
 
-class Derived : public Base {}; //forditasi ideju hiba
+class Derived : public Base {}; //fordítási idejű hiba
 	\end{lstlisting}
 	Amennyiben örököltünk egy osztályból, mely privát adattagokat tartalmaz, azokhoz nem fogunk tudni hozzáférni. Ilyenkor rá vagyunk kényszerülve get/set függvények alkalmazására, ha azok meg vannak írva (szempont lehet megírásuk szempontjából ez is).
 	
@@ -723,7 +723,7 @@ public:
 class Derived2 : private Derived
 {
 public:
-	int f() {x = 2;} //forditasi ideju hiba
+	int f() {x = 2;} //fordítási idejű hiba
 };
 	\end{lstlisting}
 	Továbbá ha az öröklődési láncban privát öröklődés van, akkor már a bázis pointerével nem lehet a leszármazottra hivatkozni (\texttt{Base *b = Derived} fordítási idejű hibát ad).
