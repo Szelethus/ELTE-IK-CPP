@@ -462,7 +462,7 @@ int main()
 	\end{lstlisting}
 	Ahogy az megfigyelhető fent, \texttt{x} csak egyszer inicializálódik, majd a későbbi függvényhívások után egyre növekszik az értéke.
 	\subsection{Fordítási egységre lokális függvények}
-  Nem csak változókat, függvényeket is deklarálhatunk statikusnak, melyek a fordítási egységre lokálisak. Figyelem! Metódusok esetében mást jelent a \texttt{static} kulcsszó, mint amit itt leírtunk.
+  Nem csak változókat, függvényeket is deklarálhatunk statikusnak, melyek a fordítási egységre lokálisak. 
 	\begin{lstlisting}
 static int f()
 {
@@ -472,6 +472,9 @@ static int f()
 int main() {std::cout << f();} // 0
 	\end{lstlisting}
 	Ezek a függvények csak az adott fordítási egységen belül érhetőek el.
+	\begin{note}
+		Figyelem! A később szóba kerülő metódusok esetében mást jelent a \texttt{static} kulcsszó, mint amit itt leírtunk.
+	\end{note}
 	\subsection{Névtelen/anonim névterek}
 	Fordítási egységre lokális változókat és függvényeket tudunk deklarálni névtelen névterek (\textit{unnamed namespaces}, vagy \textit{anonymous namespaces}) segítségével. Egy név nélküli névteren belül deklarált változók és függvények hasonlóan viselkednek, mintha eléjük lenne írva a \texttt{static} kulcsszó.
 	\begin{lstlisting}
