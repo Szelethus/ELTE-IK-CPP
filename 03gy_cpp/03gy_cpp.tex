@@ -19,7 +19,7 @@
 	%identifierstyle=\color{blue},
 	keywordstyle=\bfseries\color{green!40!black},
 	stringstyle=\color{orange},
-	emph=std,
+	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}, 
 	emphstyle = \color{blue},
 	tabsize = 4
 }
@@ -447,10 +447,10 @@ int main()
 {
 	int t[] = {5,4,3,2,1};
 	int *p = t;
-	std::cout << *p << std::endl;
-	std::cout << sizeof(int) << std::endl;
-	std::cout << sizeof(p) << std::endl;
-	std::cout << sizeof(t) << std::endl;
+	std::cout << *p << std::endl; // 5
+	std::cout << sizeof(int) << std::endl; // implementációfüggő, legyen x
+	std::cout << sizeof(p) << std::endl; // implementációfüggő, legyen y
+	std::cout << sizeof(t) << std::endl; // 5*x
 }
 		\end{lstlisting}
 		Könnyű azt hinni (hibásan), hogy a pointerek ekvivalensek a tömbökkel. A fenti program jól szemlélteti, hogy ez nem igaz. A tömb típusa tartalmazza azt az információt, hogy hány elemű a tömb. Egy pointer típusa csak azt az információt tartalmazza, hogy a mutatott elem mekkora. Számos más különbség is van. A tévhit oka az, hogy tömb könnyen konvertálódik első elemre mutató pointerré.
