@@ -541,7 +541,7 @@ public:
 	Meglepő lehet, hogy az értékadás egy új konstruktor bevezetését követően le fog fordulni. A \texttt{head.begin()} a fenti esetben egy \texttt{Iterator}-t ad vissza, mivel \texttt{head} nem konstans! Eztán a fordító az imént megírt konstruktor segítségével az \texttt{Iterator} típusú változóból készít egy \texttt{ConstIterator} típusút. Ezzel \textit{implicit kódon átkonvertálja} \texttt{Iterator}-t \texttt{ConstIterator}-rá, és utána hívja meg a másoló konstruktort. 
 	
 	\subsection{Konverziós operátor}
-	Más útja is létezik annak, hogy át lehessen konvertálni egy \texttt{Iterator} típusú objektumot \texttt{ConstIterator} típusúvá, ha létrehozunk egy un. \textbf{konverziós operátor}t (\textit{conversion operator} vagy \textit{user defined conversion}). 
+	Más módon is át lehet konvertálni egy \texttt{Iterator} típusú objektumot \texttt{ConstIterator} típusúvá. Azzal, hogy létrehozunk egy un. \textbf{konverziós operátor}t (\textit{conversion operator} vagy \textit{user defined conversion}). 
 	\begin{lstlisting}
 // ...
 class ConstIterator; //forward deklaráció itt szükséges
@@ -550,7 +550,7 @@ class Iterator
 {
 public:
 	// ...
-	operator ConstIterator() const;
+	operator ConstIterator() const; //konverziós operátor
 	// ...
 };
 
@@ -562,11 +562,11 @@ Iterator::operator ConstIterator() const
 }
 // ...
 	\end{lstlisting}
-	A fenti függvény segítségével a fordító végre tudja majd hajtani a konverziót implicit módon. 
+	A fenti konverziós operátor segítségével implicit módon végre lehet hajtani a konverziót. 
 	\begin{lstlisting}
 ConstIterator cit2 = head.begin(); //ok
 	\end{lstlisting}	
-	Amennyiben azt szeretnénk, hogy a konverzió létezzen, de implicit módon ne lehessen végrehajtani, használhatjuk az \texttt{explicit} kulcsszót:
+	Amennyiben azt szeretnénk, hogy a konverzió létezzen, de implicit módon ne jöjjön létre, használhatjuk az \texttt{explicit} kulcsszót. Ez a kulcsszó azonban csak C++11 óta használható ilyen módon:
 	\begin{lstlisting}
 class Iterator
 {
@@ -576,7 +576,7 @@ public:
 	// ...
 };
 	\end{lstlisting}
-	Ennek követeztében explicit módon jeleznünk kell, hogy \texttt{ConstIterator} típusra szeretnénk konvertálni.
+	Nézzünk meg pár példát, hogyan lehet a konverziót explicit módon használni:
 	\begin{lstlisting}
 int main()
 {
@@ -591,6 +591,9 @@ int main()
 	\end{note}
 	\begin{note}
 		A fenti módosítások ismét csak gyakorlás célját képezték, az elkészítedő listának nem lesz része a konverziós operátor.
+	\end{note}
+	\begin{note}
+    Amikor lehetőségünk van rá, használjunk egy paraméteres konstruktorokat a konverzióra. Amennyiben ahhoz az osztályhoz, amivé konvertálni szeretnénk, nem adhatunk hozzá új konstruktort (például könyvtári osztály), akkor használjuk a konverziós operátort. 
 	\end{note}
 	\subsection{Explicit konstruktorok}
 	Azt, hogy az egy paraméteres konstruktorokat a fordító implicit konverzióra felhasználja a fenti módon, megtilthatjuk itt is, ha \texttt{explicit} kulcsszót írunk a konstruktor elé.
