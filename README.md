@@ -12,6 +12,8 @@ Maga a compiled pdf az bátran bárkivel megosztható ;)
 * Nyelvi elemek
 * istream/ostream iterator
 * jobb és balérték
+* hivatkozások, linkek
+* előszó
 
 ## Linkek
 
