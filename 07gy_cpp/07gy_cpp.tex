@@ -75,8 +75,8 @@ void swap(int &a, int &b)
 	b = tmp;
 }
 	\end{lstlisting}
-	Ahogy azt láttuk, túl tudjuk terhelni ezt a függvényt, hogy más típusokat is fogadjon.
-	Azonban gyorsan megállapítható, hogy állandóan egy újabb overloadot létrehozni nem épp ideális megoldás. Ez a kisebb gond, a nagyobb az, hogy a kódismétlés áldozatai leszünk: ha bármi miatt egváltozna a \texttt{swap} belső implementáció, az összes létező swap süggvényben meg kéne ejteni a változtatást. Erre egy megoldás lehet, ha létrehozunk egy sablont, melynek mintájára a fordító maga tud generálni egy megfelelő függvényt.
+	Ahogy azt láttuk, túl tudjuk terhelni ezt a függvényt, hogy más típusokat is meg tudjunk cserélni.
+	Azonban gyorsan megállapítható, hogy állandóan egy újabb overloadot létrehozni nem épp ideális megoldás. Ez a kisebb gond, a nagyobb az, hogy a kódismétlés áldozatai leszünk: ha bármi miatt megváltozna a \texttt{swap} belső implementációja (pl. találunk hatékonyabb megoldást), az összes létező swap függvényben meg kéne ejteni a változtatást. E probléma elkerülésére egy megoldás lehet, ha létrehozunk egy sablont, melynek mintájára a fordító maga tud generálni egy megfelelő függvényt.
 	\begin{lstlisting}
 template <typename T>
 void swap(T &a, T &b)
@@ -86,7 +86,7 @@ void swap(T &a, T &b)
 	b = tmp;
 }
 	\end{lstlisting}
-	Az így implementált \texttt{swap} függvény egy \textit{template}, és a template paramétere egy típus. Ez alapján a fordító már létre tud hozni hozni megfelelő függvényeket:
+	Az így implementált \texttt{swap} függvény egy \textit{template}, és a template paramétere (\texttt{T}) egy típus. Ez alapján a fordító már létre tud hozni hozni megfelelő függvényeket:
 	\begin{lstlisting}
 int main()
 {
@@ -144,34 +144,19 @@ struct Y
 {
 	void bar() {}
 };
-int main()
-{
-	
-}
+int main() {}
 	\end{lstlisting}
-	Ez a kód nagyon úgy tűnhet, hogy nem fog lefordulni, lvén mi soha semmilyen \texttt{foo} tagfüggvényt nem írtunk, de mégis le fog. Ez azért van, mert a template osztályok (és függvények) gyakorlatilag sablonok, amiből mi létrehozhatunk egy konkrét osztályt, és mivel sose példányosítottuk, ez olyan fordítás után, mintha benne se lenne a kódban. Szintaktikus ellenőrzést végez a fordító, pl. zárójelek be vannak-e zárva, pontosvessző nem hiányzik-e stb., de azt, hogy van-e olyan \texttt{T} típus, ami rendelkezik \texttt{foo()} függvénnyel, nem nézi.
+	Ez a kód úgy tűnhet, hogy nem fog lefordulni, lévén mi soha semmilyen \texttt{foo} tagfüggvényt nem írtunk, azonban mégis le fog. Ez azért van, mert a template osztályok (és függvények) csak sablonok, amiből aminek alapján a fordító generálhat egy konkrét osztályt (vagy függvényt), és mivel sose példányosítottuk, fordítás után az \texttt{X} template osztály nem fog szerepelni a kódban. Szintaktikus ellenőrzést végez a fordító, (pl. zárójelek be vannak-e zárva, pontosvessző nem hiányzik-e stb.), de azt, hogy van-e olyan \texttt{T} típus, ami rendelkezik \texttt{foo()} függvénnyel, már nem ellenőrzi.
+	
+	\smallskip
+	Példányosítsuk az \texttt{X} osztályt \texttt{Y}-nal!
 \begin{lstlisting}
-#include <iostream>
-
-template <typename T>
-struct X
-{
-	void f()
-	{
-		T t;
-		t.foo();
-	}
-};
-struct Y
-{
-	void bar() {}
-};
 int main()
 {
 	X<Y> x;
 }
 \end{lstlisting}
-	Ekkor már azt várnánk hogy valóban nem fordul le, hisz \texttt{Y}-nak nincs \texttt{foo()} metódusa. Azonban lefordul, mivel az \texttt{f()} függvényt nem hívtuk meg, így nem is példányosult az osztályon belül.
+	Ekkor már azt várnánk hogy fordítási hibát dobjon a fordító, hisz \texttt{Y}-nak nincs \texttt{foo()} metódusa, azonban mégis gond nélkül lefordul, mivel az \texttt{f()} függvényt nem hívtuk meg, így nem is példányosult az osztályon belül.
 	\begin{lstlisting}
 int main()
 {
@@ -186,36 +171,26 @@ int main()
 
 \begin{lstlisting}
 template <typename T = void> //alapértelmezett paraméter
-struct X
-{
-	void f()
-	{
-		T t;
-		t.foo();
-	}
-};
-struct Y
-{
-	void bar() {}
-};
+struct X {/* ... */};
+
+struct Y {/* ... */};
+
 int main()
 {
 	X<Y> x;
 	X<> x2;
 }
 \end{lstlisting}
-	Ilyenkor nem szükséges megadni template paramétert. Továbbá lehet olyan template osztályunk is, mely egy template-et vár.
+	Ilyenkor nem szükséges megadni template paramétert. 
+	
+	\smallskip
+	Ahogyan az említve volt korábban, szinte bármi lehet template paraméter, akár egy másik template is.
 
 \begin{lstlisting}
 template <typename T>
-struct X
-{
-	void f()
-	{
-		T t;
-		t.foo();
-	}
-};
+struct X {/* ... */};
+
+struct Y {/* ... */};
 
 template <template <typename> class Templ>
 struct Z
@@ -225,16 +200,15 @@ struct Z
 
 int main()
 {
-	X<Y> x;
 	Z<X> z;
 }
 \end{lstlisting}
-	Ez a \texttt{Templ} egy olyan template, aminek a template paramétere egy típus. Így \texttt{Z}-nek a template paramétere egy olyan template, aminek a template paramétere egy típus. Mivel \texttt{X} egy template, így megadható \texttt{Z}-nek template paraméterként.
+	Fent \texttt{Templ} egy olyan template, aminek a template paramétere egy típus. Így \texttt{Z}-nek a template paramétere egy olyan template, aminek a template paramétere egy típus. Mivel \texttt{X} egy template (és template paramétere egy típus), így megadható \texttt{Z}-nek template paraméterként.
 	\begin{note}
 		Fent a template paraméter listában \texttt{typename} helyett \texttt{class} szerepel. Ezek gyakorlatilag ekvivalensek, mind a kettő azt jelenti, hogy az adott paraméter típus (bár a \texttt{typename} beszédesebb).
 	\end{note}
 	
-	A fenti példákban mindig egy default konstruktort használunk. Helyes lenne-e ez?
+	A fenti példákban mindig egy default konstruktort használunk, amikor objektumokat hoztunk létre. Helyes lenne-e az, ha explicit módon kíírnánk a zárójeleket (hangsúlyozva a default konstruktor hívást)?
 \begin{lstlisting}
 int main()
 {
@@ -243,11 +217,11 @@ int main()
 	Z<X> z();
 }
 \end{lstlisting}
-	A kód helyesen lefordul, de nem ugyanaz, mintha nem lenne ott a zárójel. Mivel a c++ nyelvtana nem egyértelmű, más kontextusban ugyanaz a kódrészlet mást jelenthet (egyik legegyszerűbb példa a \texttt{static} kulcsszó), így meg kellett alkotni egy olyan szabályt, miszerint amit deklarációként lehet értelmezni, azt deklarációként \textbf{kell} értelmezni. Itt ezek gyakorlatilag függvénydeklarációk lesznek: Az első esetben például egy olyan függvényt deklarálunk, melynek neve \texttt{x}, \texttt{X<Y>}-al tér vissza és nem vár paramétert. 
+	A kód helyesen lefordul, de nem ugyanaz, mintha nem lenne ott a zárójel. Mivel a c++ nyelvtana nem egyértelmű, más kontextusban ugyanaz a kódrészlet mást jelenthet (egyik legegyszerűbb példa a \texttt{static} kulcsszó), így meg kellett alkotni egy olyan szabályt, miszerint amit deklarációként lehet értelmezni, azt deklarációként \textbf{kell} értelmezni. Igy ezek függvénydeklarációk lesznek: Az első esetben például egy olyan függvényt deklarálunk, melynek neve \texttt{x}, \texttt{X<Y>}-al tér vissza és nem vár paramétert. 
 	
 	Így ha default konstruktort szeretnék meghívni, semmilyen zárójelt nem szabad használni.
 	\begin{note}
-		C++11ben lehet gömbölyű helyett \{\} zárójelet alkalmazni konstruktorhívásnál, így ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
+		C++11ben lehet \texttt{()} helyett \{\} zárójelet alkalmazni konstruktorhívásnál, így ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
 	\end{note}
 	
 	A template-ek paramérének ismertnek kell lennie fordítási időben.
@@ -263,9 +237,9 @@ int main()
 }
 	\end{lstlisting}
 	Ez nyilvánvaló, hisz a template-eknek az a funkciója, hogy a fordító generáljon pélkányokat azok alapján, és a fordítási idő végeztével erre nincs lehetőség.
-	
-	\medskip
-	Fontos még, hogy a template-ek nagyon megnövelik a fordítási időt, így nem mindig éri meg egy olyan függvényt is template-ként megírni, melyet nem feltétlenül muszáj.
+	\begin{note}
+		Fontos még, hogy a template-ek nagyon megnövelik a fordítási időt, így nem mindig éri meg egy olyan függvényt is template-ként megírni, melyet nem feltétlenül muszáj.
+	\end{note}
 	\subsection{Template specializáció}
 	Néha szeretnénk, hogy bizonyos speciális behelyettesítéseknél más legyen az implementáció mint az alap sablonban. Ilyenkor szokás \textbf{specializációkat} (\textit{template specialization}) létrehozni:
 	
@@ -296,9 +270,9 @@ int main()
 	f<int>(); //special f
 }
 	\end{lstlisting}
-	Mind \texttt{A} osztályhoz, mind \texttt{f} függvényhez látrehoztunk egy speciális esetet, amikor a template paraméter \texttt{int}. Számos okunk lehet arra hogy ezt tegyük: a standark könyvtár megfényesebb példája az \texttt{std::vector} osztály, mely egy template, és van template specializációja \texttt{bool} esetre.
+	Mind \texttt{A} osztályhoz, mind \texttt{f} függvényhez létrehoztunk egy specializációt arra az esetre, ha a template paraméterként \texttt{int}-et kapnak. Számos okunk lehet arra hogy ezt tegyük: a standard könyvtár megfényesebb példája az \texttt{std::vector} osztály, mely egy template, és van template specializációja \texttt{bool} esetre.
 	\begin{note}
-		Az \texttt{std::vector<bool>} számos optimalizációkat tartalmazhat (persze nem feltétlenül, hisz ez implementáció függő), általában nem \texttt{bool}-okban tárolja az adatokat, hanem bitekben. Sajnos azonban ez hátrányokkal is jár, például hogy a \texttt{[]} operátor érték és nem referencia szerint ad vissza -- bár valóban hatékonyabb, sok szempontból fejfájást okozhat a használata, így c++17-ben ez a specializáció nem fogja a szabvány részét képezni.
+		Az \texttt{std::vector<bool>} számos optimalizációkat tartalmazhat (persze nem feltétlenül, hisz ez implementáció függő): általában nem \texttt{bool}-okban tárolja az adatokat, hanem bitekben. Sajnos azonban ez hátrányokkal is jár, például hogy a \texttt{[]} operátor érték és nem referencia szerint ad vissza -- bár valóban hatékonyabb, sok szempontból fejfájást okozhat a használata, így c++17-ben ez a specializáció nem fogja a szabvány részét képezni.
 	\end{note}
 	Írjunk faktoriális számoló algoritmus template-ek segítségével!
 	\begin{lstlisting}
@@ -351,7 +325,7 @@ int main()
 	\end{lstlisting}
 	Kimenet: \texttt{1 1 2 2 3 3 4 4 5 5}
 	
-	Bár arra számítanánk, hogy 1-től 10ig lesznek a számok kiírva, ne felejtsük, hogy itt két telejsen különböző osztály fog létrejönni: \texttt{A<int>} és \texttt{A<double>}, így a \texttt{count} adattag hiába osztályszintű, 2 teljesen különböző példánya lesz ennek is: \texttt{A<int>::count} és \texttt{A<double>::count}.
+	Bár arra számítanánk, hogy 1-től 10ig lesznek a számok kiírva, ne felejtsük, hogy itt két teljesen különböző osztály fog létrejönni: \texttt{A<int>} és \texttt{A<double>}, így a \texttt{count} adattag hiába osztályszintű, 2 teljesen különböző példánya lesz ennek is: \texttt{A<int>::count} és \texttt{A<double>::count}.
 	
 	\subsection{Dependent scope}
 	

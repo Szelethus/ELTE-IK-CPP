@@ -134,9 +134,9 @@ void g(int (*t)[5])
 int main()
 {
 	int a[6];
-  g(&a); //forditasi hiba!
+	g(&a); //forditasi hiba!
 	int b[5];
-  g(&b); //ok
+	g(&b); //ok
 }
 	\end{lstlisting}
 	
@@ -159,7 +159,7 @@ int main()
 int main()
 {
 	char* hello= "Hello";
-	hello[1] = o;
+	hello[1] = 'o';
 }
 	\end{lstlisting}
 	A fenti kódban megsértettük a konstans korrektséget, hisz egy nem konstansra mutató pointerrel mutatuk egy konstans karakterlánc literál első elemére. Ennek ellenére, a fenti kód lefordul. Ennek az az oka, hogy az eredeti C-ben nem volt const kulcsszó, a kompatibilitás végett ezért C++ban lehet konstans karakterlánc literál elemire nem konstansra mutató pointerrel mutatni.
