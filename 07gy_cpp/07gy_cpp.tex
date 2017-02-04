@@ -75,7 +75,7 @@ void swap(int &a, int &b)
 	b = tmp;
 }
 	\end{lstlisting}
-	Ahogy azt láttuk, túl tudjuk terhelni ezt a függvényt, hogy más típusokat is meg tudjunk cserélni.
+	Ahogy azt láttuk, túl tudjuk terhelni ezt a függvényt, hogy más típusú objektumokat is meg tudjunk cserélni.
 	Azonban gyorsan megállapítható, hogy állandóan egy újabb overloadot létrehozni nem épp ideális megoldás. Ez a kisebb gond, a nagyobb az, hogy a kódismétlés áldozatai leszünk: ha bármi miatt megváltozna a \texttt{swap} belső implementációja (pl. találunk hatékonyabb megoldást), az összes létező swap függvényben meg kéne ejteni a változtatást. E probléma elkerülésére egy megoldás lehet, ha létrehozunk egy sablont, melynek mintájára a fordító maga tud generálni egy megfelelő függvényt.
 	\begin{lstlisting}
 template <typename T>
@@ -146,7 +146,7 @@ struct Y
 };
 int main() {}
 	\end{lstlisting}
-	Ez a kód úgy tűnhet, hogy nem fog lefordulni, lévén mi soha semmilyen \texttt{foo} tagfüggvényt nem írtunk, azonban mégis le fog. Ez azért van, mert a template osztályok (és függvények) csak sablonok, amiből aminek alapján a fordító generálhat egy konkrét osztályt (vagy függvényt), és mivel sose példányosítottuk, fordítás után az \texttt{X} template osztály nem fog szerepelni a kódban. Szintaktikus ellenőrzést végez a fordító, (pl. zárójelek be vannak-e zárva, pontosvessző nem hiányzik-e stb.), de azt, hogy van-e olyan \texttt{T} típus, ami rendelkezik \texttt{foo()} függvénnyel, már nem ellenőrzi.
+	Ez a kód úgy tűnhet, hogy nem fog lefordulni, lévén mi soha semmilyen \texttt{foo} tagfüggvényt nem írtunk, azonban mégis le fog. Ez azért van, mert a template osztályok (és függvények) csak sablonok, amiből aminek alapján a fordító generálhat egy konkrét osztályt (vagy függvényt), és mivel sose példányosítottuk, fordítás után az \texttt{X} template osztály nem fog szerepelni a kódban. Szintaktikus ellenőrzést végez a fordító, (pl. zárójelek be vannak-e zárva, pontosvessző nem hiányzik-e stb.), de azt, hogy van-e olyan \texttt{T} típus, ami rendelkezik \texttt{foo()} függvénnyel, már nem.
 	
 	\smallskip
 	Példányosítsuk az \texttt{X} osztályt \texttt{Y}-nal!
@@ -156,7 +156,7 @@ int main()
 	X<Y> x;
 }
 \end{lstlisting}
-	Ekkor már azt várnánk hogy fordítási hibát dobjon a fordító, hisz \texttt{Y}-nak nincs \texttt{foo()} metódusa, azonban mégis gond nélkül lefordul, mivel az \texttt{f()} függvényt nem hívtuk meg, így nem is példányosult az osztályon belül.
+	Ekkor már azt várnánk hogy fordítási hibát dobjon a fordító, hisz \texttt{Y}-nak nincs \texttt{foo()} metódusa, azonban mégis gond nélkül lefordul, mivel az \texttt{f()} tagfüggvényt nem hívtuk meg, így nem is példányosult az osztályon belül.
 	\begin{lstlisting}
 int main()
 {
@@ -164,7 +164,7 @@ int main()
 	x.f();
 }
 	\end{lstlisting}
-	Itt már végre kapunk fordítási hibát, mert példányosul \texttt{f()}. Ez jól mutatja, hogy a template-ek lusták, és csak akkor példányosulnak, ha nagyon muszáj.
+	Itt már végre kapunk fordítási hibát, mert példányosul \texttt{f()}. Ez jól mutatja, hogy a template-ek lusták, és csak akkor példányosulnak, ha ,,nagyon muszáj''.
 	\medskip
 	
 	A template-eknek adhatunk meg alapértelmezett értéket.
@@ -181,7 +181,7 @@ int main()
 	X<> x2;
 }
 \end{lstlisting}
-	Ilyenkor nem szükséges megadni template paramétert. 
+	Ilyenkor nem szükséges megadni template paramétert (mely esetben értelemszerűen \texttt{X<> == X<void>}). 
 	
 	\smallskip
 	Ahogyan az említve volt korábban, szinte bármi lehet template paraméter, akár egy másik template is.
@@ -236,7 +236,7 @@ int main()
 	f<n>(); //hiba, n nem ismert fordítási időben
 }
 	\end{lstlisting}
-	Ez nyilvánvaló, hisz a template-eknek az a funkciója, hogy a fordító generáljon pélkányokat azok alapján, és a fordítási idő végeztével erre nincs lehetőség.
+	Ez nyilvánvaló, hisz a template-eknek az a funkciója, hogy a fordító generáljon belőlük példányokat, és a fordítási idő végeztével erre nincs lehetőség.
 	\begin{note}
 		Fontos még, hogy a template-ek nagyon megnövelik a fordítási időt, így nem mindig éri meg egy olyan függvényt is template-ként megírni, melyet nem feltétlenül muszáj.
 	\end{note}
@@ -250,7 +250,7 @@ struct A
 	A()	{ std::cout << "general A" << std::endl; }
 };
 
-template <>
+template <> //template specializáció
 struct A<int>
 {
 	A() { std::cout << "special A" << std::endl; }
@@ -259,7 +259,7 @@ struct A<int>
 template <class T>
 void f() { std::cout << "general f" << std::endl; }
 
-template<>
+template<> //template specializáció
 void f<int>() { std::cout << "special f" << std::endl; }
 
 int main() 
@@ -369,7 +369,7 @@ int main()
 	f(a);
 }
 	\end{lstlisting}
-	Itt máris bajba jutottunk, a fordító azt a hibát fogja jelezni hogy \texttt{X} egy un. \textbf{dependent scope}-ban van. Ez azt jelenti, hogy attól függően, milyen template paraméterrel példányosítjuk \texttt{A}-t, \texttt{X}-nek lehet más a jelentése. Az alábbi kód ezt jól demonstrálja:
+	Itt máris bajba jutottunk, a fordító azt a hibát fogja jelezni, hogy \texttt{X} egy un. \textbf{dependent scope}-ban van. Ez azt jelenti, hogy attól függően, milyen template paraméterrel példányosítjuk \texttt{A}-t, \texttt{X}-nek lehet más a jelentése. Az alábbi kód ezt jól demonstrálja:
 	\begin{lstlisting}
 template <typename T>
 struct A
