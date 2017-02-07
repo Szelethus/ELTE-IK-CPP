@@ -19,7 +19,7 @@
 	%identifierstyle=\color{blue},
 	keywordstyle=\bfseries\color{green!40!black},
 	stringstyle=\color{orange},
-	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}, 
+	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, detail, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}, 
 	emphstyle = \color{blue},
 	tabsize = 4
 }
@@ -65,7 +65,7 @@
 	Visszatérve a korábban írt láncolt listánkhoz, bátran állíthatjuk, hogy mindennel rendelkezik ami számunkra fontos. Azonban ha egy darab header fájlban tárolnánk mindent, számos problémába ütköznénk. Ha több fordítási egységbe illesztenénk be a headert, fordítási idejű hibát kapnánk, hogy számos függvényt többször próbáltunk definiálni (sértenénk az ODR-t). Erre megoldás lehet, hogy a definíciókat és deklarációkat elválasztjuk: az osztályban lévő függvények deklarációit hagyjuk meg a header fájlban, és a definíciókat egy külön fordítási egységbe tegyük!
 	
 	\begin{note}
-		Feltűnhet majd, hogy pár definíció bent maradt. Erre később lesz magyarázat.
+		Feltűnhet majd, hogy pár függvénydefiníció bent maradt. Erre később lesz magyarázat.
 	\end{note}
 	
 	\medskip
@@ -206,7 +206,8 @@ void print(const List &l)
 	std::cout << std::endl;
 }
 
-int main() {
+int main() 
+{
 	List head(5);
 	head.add(8);
 	head.add(10);
@@ -218,11 +219,16 @@ int main() {
 	Ez a szétválasztás sok egyéb előnnyel is jár: a \texttt{List}-hez tartozó információk sokkal kisebb helyen elférnek. Azonban ahogy a fenti megjegyzés is felhívta rá a figyelmet, a list.hpp továbbá is tartalmaz definíciókat! Ennek ellenére azt tapasztaljuk, hogyha több fordítási egységbe illesztjük be a headert, még akkor sem kapunk fordítási idejű hibát. Ennek a magyarázatához tegyünk egy kisebb kitérőt.
 	\subsection{Inline függvények}
 	
-	Tekintsük azt a példát, amikor a \texttt{void f() \{\}} függvényt is beillesztjük a headerbe: több fordítási egység esetén linkelési hibát fog okozni, mert sértjük az ODR-t. Ez azonban megkerülhető az \texttt{inline} kulcsszó használatával, ez ugyanis megszünteti a linker hibát: minden inline-ként definiált függvény beilleszthető több fordítási egységbe, ahol linkelés folyamán a definíciók közül egy tetszőlegesen kiválasztásra kerül. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
+	Tekintsük azt a példát, amikor a \texttt{void f() \{\}} függvényt is beillesztjük a headerbe: ha több fordítási egységet fordítanánk egyszerre, melybe ez a header be van illesztve esetén linkelési hibát fog kapunk, mert \texttt{f} többször lesz definiálva. Ez azonban megkerülhető az \texttt{inline} kulcsszó használatával, segítségével ugyanis kiküszöbölhető a linker hiba: minden azonos nevű, visszatérési értékű, és paraméter listájú inline-ként definiált függvény definícióval együtt beilleszthető több különböző fordítási egységbe, és nem fog fordítási hibát okozni.
+	
+	Ez úgy oldható meg, hogy a fordító a linkelés folyamán a definíciók közül egyet tetszőlegesen kiválasztást. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
+	\begin{lstlisting}
+inline void f() {}
+	\end{lstlisting}
 	
 	\medskip
-	A következő ábra jól demonstrálja a problémát:
-	\begin{figure}[!h]
+	Az ábra jól demonstrálja a problémát.
+	\begin{figure}[t]
 		\centering
 		\begin{tikzpicture}
 		\tikzstyle{HeaderName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
@@ -265,10 +271,10 @@ int main() {
 	Azok a tagfüggvények, melyek nem az osztály törzsében vannak definiálva, nem lesznek inline-ok, ezért volt az, hogy mielőtt szétszedtük a listánkat header fájlra és fordítási egységre, linkelési hibát kaptunk (\texttt{Iterator} és \texttt{ConstIterator} pár tagfüggvénye külön volt véve).
 	\medskip
 	
-	Cseréljük le továbbá a print függvényt:
-	
+	Cseréljük le a print függvényt:
+	%TODO nem ártana megmagyarázni, ez miért nem tagfüggvény
 	\begin{lstlisting}
-std::ostream& operator<<(std::ostream& os, const List &l)
+std::ostream& operator<<(std::ostream &os, const List &l)
 {
 	for(ConstIterator it = l.begin(); it != l.end(); ++it)
 	{
@@ -277,10 +283,28 @@ std::ostream& operator<<(std::ostream& os, const List &l)
 	return os;
 }
 	\end{lstlisting}
-	Sajnos fordítási hibát kapunk, hisz a fordító nem tudja mi az az \texttt{ostream}, így kell valamit include-olni. Ilyenkor a header fájlba inkább érdemes az \texttt{iosfwd} headert berakni \texttt{iostream} helyett, mert ez minden beolvasással és kiíratással kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység méretéte (azonban a cpp fájlban muszáj \texttt{iostream}-et használni, hogy a definíciók meglegyenek).
+	Sajnos ismét fordítási hibát kapunk, hisz a fordító nem tudja mi az az \texttt{ostream}, hisz az ismerős \texttt{iostream} könyvtár nincs include-olva. Ilyenkor azonban érdemes inkább az \texttt{iosfwd} headert beilleszteni az \texttt{iostream} helyett, mert ez minden beolvasással és kiíratással kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység mérete (azonban a cpp fájlban muszáj \texttt{iostream}-et használni, hogy a definíciók meglegyenek).
+	\begin{note}
+		Ha létre szeretnénk hozni egy \texttt{std::ostream} típusú változót, szükségünk lenne az \texttt{iostream} könyvtárra, hisz a fordítónak tudnia kéne, mekkora az \texttt{std::ostream} mérete, és ehhez szüksége van a teljes osztálydefinícióra. Azonban a referencia vagy pointer típusoknál erre nincs szükség, amíg nem akarunk egy tagfüggvényüket meghívni.
+	\end{note}
 	\section{Névterek}
+	A kódunkkal kapcsolatban felmerülhet egy másik probléma is: nagyon sok hasznos nevet elhasználtunk, pl. több \texttt{Iterator} nevű osztályt nem hozhatunk létre (az un. globális névtérbe vagy \textit{global namespace}-be kerültek), különben a névütközés áldozatai leszünk. Pedig várhatóan nem csak ennek az egy konténernek szeretnék iterátort írni.
+	\smallskip
 	
-	A probléma csak az, hogy nagyon sok hasznos nevet elhasználtunk, pl. több \texttt{Iterator} nevű osztályt nem hozhatunk létre (az un. \textit{global namespace}-be kerültek), különben a névütközés áldozatai leszünk. Pedig várhatóan nem csak ennek az egy konténernek szeretnék iterátort írni. Megoldás lehet, hogyha az iterátorainkat egy névtérbe (\textit{namesspace}) rakjuk.
+	Megoldás lehet, hogyha inline class-t hozunk létre, azaz az iterátor teljes deklarációját beillesztjük a \texttt{List}-be, így csak a \texttt{List} lát rá \texttt{Iterator}-ra követlenül, mindenhol máshol úgy kell hivatkozni rá, hogy \texttt{List::Iterator}.
+	\begin{lstlisting}
+class List
+{
+public:
+	class Iterator
+	{
+		//...
+	};
+	//...
+};
+	\end{lstlisting}
+	
+	Azonban szerencsésebb, ha az iterátorainkat egy névtérbe (\textit{namesspace}) rakjuk.
 \begin{lstlisting}
 namespace detail
 {
@@ -294,13 +318,70 @@ namespace detail
 	};
 }
 \end{lstlisting}
-	A névterek segíthetnek abba, hogy logikai egységebre rendezzük a programunkat. Az egyik legnagyobb ilyen egység az \texttt{std} névtér, mely tartalmaz minden függvényt, változót, stb, ami a standard részét alkotja. 
+	Így az \texttt{Iterator} és \texttt{ConstIterator} osztályra a későbbiekben csak úgy hivatkozhatunk, ha megmondjuk, mely névtérből származnak. Ugyanezzel a módszerrel, ha létrehozunk pl. egy \texttt{Vector} nevű osztályt, annak is írhatunk egy \texttt{Iterator} nevű osztályt, amit pl. egy \texttt{VectorDetail} névtérbe tehetünk.
+	\begin{lstlisting}
+detail::Iterator it;
+detail::ConstIterator cit;
+	\end{lstlisting}
+
+	A névterek segíthetnek abban, hogy logikai egységebre rendezzük a ködunkat. Az egyik legnagyobb ilyen egység az \texttt{std} névtér, mely tartalmaz minden függvényt, változót, stb, ami a standard részét alkotja. 
 	
-	Lehet névtereket egymásba is ágyazni, erre lehet példa a c++11-es \texttt{chrono} könyvtár, mely az \texttt{std} névteren belül számos dolgot a \texttt{chrono} alnévtérben tárol.
+	Lehet névtereket egymásba is ágyazni, erre lehet példa a C++11-es \texttt{chrono} könyvtár, mely az \texttt{std} névteren belül számos dolgot a \texttt{chrono} alnévtérben tárol.
 	
+	\subsection{Typedef}
+	A \texttt{typedef} kulcsszó szinonimák létrehozására használatos, és ha ügyesen használjuk, ki lehet használni valamennyi előnyét. 
+	
+	\smallskip
+	Hozzunk létre egy osztályt, melynek adatokat kell tárolnia. Tegyük fel, hogy egyenlőre nem fontos számunkra az, hogy milyen konténerben tároljuk, és a példa kedvéért követeljük meg ettől a leendő konténertől hogy rendelkezzen \texttt{push\_back} tagfüggvénnyel. Az \texttt{std::vector} konténerrel ez így nézhetne ki:
+	\begin{lstlisting}
+class StoreIntData
+{
+private:
+	std::vector<int> data;
+};
+	\end{lstlisting}
+	Írjunk egy tagfüggvényt, mellyel két \texttt{StoreIntData} típus tárolt adatait össze tudjuk fűzni.
+	\begin{lstlisting}
+class StoreIntData
+{
+public:
+	std::vector<int> merge(StoreIntData &other)
+	{
+		std::vector<int> ret;
+		for(int i = 0; i<data.size(); i++)  ret.push_back(data[i]);
+		for(int i = 0; i<other.size(); i++) ret.push_back(other.data[i]);
+		return ret;
+	}
+private:
+	std::vector<int> data;
+};
+	\end{lstlisting}
+	\begin{note}
+		Később látunk majd példát egy ennél jóval elegánsabb megoldásra is.
+	\end{note}
+	Tegyük fel, hogy az implementáció egy pontján úgy döntünk, mégse \texttt{std::vector}-ban, hanem \texttt{std::deque}-ban szeretnénk tárolni (erről a konténerről részletesen szó lesz később, egyenlőre legyen elég annyi, hogy az \texttt{std::vector}-hoz hasonló). Ekkor rákényszerülünk arra, hogy minden helyen, ahova \texttt{std::vector}-t írtunk, módosítanunk kelljen, és a kódismétlés áldozatai lettünk. Ehelyett használjunk egy \texttt{typedef}-et!
+	\begin{lstlisting}
+class StoreIntData
+{
+public:
+	typedef std::deque<int> Container;
+	
+	Container merge(StoreIntData &other)
+	{
+		Container ret;
+		for(int i = 0; i<data.size(); i++)  ret.push_back(data[i]);
+		for(int i = 0; i<other.size(); i++) ret.push_back(other.data[i]);
+		return ret;
+	}
+private:
+	Container data;
+};
+	\end{lstlisting}
+	Így ha módosítanunk kell a konténerünk típusát, elég a typedefet átírni.
 	\medskip
-	Már csak az a baj, hogy így a \texttt{List} nem tudja, mi az az \texttt{Iterator}, hisz az egy \texttt{datail} nevű namespace-ben van, ezért vagy minden \texttt{Iterator}-t lecserélünk \texttt{detail::Iterator}-ra, vagy pedig létrehozunk egy szinonimát, melyet a \texttt{typedef} kulcsszóval tehetünk meg.
-\begin{lstlisting}
+	
+	Visszatérve a láncolt listánkra, a módosítás után \texttt{List} nem tudja, mi az az \texttt{Iterator}, hisz az egy \texttt{datail} nevű névtérben van, ezért vagy minden \texttt{Iterator}-t lecserélünk \texttt{detail::Iterator}-ra, vagy pedig létrehozunk egy szinonimát.
+	\begin{lstlisting}
 class List
 {
 public:
@@ -308,27 +389,17 @@ public:
 	typedef detail::ConstIterator ConstIterator;
 	//...
 };
-\end{lstlisting}
-	Ezzel a trükkel \texttt{List}-en belül (és csak ott!) elegendő lehet \texttt{Iterator}t írni. Ennek segítségével (mivel ezek a tpyedef-ek publikusak) így is lehet hivatkozni a \texttt{List} iterátorára: \texttt{List::Iterator}.
+	\end{lstlisting}
+	A typedef segítségével viszont még egy dolgot nyertünk: mivel ezen a szinonimák publikusak, így az osztályon kívül is tudunk rájuk hivatkozni így:
+	\begin{lstlisting}
+List::Iterator it = head.begin();
+	\end{lstlisting}
 	
-	\medskip
-	Erre másik megoldás lehet, hogyha inline class-t hozunk létre, azaz az iterátor teljes deklarációját beillesztjük a \texttt{List}-be.
-\begin{lstlisting}
-class List
-{
-public:
-	class Iterator
-	{
-		//...
-	};
-	//...
-};
-\end{lstlisting}
 	\section{Nem template osztály átírása template osztályra}
-	Már csak az a probléma, hogy ez az osztály csak \texttt{int}-ekre működik. Csináljunk belőle inkább egy template osztályt! Feladatunk csupán annyi, hogy az osztály elé írjunk egy \texttt{template <typename T>}-t, és minden \texttt{List}-et \texttt{List<T>}-re cseréljünk, és minden \texttt{int}-et \texttt{T}-re. Ehhez nyilván az iterátorainkat is módosítani kell.
+	Már csak az a probléma, hogy \texttt{List} csak \texttt{int}-eket képes tárolni. Csináljunk belőle egy template osztályt! Feladatunk csupán annyi, hogy az osztály elé írjunk egy \texttt{template <typename T>}-t, és minden \texttt{List}-et \texttt{List<T>}-re, valamint minden \texttt{int}-et \texttt{T}-re cseréljünk. Ehhez nyilván az iterátorainkat is módosítani kell majd.
 	
 	\medskip
-	Időközben felmerül a hatékonyság kérdése is. A listánkban eddig mindent érték szerint vettünk át, ami \texttt{int}-nél (általában) hatékonyabb, mint a referencia szerinti, azonban template-eknél nem garantáljuk, hogy ilyen alap típussal fogják példányosítani az osztályunkat, és ilyenkor úgy szokás hozzáállni, hogy a leendő template paraméter egy nagyon nagy mérettel rendelkező típus lesz, melynél érték helyett konstans referenciával szokás átvenni minden paramétert hatékonyság végett. Sőt, még a \texttt{ConstIterator} dereferáló operátora is inkább konstans referenciát adjon vissza!
+	Időközben felmerül a hatékonyság kérdése is. A listánkban eddig mindent érték szerint vettünk át, ami \texttt{int}-nél (általában) hatékonyabb, mint a referencia szerinti, azonban template-eknél nem garantáljuk, hogy ilyen kis méretű típussal fogják példányosítani az osztályunkat, így ilyenkor célszerű úgy hozzáállni az implementáláshoz, hogy a leendő template paraméter egy nagyon nagy mérettel rendelkező típus lesz, melynél érték helyett hatékonyabb konstans referenciával visszatérni és átvenni a paramétereket.
 	\begin{note}
 		Általában egy primitív típus, mint pl. az \texttt{int} vagy \texttt{char}, kisebb mérettel rendelkezik mint a hozzá tartozó pointer vagy referencia típus, így hatákonyabb ezeket a típusokat inkább érték szerint átvenni.
 	\end{note}
@@ -367,9 +438,10 @@ namespace detail
 		ConstIterator(Iterator<T> it) : p(it.p) {}
 		explicit ConstIterator(const List<T> *p) : p(p) {}
 		bool operator==(ConstIterator other) const { return p == other.p; }
-		bool operator!=(ConstIterator other) const { return !(*this == other); }
+		bool operator!=(ConstIterator other) const 
+											  { return !(*this == other); }
 		ConstIterator operator++();
-		const T &operator*() const;
+		const T &operator*() const; //konstans referenciával tér vissza!
 	private:
 		const List<T> *p;
 	};	
@@ -509,28 +581,24 @@ std::ostream &operator<<(std::ostream& os, const List<T> &l)
 
 int main() 
 {
-	List<int> head(5); // *
+	List<int> head(5);
 	head.add(8);
 	head.add(10);
 	head.add(8);
 	std::cout << head;
 }
 	\end{lstlisting}
+	Fordításnál azonban linkelési hibát kapunk, de miért? A list.hpp-ben benne van mindenféle deklaráció, és a list.cpp-ben meg több \texttt{List}-béli implementáció. A válasz a template-ek lustaságában rejlik.
 	
-	Kérdés, hogy a megjelölt helyen kell-e typename vagy sem? A válasz az hogy nem, mert itt az \texttt{int} egy ismert típus, az előbbi példában meg \texttt{T} nem volt ismert, és az aztán bármi lehetett. A fordító a konkrét behelyettesítésnél tudni fogja, hogy \texttt{ConstIterator} egy típus lesz.
+	Amikor a list.cpp-t ill. main.cpp-t fordítjuk, megfelelően létrejön az object fájl, mely tartalmazza példaképp azt, hogy a main függvény hivatkozik a \texttt{List<int>::add} függvényre. Linkeléskor a fordító keresi ennek a függvénynek az implementációját, azonban minden \texttt{List}-béli függvény template, és a list.cpp-ben semmit sem példányosítunk, az szinte teljesen üres lesz fordítás után. 
+	\smallskip
 	
-	\medskip
-	No, fordítsunk!
+	Ennek következményeképp template osztályokat/függvényeket definícióval együtt a header fájlokban kell tárolni.
 	
-	\medskip
-	Igen, sejthető volt hogy ez nem fog menni. Úgy tűnhet, hogy semmi se úgy működik ebbe a nyelvbe, ahogy azt gondolnánk. Mindenre van magyarázat,
-	\begin{center}
-		\textit{,,néha az hogy valaki elkúrta.''}
-		
-		/Horváth Gábor/
-	\end{center}
-	Linkelési hibát kaptunk, de miért? A list.hpp-ben benne van mindenféle deklaráció, és a list.cpp-ben meg több \texttt{List}-béli implementáció. Amikor a list.cpp-t fordítjuk, létrejön az object fájl, a mainben szintén. Azonban minden implementált függvény template: a háttérben a list.cpp-ben semmit sem példányosítunk, így az szinte teljesen üres fordítás után. A main.cpp-ben így hiába megy az object fájl kreálása, lévén nem kell ismerni ahhoz a függvények definícióit, azonban a linkelésnél már meg kéne tudnunk találni azokat. Így a template osztályokat/függvényeket a header fájlokban kell tárolni.
+	Megoldás lehet, hogyha az egész list.cpp tartalmát bemásoljuk a list.hpp-be (itt már azonban muszáj lesz az \texttt{iosfwd}-t \texttt{iostream}-re váltani). Az átláthatóság azonban még így se esett áldozatul, mert a fájl tetején vannak a deklarációk, végén külön a definíciók, így még ugyanúgy könnyedén és gyorsan kinyerhető belőle a szükséges információ.
 	
-	Itt megoldás lehet, hogyha az egész cpp-t beemeljük a list.hpp-be (itt mát azonban muszáj lesz az \texttt{iosfwd}-t \texttt{iostream}-re váltani). Az átláthatóság azonban nem lett áldozat, mert a fájl tetején van a deklaráció, és szétszedve van benne definíció.
+	\begin{note}
+		Ha nagyon fontosnak érezzük, hogy a definíciók külön fájlban legyenek, az is megoldható. Nevezzük át a {list.cpp} fájlt {list\_impl.hpp}-ra, és include-oljuk a {list.hpp} végén.
+	\end{note}
 	
 \end{document}

@@ -406,4 +406,6 @@ void f()
 	\begin{note}
 		A dependent scope problémája nem csupán az osztályon belüli osztályokra érvényes. Nemsokára meglátjuk, hogy a \texttt{typedef} kulcsszó is ide tud vezetni.
 	\end{note}
+	Így viszont felmerülhet a kérdés hogy van-e szükség \texttt{typename} kulcsszóra, ha egy \texttt{std::vector<int>::iterator} típusú objektumot akarunk létrehozni (\texttt{std::vector<int>::iterator vit;}). A válasz az hogy nem, hisz ha konkrétan megadjuk a típust, amellyel példányosítanánk, akkor a fordító arra a konkrét típusra vissza tudja keresni, hogy \texttt{std::vector<int>::iterator} típus-e, vagy sem.
+	
 \end{document}
