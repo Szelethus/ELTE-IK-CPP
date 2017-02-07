@@ -85,7 +85,7 @@ public:
 	bool operator==(Iterator other) const { return p == other.p; }
 	bool operator!=(Iterator other) const { return !(*this == other); }
 	Iterator operator++();
-	int &operator*() const;
+	int& operator*() const;
 private:
 	friend class ConstIterator;
 	List *p;
@@ -110,7 +110,7 @@ public:
 	explicit List(int data_, List *next = 0) : data(data_), next(next) {}
 	~List() { delete next; }
 	List(const List &other);
-	List &operator=(const List &other);
+	List& operator=(const List &other);
 	void add(int data);
 	Iterator begin() { return Iterator(this); }
 	ConstIterator begin() const { return ConstIterator(this); }
@@ -424,7 +424,7 @@ namespace detail
 		bool operator==(Iterator other) const { return p == other.p; }
 		bool operator!=(Iterator other) const { return !(*this == other); }
 		Iterator operator++();
-		T &operator*() const;
+		T& operator*() const;
 	private:
 		template<typename>
 		friend class ConstIterator;
@@ -441,7 +441,7 @@ namespace detail
 		bool operator!=(ConstIterator other) const 
 											  { return !(*this == other); }
 		ConstIterator operator++();
-		const T &operator*() const; //konstans referenciával tér vissza!
+		const T& operator*() const; //konstans referenciával tér vissza!
 	private:
 		const List<T> *p;
 	};	
@@ -456,7 +456,7 @@ public:
 	explicit List(const T &data_, List *next = 0) : data(data_), next(next) {}
 	~List() { delete next; }
 	List(const List &other);
-	List &operator=(const List &other);
+	List& operator=(const List &other);
 	void add(const T &data);
 	Iterator begin() { return Iterator(this); }
 	ConstIterator begin() const { return ConstIterator(this); }
@@ -529,7 +529,7 @@ namespace detail
 	}
 	
 	template <typename T>
-	T &Iterator<T>::operator*() const 
+	T& Iterator<T>::operator*() const 
 	{
 		return p->data;
 	}
@@ -542,14 +542,14 @@ namespace detail
 	}
 	
 	template <typename T>
-	const T &ConstIterator<T>::operator*() const 
+	const T& ConstIterator<T>::operator*() const 
 	{
 		return p->data;
 	}
 }
 
 template<typename T>
-std::ostream &operator<<(std::ostream& os, const List<T> &l) 
+std::ostream& operator<<(std::ostream& os, const List<T> &l) 
 {
 	for(List<T>::ConstIterator it = l.begin(); it != l.end(); ++it) 
 	{
