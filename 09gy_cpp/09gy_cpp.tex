@@ -62,10 +62,7 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor és \textsc{Horváth} Gábor gyakorlatán. (\today)
 	
-	\section{STL konténerek}
-
-	Az \textit{STL} a \textit{Standard Template Library} rövidítése.
-	\subsection{Funktorok}
+	\section{Funktorok}
 	Mielőtt belevetnénk magunkat az STL-ben lévő algoritmusokba és konténerekbe, fontos megismerkednünk a funktorokkal, melyek a rendezéseknél lesznek majd használatosak.
 	\medskip
 	
@@ -91,14 +88,9 @@ int main()
 	std::cout << s2(2) << std::endl; //10
 }
 	\end{lstlisting}
-	Itt gyakorlatilag az objektum függvényként funkcionál. A funktorok azért fontosak, mert megadhatók template paraméterként, és így tudjuk elérni, hogy rendezéshez lehessen őket használni.
-	\begin{note}
-	Miért használunk funktorokat mondjuk függvénypointerek helyett? Világos, hogyha egyedi rendezést akarunk, akkor muszáj ezt az információt valahogy átadni. A funktorok erre alkalmasabbak, példaképp vegyük ehhez egy olyan template függvényt, melynek egyik template paramétere egy olyan funktort vár, melynek \texttt{()} operátora egy paramétert vár és \texttt{bool}-al tér vissza, és feladata az erre igazat adó elem megkeresése. 
-	
-	Hogyan tudnánk mi funktorok helyett függvénypointerrel a második páros számot megkeresni vele? Vagy az ötödik 8-al oszthatót? Nos, függvényekkel igencsak nehezen (kb statikus adattagokra kényszerülnénk, vagy egy hasonlóan nem épp elegáns megoldásra), azonban egy funktorban létrehozhatunk egy számlálót, melyet tudunk szépen növelgetni.
-	\end{note}
-	
-	Segíthet a megértésben, ha tekintjük az alábbi példát:
+	Fent \texttt{x} bár objektum, függvényként is funkcionál. A funktorok segítségével nagyon könnyedén tudunk objektumokat rendezni. Tekintsünk is erre egy példát!
+	\subsection{Predikátumok}
+	Írjunk egy funktort, mely egész számok számokat növekvő sorrendbe rendez.
 	\begin{lstlisting}
 template <class Compr>
 bool f(int a, int b, Compr c)
@@ -118,36 +110,77 @@ int main()
 {
 	if( f(2,3, Less()) )
 		std::cout << "2 kisebb mint 3! ";
-	
-	int a = 2, b = 2;
-	if ( f(a, b, Less()) == false && f(b, a, Less()) == false )
-		std::cout << "a es b egyenloek!" << std::endl;
 }
 	\end{lstlisting}
-	Kimenet: \texttt{2 kisebb mint 3! a es b egyenloek!}
+%	int a = 2, b = 2;
+%	if ( f(a, b, Less()) == false && f(b, a, Less()) == false )
+%	std::cout << "a es b egyenloek!" << std::endl;
+	Kimenet: \texttt{2 kisebb mint 3!}
 	
-	Ez a funktor (\texttt{Less}) egy un. \textit{binary predicate}, azaz a gömbölyű zárójel operátora két azonos típusú objektumhoz rendel egy logikai értéket. Figyeljük meg, hogyan adtuk meg a harmadik paramétert: \texttt{Less}-nek meghívtuk a default konstruktorát, de nem adtunk neki változónevet. Itt egy un. névtelen temporális változó jön létre, mely \texttt{f} paramétereinek kiértékelésekor jön létre, majd az \texttt{f} lefutása után meg is semmisül. 
+	A fenti funktor (\texttt{Less}) egy un. \textbf{bináris predikátum} (\textit{binary predicate}), azaz a gömbölyű zárójel operátora két azonos típusú objektumhoz rendel egy logikai értéket (matamatikai nyelven $Less: T\times T \to \mathbb{L}$, ahol $T$ ismert típus). Figyeljük meg, hogy a harmadik paraméter egy névtelen temporális változó. 
 	
-	Figyeljük meg azt is, hogy ebben az esetben érték szerint vettünk át: ez nem csak hatékonyabb, hisz \texttt{Less} mérete minimális (nincs adattagja), de mivel \texttt{Less()} egy jobbérték, csak így, vagy konstans referenciával tudnánk átvenni.
+	\begin{note}
+		Figyeljük meg azt is, hogy ebben az esetben érték szerint vettük át a hamradik paramétert: ez nem csak hatékonyabb, hisz \texttt{Less} mérete minimális (nincs adattagja), de mivel \texttt{Less()} egy jobbérték, csak így, vagy konstans referenciával tudnánk átvenni.
+	\end{note}
+	
+	Ez alapján az egyenlőség is levezethető: ha egy $a$ szám nem nagyobb $b$-nél, és $b$ sem nagyobb $a$-nál, akkor egyenlőek. 
+	\[a = b \quad \Leftrightarrow \quad \neg(a<b)\, \wedge\, \neg(b<a)\]
+	\begin{lstlisting}
+int main()
+{
+	int a = 2, b = 2;
+	if( f(a, b, Less()) == false && f(b, a, Less()) == false )
+		std::cout << "2 és 2 egyenlő!";
+}
+	\end{lstlisting}
+	Kimenet: \texttt{2 és 2 egyenlő!}
 	\smallskip
-	
-	Ez alapján az egyenlőség is levezethető: \quad $a = b \quad \Leftrightarrow \quad \neg(a<b)\, \wedge\, \neg(b<a)$
-	\medskip
 	
 	Könnyű látni, hogy általánosan beszélve, \texttt{Compr} összehasonlító funktorral $a$ és $b$ \texttt{T} típusú objektumoknál
 	\[ a\ \ \text{és}\ \ b\ \ \text{ekvivalens}\quad \Leftrightarrow\quad \neg \,Compr(a, b)\, \wedge\, \neg \,Compr(b, a). \]
-	\begin{note}
-		Azokat a funktorokat, melyeknek az \texttt{()} operátora csak \textbf{egy} adott típusú objektumot várnak és \texttt{bool} a visszatérési értékük, \textit{unary predicate}-nek hívjuk.
-	\end{note}
+	Azokat a funktorokat, melyeknek az \texttt{()} operátora csak \textbf{egy} adott típusú objektumot várnak és \texttt{bool} a visszatérési értékük, \textit{unary predicate}-nek hívjuk. Írassunk ki egy tömb páros elemeit!
+	\begin{lstlisting}
+template <class T, class Pred> //pred mint predicate
+void printIf(T *start, int size, Pred pred)
+{
+	for (int i = 0; i<size; i++)
+	{
+		if( pred(start[i]) )
+			std::cout << start[i] << std::endl;
+	}
+}
 
+struct IsEven //unary predicate
+{
+	bool operator()(const int &a) const
+	{
+		return a % 2 == 0;
+	}
+};
+
+int main()
+{
+	int t[] = {1,2,3,4,5,6};
+	printIf(t, sizeof(t)/sizeof(t[0]), IsEven()); //2 4 6
+}
+	\end{lstlisting}
+	%TODO kéne futtatni, hogy valóban nem hibás.
+	\begin{note}
+		Miért használunk funktorokat függvénypointerek helyett? Világos, hogyha egyedi rendezést szeretnénk, akkor muszáj ezt az információt valahogy átadni. A funktorok erre alkalmasabbak, példaképp vegyük ehhez egy olyan template függvényt, melynek egyik template paramétere egy olyan funktort vár, melynek \texttt{()} operátora egy paramétert vár és \texttt{bool}-al tér vissza, és feladata az erre igazat adó elem megkeresése. 
+		
+		Hogyan tudnánk mi funktorok helyett függvénypointerrel a második páros számot megkeresni vele? Vagy az ötödik 8-al oszthatót? Nos, függvényekkel igencsak nehezen (kb statikus adattagokra kényszerülnénk, vagy egy hasonlóan nem épp elegáns megoldásra), azonban egy funktorban létrehozhatunk egy számlálót, melyet tudunk növelgetni.
+	\end{note}
+	\section{STL konténerek}
+	
+	Az \textit{STL} a \textit{Standard Template Library} rövidítése.
 	\subsection{Bevezető a konténerekhez}
-	C++ban az egyetlen tároló alapértelmezetten a tömb. Azonban az meglehetősen kényelmetlen: a tömb egymás mellett lévő memóriacímek összessége, nem tehetjük meg azt, hogy csak úgy hozzáveszünk 1-1 elemet (mi van ha valaki más már írt oda?). Ezért jobban járunk, ha írunk egy egyedi kontért (pl. az általunk létrehozott \texttt{List}), vagy pedig válogatunk az előre megírt STL konténerek között.
+	C++ban az egyetlen tároló alapértelmezetten a tömb. Azonban az meglehetősen kényelmetlen: a tömb egymás mellett lévő memóriacímek összessége, nem tehetjük meg azt, hogy csak úgy hozzáveszünk 1-1 elemet (mi van ha valaki más már írt oda?). Ezért jobban járunk, ha vagy írunk egy egyedi konténert (pl. az általunk létrehozott \texttt{List}), vagy pedig válogatunk az előre megírt STL konténerek között.
 	
 	Három konténertípust különböztetünk meg:
 	\begin{itemize}
-		\item Szekvenciális: Olyan sorrendben tárolja az adattagokat, ahogyan betesszük őket. \\Példa: \texttt{std::vector}, \texttt{std::deque,} \texttt{std::list.}
-		\item Asszociatív: Az elemek rendezettek a konténerben.\\ Példa: \texttt{std::set}, \texttt{std::map}, \texttt{std::multiset}, \texttt{std::multimap}.
-		\item Konténer adapter: Egy meglévő konténert alakítanak át, általában szogorítanak. Példaképp ha vesszük az \texttt{std::deque} konténert, ami egy kétvégű sor, könnyen tudunk belőle egy egyvégű sort csinálni. Ezen a konténerek általában egy másik konténert tárolnak, és annak a funkcióit szigorítják.
+		\item \textbf{Szekvenciális}: Olyan sorrendben tárolja az adattagokat, ahogyan betesszük őket. \\Példa: \texttt{std::vector}, \texttt{std::deque,} \texttt{std::list.}
+		\item \textbf{Asszociatív}: Az elemek rendezettek a konténerben.\\ Példa: \texttt{std::set}, \texttt{std::map}, \texttt{std::multiset}, \texttt{std::multimap}.
+		\item \textbf{Konténer adapter}: Egy meglévő konténert alakítanak át, általában szogorítanak. Példaképp ha vesszük az \texttt{std::deque} konténert, ami egy kétvégű sor, könnyen tudunk belőle egy egyvégű sort csinálni. Ezen a konténerek általában egy másik konténert tárolnak, és annak a funkcióit szigorítják.
 		\\Példa: \texttt{std::queue}, \texttt{std::stack}.
 	\end{itemize}
 	Minden STL konténer rendelkezik konstans és nem konstans iterátorral, fordított irányú és konstans fordított irányú iterátorral melyre így hivatkozhatunk:
@@ -171,14 +204,16 @@ int main()
 		\end{tabular}
 	\end{center}
 	
-	A következő leírásban nem fogunk minden létező tagfüggvénnyel foglalkozni: egyrészt olyan sok van, hogy azt teljesen irreális észben tartani, másrészt sok ilyenhez érdemi hozzáfűznivalót én nehezen tudnék fűzni, így az egyes szekciók végén található link az adott konténerhez.
+	A következő leírásban nem fogunk minden létező tagfüggvénnyel foglalkozni: egyrészt olyan sok van, hogy azt teljesen irreális észben tartani, másrészt sok ilyenhez érdemi hozzáfűznivalót én nehezen tudnék tenni, így az egyes szekciók végén található link az adott konténerhez.
 	
 	\begin{note}
 		Nagyon fontos képesség az is, hogy valaki hogyan tud utánanézni valaminek, amivel nincs teljesen tisztában, így erősen javallott a \url{cppreference.com}-el való ismerkedés, illetve más helyeken lévő információk böngészése is.
 	\end{note}	
 	\subsection{vector}
-	A \texttt{<vector>} könyvtárban található, maga a konténer az \texttt{std::vector} névre hallgat. Bár a pontos definíciója értelemszerűen implementációfüggő, vannak olyan tulajdonságok, melyeket elvár a szabvány.
-	\smallskip
+	A \texttt{<vector>} könyvtárban található, maga a konténer az \texttt{std::vector} névre hallgat. Előzménytárgyakból ismerős lehet ez a konténer, más néven mint dinamikus tömb hivatkoztunk rá. Bár a pontos definíciója mint megannyi STL-béli algoritmus és konténer implementációfüggő, vannak olyan tulajdonságok, melyeket elvár a szabvány: pl. rendelkezzen \texttt{push\_back} függvénnyel, a \texttt{[]} operator műveletigénye legyen konstans, stb.
+	
+	\medskip
+	Tekintsünk az \texttt{std::vector} pár alkalmazását.
 	\begin{lstlisting}
 #include <vector>
 #inclide <iostream>
@@ -186,27 +221,30 @@ int main()
 int main()
 {
 	std::vector<int> v;
-	v.push_back(5); //v.size() == 1
-	v.pop_back(); //v.size() == 0
 	
-	for (int i = 0; i<10; i++)
+	//elem beszúrása
+	for (int i = 0; i<11; i++)
 		v.push_back(i);
 		
-	for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
-		std::cout << *it << std::endl; // 0 1 2 3 4 5 6 7 8 9
-		
+	//utolsó elem törlése
+	v.pop_back();
+	
+	//végigiterálás a konténeren a már jól ismert módon
 	for (int i = 0; i<v.size; i++)
 		std::cout << v[i] << std::endl; // 0 1 2 3 4 5 6 7 8 9
+		
+	//iterátorok használata
+	for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
+		std::cout << *it << std::endl; // 0 1 2 3 4 5 6 7 8 9
 }
 	\end{lstlisting}
-	A \texttt{vector} leggyakrabban dinamikusan lefoglalt tömbben tárolja az adatainkat, viszont a tömb mérete nem növelhető, így ha túl sok elemet akarunk beletenni, a \texttt{vector} lefoglal egy nagyobb memóriaterületet (leggyakrabban kétszer akkorát). Így a \texttt{push\_back}-nek a műveletigénye amortizált konstans: Általában konstans, de ha új memóriaterületet kell lefoglalni és a meglevő elemet átmásolni, akkor lineáris.
+	A \texttt{vector} leggyakrabban dinamikusan lefoglalt tömbben tárolja az adatainkat, viszont -- ahogy az korábban is említve volt -- egy tömb mérete nem növelhető. Ezt az \texttt{std::vector} a következőféleképpen oldja meg: ha több elemet szeretnénk beszúrni, mint amennyi az adott \texttt{vector} kapacitása, akkor lefoglal egy nagyobb memóriaterületet (leggyakrabban kétszer akkorát), és minden elemet átmásol erre az új memóriaterületre. 
+	
+	Így a \texttt{push\_back}-nek a műveletigénye amortizált konstans: Általában konstans, de ha új memóriaterületet kell lefoglalni és a meglevő elemet átmásolni, akkor lineáris.
 	
 	\begin{note}
-		Számos okból a \texttt{vector} a leggyakoribb választás, ha konténerre van szükségünk. Flexibilitása és gyorsasága kiemelkedő, azonban megvannak a maga gyenge pontjai.
+		Számos okból a \texttt{vector} a leggyakoribb választás, ha konténerre van szükségünk. Flexibilitása és gyorsasága kiemelkedő, azonban megvannak a maga gyenge pontjai: a konténer közepére elemet beszúrni például csak úgy tudunk, ha egyesével valamennyi elemet odébb másolunk.
 	\end{note}
-	
-	\smallskip
-	Előzménytárgyakból már ismerkedtünk ezzel a konténerrel: az előbb említett \texttt{push\_back} tagfüggvényt szoktuk használni új elem beszúrására a konténer végére, a \texttt{pop\_back} művelettel pedig a konténer végén lévő elemet tujuk kiszedni. 
 	
 	Feltűnhet, hogy ezek a műveletek, csakúgy mint számos egyéb melyet a cppreference-n olvashatunk, a konténer végére fókuszál, sőt, az elejére vonatkozó műveletek nincsenek is implementálva (nincs semmilyen \texttt{push\_front} vagy \texttt{pop\_front}). Ennek az az oka, hogy az \texttt{std::vector}-nál a konténer végének a módosítása a leghatékonyabb, ha a közepén/elején szeretnénk módosító művelteket végrehajtani, az gyakran a környező elemek odébb másolásával jár.
 
@@ -222,22 +260,17 @@ int main()
 	for (int i = 0; i<v.size(); i++)
 		std::cout << v[i] << ' '; // 0 1 2 3 4 5 6 7 8 9
 		
-	std::vector<int>::iterator it = v.begin();
-	++it; ++it; ++it;
+	std::vector<int>::iterator it = v.begin() + 3;
 	v.erase(it);
 	for (int i = 0; i<v.size(); i++)
 		std::cout << v[i] << ' '; // 0 1 2 4 5 6 7 8 9
 	
-	it = v.begin();
-	++it; ++it; ++it; 
+	it = v.begin() + 3;
 	v.insert(it, 3);
 	for (int i = 0; i<v.size(); i++)
 		std::cout << v[i] << ' '; // 0 1 2 3 4 5 6 7 8 9
 }
 	\end{lstlisting}
-	\begin{note}
-		Nyilván nonszensz, ahogy fent egyesével lépegettünk az iterátorral a negyedik elemig. Erre nemsokára egy értelmesebb megoldást fogunk látni.
-	\end{note}
 	Az iterátorok kezelésének azonban komoly veszélyei is vannak, a legnagyobb gonosz itt az un. iterátor invalidáció (\textit{iterator invalidation}). Amikor a \texttt{vector} által lefoglalt dinamikus tömb mérete túl kicsi az újabb elemek beszúrásához, és egy újabb tömbbe másolja át őket, minden iterátor, pointer és referencia ami a régebbi tömbre hivatkozott invalidálódik, lévén olyan területre hivatkoznak, melyeket már felszabadultak. 
 	\smallskip
 	
@@ -275,28 +308,50 @@ int main()
 	}
 }
 	\end{lstlisting}
-	
-	\medskip
+	\begin{note}
+		Oldjuk meg, hogy a fenti 4-es értékű elem törlésénél \texttt{it}-nek ne újra \texttt{v.begin() + 3}-at adjunk értékül, hanem használjunk ki hogy az \texttt{erase} függvény visszatér egy iterátorral!
+	\end{note}
 	Link: \url{http://en.cppreference.com/w/cpp/container/vector}.
 	
 	\begin{note}
-		Az \texttt{std::deque} működése ez alapján triviális, így annak megismerését az olvasóra bízom.
+		Az \texttt{std::deque} működése az eddiegiek alapján triviális, így annak megismerését az olvasóra bízom.
 	\end{note}
 	\subsection{set}
 	
-	Az \texttt{std::set} a \texttt{<set>} könyvtárban található. E konténernek nincs \texttt{push\_back} tagfüggvénye, helyette az \texttt{insert} függvény használatos elem betevésére. 
-	\medskip
+	Az \texttt{std::set} a \texttt{<set>} könyvtárban található. Ez a konténer a matematikai halmazt valósítja meg: egyedi elemeket tárol, és ha egy olyan elemt próbálnánk beszúrni, mellyel ekvivalens már szerepel a \texttt{set}-ben, nem történne semmi (\textit{no-op}). 
 	
-	Ez a konténer a matematikai halmazra hasonlít: egyedi elemet tárol, és ha egy eleve bent lévő elemmel ekvivalenset próbálnánk beszúrni, nem történne semmi. Ezen kívül a szabvány azt is megköveteli, hogy ez a konténer rendezett legyen, így a tárolandó \texttt{T} típus mellett egy olyan funktort is vár template paramterül, melynek \texttt{()} operátora két \texttt{T} típust vár paraméterül és logikai értékkel tér vissza.
+	A szabvány azt is megköveteli, hogy ez a konténer rendezett legyen. Ehhez szüksége van a konténernek egy bináris predikátum funktorra is mint template paraméter a tárolandó \texttt{T} típus mellett.
 	\smallskip
 	
 	Ez utóbbi template paramétert nem kell feltétlenül megadni, alapértelmezetten ugyanis az \texttt{std::set} az \texttt{std::less<T>} alapján rendez, mely gyakorlatilag az \texttt{<} operátorral ekvivalens.
 	\smallskip
 	
-	Az \texttt{std::set} általában piros-fekete bináris faként van implementálva, a hatékonyság végett.
+	Ezt a következőféleképpen képzelhetjük el:
+	\begin{lstlisting}
+namespace std
+{
+	template <class T>
+	struct less
+	{
+		bool operator()(const T &lhs, const T &rhs) const
+		{
+			return lhs < rhs;
+		}
+	};
+
+	template <class T, class Compr = less<T> >
+	class set;
+}
+	\end{lstlisting}
 	\begin{note}
-		A szabvány elvárja, hogy az \texttt{insert} műveletigénye logaritmikus legyen.
+		cppreference-en megfigyelhető, hogy ennél több template paraméterrel is rendelkezik az \texttt{std::set} -- mivel ezek mind rendelkeznek alapértelmezett értékkel, a továbbiakban az egyszerűség kedvéért figyelmen kívül hagyjuk őket.
 	\end{note}
+	
+	\begin{note}
+		Az \texttt{std::set} általában piros-fekete bináris faként van implementálva, a hatékonyság végett. Ez (vagy egy hasonlóan hatékony implementáció) fontos, mert a szabvány elvárja, hogy az \texttt{insert}, és sok egyéb tagfüggvény műveletigénye logaritmikus legyen.
+	\end{note}
+	
+	
 	\begin{lstlisting}
 #include <set>
 #include <iostream>
