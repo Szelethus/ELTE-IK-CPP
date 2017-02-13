@@ -434,7 +434,14 @@ struct List
 	Azonban a struktúránk működött eddig is, pedig nem írtunk konstruktort. Ha konstruktorra szükség van objektum létrehozáshoz, akkor hogyan lehet ez? Úgy, hogy a fordító a hiányzó kulcsfontosságú függvényeket legenerálja nekünk. Létrehoz (többek között) egy un. \textbf{default konstruktort}, ha mi explicit nem hoztunk létre konstruktort. A default konstruktor 0 paraméterrel meghívható. Fontos azonban, ha mi írunk egy konstruktort, akkor a fordító már nem fog generálni ilyet.
 	
 	\medskip
-	A konstruktor fejléce után található egy un. \textbf{inicializációs lista}. Az inicializációs lista hasonló jelentéssel bír, mint a következő kód:
+	Így a következőféleképpen tudunk egy \texttt{List} típusú objektumot létrehozni:
+	\begin{lstlisting}
+List head(5); //ok, létrehoz egy 5 értékkel rendelkező, 1 elemű listát
+List head2; //nem ok, már nincs paraméter nélküli konstruktor
+	\end{lstlisting}
+	
+	\medskip
+	A konstruktor fejléce után található egy un. \textbf{inicializációs lista}. Az inicializációs listával rendelkező konstruktor hasonló jelentéssel bír, mint a következő kód:
 	\begin{lstlisting}
 List(int _data, List *_next = 0)
 {
@@ -442,12 +449,40 @@ List(int _data, List *_next = 0)
 	next = _next;
 }
 	\end{lstlisting}
-  Az inicializációs lista használata azonban hatékonyabb.
-	Mire a konstruktor törzséhez érünk, addigra az adattagoknak inicializálva kell lenniük. A trözsben ezért már inicializált értékeket írunk felül, ami erőforráspazarlás. Primitív típusok esetén ez nem jelent problémát, összetett típusok esetén viszont számottevő lehet.
+	  Az inicializációs lista használata azonban hatékonyabb.
+	Mire a konstruktor törzséhez ér a vezérlés, addigra az adattagoknak inicializálva kell lenniük. A törzsben ezért már inicializált értékeket írunk felül, ami erőforrás pazarlás. Primitív típusok esetén ez nem jelent problémát, összetett típusok esetén viszont számottevő lehet.
 	\begin{note}
-    A konstruktor törzsében történő értékadás 2 lépés (mivel előtte egy alapértelmezett konstruktor már inicializálta az objektumot), az inicializálás csak 1.
+	    A konstruktor törzsében történő értékadás 2 lépés (mivel előtte egy alapértelmezett konstruktor már inicializálta az objektumot), az inicializálás csak 1.
 	\end{note}
-	Fontos megjegyzés, hogy az a struktúra elemei a meződ definiálásának a sorrendjében inicializálódnak. Tehát, bármilyen sorrendben írjuk mi az inicializációs listát, mindig először a \texttt{data}, és utána a \texttt{next} fog inicializálódni.
+	Fontos megjegyzés, hogy az a struktúra elemei a mezők definiálásának a sorrendjében inicializálódnak. Tehát, bármilyen sorrendben írjuk mi az inicializációs listát, mindig először a \texttt{data}, és utána a \texttt{next} fog inicializálódni.
+	
+	\medskip
+	Előfordulhat olyan, hogy szeretnénk létrehozni egy listát, de azt szeretnénk, hogy élettartama mennél minimálisabb legyen. Ezt megtehetjük például úgy, hogy ha egy külön blokkban hozzuk létre.
+	\begin{lstlisting}
+void printFirstElement(const List &l) { std::cout << l.data << std::endl; }
+
+int main
+{
+	//...
+	{
+		List l(4);
+		printFirstElement(l);
+	} // l megsemmisül
+	//...
+}
+	\end{lstlisting}
+	Ha valóban csak ideiglenesen van szükségünk erre a listára azonban, létrehozhatunk egy temporális változót is, vagy más néven egy \textbf{név nélküli temporális változót}. Ehhez csupán annyit kell tennünk, hogy elhagyjuk a változó nevét, és a típus után egyből a konstruktor paramétereit adjuk meg.
+	\begin{lstlisting}
+List(4); //amint létrejön ez a változó, meg is fog semmisülni.
+//...
+printFirstElement(List(4)); //a lista élettartama a függvényhívástól a függ-vény futásának végéig tart.
+	\end{lstlisting}
+	\begin{note}
+		Név nélküli temporális változó az is, ha egy literált írunk. Ha pl. az \texttt{f} függvény egy darab \texttt{int}-et vár paraméterül, akkor \texttt{f(5)} hívásakor \texttt{5} egy név nélküli temporális változó.
+	\end{note}
+	\begin{note}
+		A temporális változók jobb értékek, így csak konstans referenciával, vagy érték szerint tudjuk őket átvenni.
+	\end{note}
 	\subsection{Destrukorok}
 	Ahogy gondoskodtunk a listaelemek létrehozásáról, gondoskodhatnánk annak megfelelő megsemmisüléséről is.
 	\begin{lstlisting}
