@@ -318,7 +318,7 @@ int main()
 	\end{note}
 	\subsection{set}
 	
-	Az \texttt{std::set} a \texttt{<set>} könyvtárban található. Ez a konténer a matematikai halmazt valósítja meg: egyedi elemeket tárol, és ha egy olyan elemt próbálnánk beszúrni, mellyel ekvivalens már szerepel a \texttt{set}-ben, nem történne semmi (\textit{no-op}). 
+	Az \texttt{std::set} a \texttt{<set>} könyvtárban található. Ez a konténer a matematikai halmazt valósítja meg: egyedi elemeket tárol, így ha egy olyan elemet próbálnánk beszúrni, mellyel ekvivalens már szerepel a \texttt{set}-ben, nem történne semmi (\textit{no-op}). 
 	
 	A szabvány azt is megköveteli, hogy ez a konténer rendezett legyen. Ehhez szüksége van a konténernek egy bináris predikátum funktorra is mint template paraméter a tárolandó \texttt{T} típus mellett.
 	\smallskip
@@ -519,25 +519,29 @@ int main()
 	Látjuk, hogy ez a formula hamisat ad, így nem bizonyulnak majd ekvivalensnek. Ha nem szigorú részben rendezést használunk, hanem gyengét, akkor a reflexivitást is elvesztjük. Ez azt jelenti, hogy egy elem nem lehet ekvivalens önmagával!
 	
 	Így \texttt{strlenWrong} nem egy jó rendezés, mivel ha ekvivalenciát vizsgálunk, sose fog igazat adni, sose tudjuk meg, egy adott benne van-e, és az elemek törlése is sok problémához vezetne.
-	\medskip
-	
+	\begin{note}
+		Bár sokszor volt ez fentebb leírva, hangsúlyozandó hogy az \texttt{std::set} \textbf{nem} az \texttt{==} operátor segítéségével vizsgálja az ekvivalencát. Két objektum lehet egyszerre \textbf{ekvivalens} és nem \textbf{egyenlő}, függően az \texttt{==} operátor és a rendezés implementációjától.
+	\end{note}
 	Link: \url{http://en.cppreference.com/w/cpp/container/set}
 	
 	\begin{note}
 		Az \texttt{std::multiset} működése az eddigiek alapján triviális, így annak megismerését ismét az olvasóra bízom.
 	\end{note}
 	\subsection{list}
-	Ez a konténer nagyon hasonló ahhoz, mint amit mi írtunk, csak lehet üres, és kétirányú.
+	Az \texttt{std::list} konténer a \texttt{<list>} könyvtár része, és nagyon hasonló ahhoz, mint amit mi írtunk, viszont létezik fejelemmel, és kétirányú.
 	\smallskip
 	
-	Feltűnő lehet, hogy az \texttt{std::vector}-ral szemben ennek a konténernek nincs \texttt{[]} operátora, hiszen mire egy adott elemet elérünk, szépen el kell oda lépegetni egyesével. A szögletes zárójel operátort csak akkor szokás írni, hogy ha nagyon hatékony, lehetőleg konstans műveletigényű az adott elem lekérdezése, de ez a listánál nem teljesül.
+	Az \texttt{std::vector}-ral szemben ennek a konténernek nincs \texttt{[]} operátora, hiszen mielőtt egy adott indexű elemet vissza tudna adni, el kell oda lépegetnie egyesével. A szögletes zárójel operátort csak akkor szokás írni, hogy ha nagyon hatékony, lehetőleg konstans műveletigényű az adott elem lekérdezése, de ez a listánál nem teljesül.
 	\begin{note}
-		Bár elméletben gyorsabb egy láncolt listába beszúrni, de ez a gyakorlatban általában mégsem igaz. Azért, mert az egy dolog, hogy az elemeket egyesével odébb kell tolni egy vektorban, azonban mivel abban szekvenciálisan vannak a memóriacímek egymás mellett, és a processzor nem egyesével adja vissza az elemeit, hanem egy nagyobb blokkot mutat belőle, a vector sokkal gyorsabban végrehajtja ezeket a műveleteket, míg a listánál muszáj egyik címről a másikra haladni, ami sokkal költségesebb tud lenni.
+		Bár elméletben gyorsabb egy láncolt listába beszúrni a \texttt{vector}-ral (vagy hasonló konténerrel) szemben, hisz csak pár pointert kell átállítani, ez a gyakorlatban csak kivételes esetben teljesül. Ennek az az oka, hogy bár az elemeket egyesével odébb kell tolni egy vektorban, azok szekvenciálisan vannak a memóriában, és mivel a processzor számít arra, hogy nem csak egy adott elemet, de a környezőket is módosítani szeretnénk, minden alkalommal amikor egy adott elemet kérdezünk le, azzal együtt a környező elemeket is visszaadja nekünk. Ennek következtében kevesebb processzorművelettel végrehajtható a tologatás.
+		
+		Mivel egy láncolt listában egyesével kell haladni az egyik elemről a következőre, ez gyakran annyira költséges, hogy jobban járunk a vektor alkalmazásával akkor is, ha sokat kell a konténer közepére beszúrni.
+		
+		Kivételes eset lehet, ha nagyon sok elemből álló listánk van, és azok nagy méretű objektumokat tárolnak, valamint nagyon gyakran kell két elem közé beszúrni. Ilyenkor valóban hatékonyabb tud lenni a \texttt{list}.
 	\end{note}
-	\begin{note}
-		Amennyiben sok elemből álló listánk van, és azok nagy objektumokat tárolnak, hatékonyabb lehet a \texttt{vector}-nál.
-	\end{note}
-	Hogyan tudunk akkor a harmadik elemre ugrani?
+	Mivel már a korábban megismerkedtünk a láncolt listákkal, valamint a korábbi szekciókban mutatott tagfüggvények alkalmazása gyakran teljesen megegyezik a \texttt{list}-nél használatosakkal, túl komoly példákat itt nem fogunk venni. 
+	
+	Azonban érdemes felhívni a figyelmet egy problémára. Kérdezzük le egy lista harmadik elemét!
 	\begin{lstlisting}
 #include <iostream>
 #include <list>
@@ -552,12 +556,37 @@ int main()
 	std::cout << *it << std::endl; // 2
 }
 	\end{lstlisting}	
-	Az iterátorok léptetésére kell hogy legyen egy egyszerűbb módszer. A fenti \texttt{std::vector}-ral tudnunk kéne ugorni azonnal a kívánt elemre, míg a listánál végig kell menni egyesével az elemeken: jó lenne egy olyan algoritmust találni, mely e kettőt egybefoglalja (erre később látunk is majd példát az STL algoritmusoknál).
+	Az iterátorok léptetésére kell hogy legyen egy egyszerűbb módszer. írhatnánk ciklust, azonban beszédesebb lenne egy léptető függvény írása.
+	
+	Azonban nem ártana, ha nem csak tetszőleges típust tároló lista iterátorát, hanem tetszőleges konténer iterátorát tudná ez a függvény léptetni. Viszont egy \texttt{std::vector}-nál bármikor ugorhatunk egy tetszőleges elemre: jó lenne egy olyan algoritmust találni, mely e kettőt egybefoglalja (erre később látunk is majd példát az STL algoritmusoknál).
 	
 	\medskip
-	Ha böngészünk cppreference-en, feltűnhet, hogy az \texttt{std::vector}-ral szemben azonban létezik \texttt{push\_front} és \texttt{pop\_front} metódus: ezeket az \texttt{std::vector}-ral ellentétben konstans idő alatt el lehet végezni (elegendő a fejelemet a rákövetkező elemre állítani és kész is).
+	Ha böngészünk cppreference-en, feltűnhet, hogy az \texttt{std::vector}-ral szemben létezik \texttt{push\_front} és \texttt{pop\_front} metódus: ezeket az \texttt{std::vector}-ral ellentétben konstans idő alatt el lehet végezni (elegendő a fejelemet a rákövetkező elemre állítani és kész is).
 	\medskip
 	
+	Léteznek kifejezetten a listára specifikus műveletek is. Ezek azért nagyon fontosak, mert nem igénylik azt, hogy az adott objektumot lehessen másolni (vagy mozgatni, C++11 szerint). Ez olyankor is fontos lehet, ha például a tárolt objektumok mérete nagyon nagy, és költséges lenne másolni. Példaképp, a \texttt{splice} tagfüggvény egy másik listát (is) vár paraméterül, és azt a listát fűzi be a saját elemei közé.
+\begin{lstlisting}
+std::ostream& operator<<(std::ostream& out, const std::list<int> &l)
+{
+	for (std::list<int>::const_iterator it = l.begin(); it != l.end(); it++)
+	out << *it << ' ';
+	return out;
+}	
+
+int main()
+{
+	std::list<int> list1, list2{};
+	for(int i = 0; i<5; i++)
+	list1.push_back(i); 
+	for(int i = 0; i<5; i++)
+	list2.push_front(i);
+	std::cout << list1 << std::endl; // 0 1 2 3 4
+	std::cout << list2 << std::endl; // 4 3 2 1 0 
+	
+	list1.splice(list1.end(), list2);
+	std::cout << list1 << std::endl; // 0 1 2 3 4 4 3 2 1 0
+}
+\end{lstlisting}
 	Link: \url{http://en.cppreference.com/w/cpp/container/list}
 	\subsection{map}
 	Az \texttt{std::map} a \texttt{<map>} könyvtárban található. Ez egy egyedi kulcs-érték párokat tároló konténer, mely minden kulcshoz egy értéket rendel. Működése nagyon hasonlít az \texttt{std::set}-ére, annyi különbséggel, hogy párokat tárol (így két kötelező template paramétere van), és mindig a kulcs szerint rendez.
