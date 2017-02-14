@@ -350,67 +350,120 @@ namespace std
 	\begin{note}
 		Az \texttt{std::set} általában piros-fekete bináris faként van implementálva, a hatékonyság végett. Ez (vagy egy hasonlóan hatékony implementáció) fontos, mert a szabvány elvárja, hogy az \texttt{insert}, és sok egyéb tagfüggvény műveletigénye logaritmikus legyen.
 	\end{note}
+	Tekintsünk pár példát az \texttt{std::set} alkalmazására! Mivel ez a konténer rendezett, így ha sok adatot pakolunk bele, nagyon nehéz megmondani, hogy az elemek milyen sorrendben lesznek, így az \texttt{std::set} elemeihez többnyire csak iterátorokkal tudunk hozzáférni.
 	
-	
-	\begin{lstlisting}
+	Lássunk példát pár speciális tagfüggvényre is!
+\begin{lstlisting}
 #include <set>
 #include <iostream>
 
-struct Circle
+template <class T>
+void printSet(const std::set<T> &s)
 {
-	int x, y, r;
-	Circle(int _x, int _y, int _r) : x(_x), y(_y), r(_r) {}
+	for(typename std::set<T>::const_iterator it = s.begin(); 
+													    it != s.end(); ++it)
+		std::cout << *it << ' ';
+}
+
+int main()
+{
+	std::set<int> si; 
+	for(int i = 10; i>0; i--) //forditva!
+		si.insert(i);
+	std::cout << si.size() << std::endl; // 10
+	si.insert(5); //5 már szerepel a halmazban
+	std::cout << si.size() << std::endl; // 10
+	
+	printSet(si); // 1 2 3 4 5 6 7 8 9 10
+	//operator< növekvően rendez, hiába fordított sorrendben illesztettük be az elmeket
+	
+	//adott értékű elem törlése
+	std::set<int>::iterator it = si.find(4);
+	if(it != si.end())
+		si.erase(it);
+	printSet(si); // 1 2 3 5 6 7 8 9 10
+	
+	//töröljük ki az [6, 8) intervallumot!
+	std::set<int>::iterator begin = si.find(6), end = si.find(8);
+	if(begin != si.end())
+		si.erase(begin, end);
+	printSet(si); // 1 2 3 5 8 9
+	
+}
+\end{lstlisting}
+	Figyeljük meg, hogy az elemek törlésekor, leellenőriztük, valóban szerepel-e az az adott elem a halmazban. Mivel a \texttt{find} tagfüggvény egy past-the-end iterátorral tér vissza, hogyha az adott elemet nem találja, az azzal való egyenlőség segítéségvel tudjuk ezt megvizsgálni.
+	
+	Ha egy past-the-end iterátort próbálunk törölni az \texttt{erase} függvénnyel, nem definiált viselkedést kapunk.
+	
+	\medskip
+	A következő példában tekintsünk egy \texttt{int}-től különböző típust tároló halmazt. Ne feledjük, mivel e konténer rendezi az elemeit, mindenképpen muszáj a struktúránk mellé még valamit megírnunk. Ez lehet az alapértelmezetten alkalmazott \texttt{operator<} függvény vagy egy új funktor.
+\begin{lstlisting}
+struct Point
+{
+	int x, y;
+	Point(int _x, int _y) : x(_x), y(_y) {}
 };
 
-std::ostream& operator<<(std::ostream& os, const Circle &c)
+std::ostream& operator<<(std::ostream& os, const Point &p)
 {
-	os << c.x << ' ' << c.y << ' ' << c.r;
+	os << p.x << ' ' << p.y;
 	return os;
 }
 
-bool operator<(const Circle &lhs, const Circle &rhs)
+//operator< y koordináta szerint rendez
+bool operator<(const Point &lhs, const Point &rhs)
 {
-	return lhs.r < rhs.r;
+	return lhs.y < rhs.y;
 }
 
+//LessByX funktor x koordináta szerint
 struct LessByX
 {
-	bool operator()(const Circle &lhs, const Circle &rhs) const
+	bool operator()(const Point &lhs, const Point &rhs) const
 	{
 		return lhs.x < rhs.x;
 	}
 };
 
 int main()
-{
-	std::set<int> si;
-	for(int i = 10; i>0; i--) //forditva!
-		si.insert(i);
-	//torlesrol majd kesobb
-	//si.size() == 10
-	si.insert(5); //si.size() == 10
+{	
+	std::set<Point> spy;
+	spy.insert(Point(3, 1));
+	spy.insert(Point(1, 3));
+	spy.insert(Point(2, 2));
+	for(std::set<Point>::iterator it = spy.begin(); it != spy.end(); ++it)
+		std::cout << *it << ", "; // 3 1, 2 2, 1 3,
 	
-	for(std::set<int>::iterator it = si.begin(); it != si.end(); ++it)
-		std::cout << *it << ' '; // 0 1 2 3 4 5 6 7 8 9
+	std::set<Point, LessByX> spx;
+	spx.insert(Point(3, 1));
+	spx.insert(Point(1, 3));
+	spx.insert(Point(2, 2));
+	for(std::set<Point, LessByX>::iterator it = spx.begin(); 
+												    it != spx.end(); ++it)
+		std::cout << *it << ", "; // 1 3, 2 2, 3 1,
 	
-	std::set<Circle> sk;
-	sk.insert(Circle(3, 2, 2));
-	sk.insert(Circle(1, 2, 1));
-	sk.insert(Circle(2, 2, 3));
-	for(std::set<Circle>::iterator it = sk.begin(); it != sk.end(); ++it)
-		std::cout << *it << ", "; // 1 2 1, 3 2 2, 2 2 3
+	spy.insert(Point(1, 1)); spx.insert(Point(1, 1));
+	std::cout << spy.size() << ' ' << spx.size() << std::endl; // 3 3
+}
+\end{lstlisting}
+	\begin{note}
+		A funktorok mellett az beszúrófüggvények használata is jó példa arra, mikor hasznosak a név nélküli temporális változók.
+	\end{note}
+	A fenti példában megfigyelhető, hogy bár 1, 1 koordinátákkal rendelkező pontot egyik halmaz sem tartalmaz, az mégis \texttt{ekvivalens} egy, a halmazokban már szereplő elemekkel.
 	
-	std::set<Circle, LessByX> skr;
-	skr.insert(Circle(3, 2, 2));
-	skr.insert(Circle(1, 2, 1));
-	skr.insert(Circle(2, 2, 3));
-	for(std::set<Circle, LessByX>::iterator it = skr.begin(); 
-												   it != skr.end(); ++it)
-		std::cout << *it << ", "; // 1 2 1, 2 2 3, 3 2 2
-}	
-	\end{lstlisting}
-
-	Egy egyedi rendezés használata veszélyekkel is járhat azonban.
+	\begin{center}	
+		\texttt{spy} esetében:\quad  $\neg$\big(\texttt{Point}(1, 1) < \texttt{Point}(3, 1)\big) \,\, $\wedge$\quad $\neg$\big(\texttt{Point}(3, 1) < \texttt{Point}(1, 1)\big)
+		
+		\texttt{spx} esetében:\quad  $\neg$\big(\texttt{Point}(1, 1) < \texttt{Point}(1, 3)\big) \,\, $\wedge$\quad $\neg$\big(\texttt{Point}(1, 3) < \texttt{Point}(1, 1)\big)
+	\end{center}
+	Vagy másféleképpen a funktorok neveivel:
+	
+	\begin{center}	
+		\texttt{spy} esetében:\quad  $\neg$\texttt{less}\big(\texttt{Point}(1, 1), \texttt{Point}(3, 1)\big) \,\, $\wedge$\quad $\neg$\texttt{less}\big(\texttt{Point}(3, 1), \texttt{Point}(1, 1)\big)
+		
+		\texttt{spx} esetében:\quad  $\neg$\texttt{LessByX}\big(\texttt{Point}(1, 1), \texttt{Point}(1, 3)\big) \,\, $\wedge$\quad $\neg$\texttt{LessByX}\big(\texttt{Point}(1, 3), \texttt{Point}(1, 1)\big)
+	\end{center}
+	Egy egyedi rendezés használata veszélyekkel is járhat azonban. Térjünk át \texttt{std::string}-ekre, és rendezzünk azok hossza szerint.
 	\begin{lstlisting}
 struct strlen
 {
@@ -426,23 +479,17 @@ int main()
 	s.insert("C++");
 	s.insert("Java");
 	s.insert("Haskell");
-	std::cout << s.count("ADA") << std::endl; // 1
-}
-	\end{lstlisting}
-	A \texttt{count} tagfüggvény megszámolja, hány \texttt{ADA}-val \textbf{ekvivalens} elem van a \texttt{set}ben. Mivel a funktorunk úgy hasonlít össze két elemet, hogy megnézi, melyik string hossza nagyobb, \texttt{C++} és az \texttt{ADA} ekvivalens lesz, így legnagyobb meglepődésünkre 1-et fog ez a program kiírni!
-	%miért pocakos a dékán úr? mert has kell
-\begin{lstlisting}
-int main()
-{
-	std::set<std::string, strlen> s;
-	s.insert("C++");
-	s.insert("Java");
-	s.insert("Haskell");
 	s.insert("GOD");
 	std::cout << s.size() << std::endl; // 3
+	std::cout << s.count("GOD") << ' ' << s.count("ADA"); // 1 1
 }
 \end{lstlisting}
-	Most értelemszerűen azt várnánk, hogy a méret 4 legyen, de mégis 3at ír ki, mert az \texttt{insert} függvény nem teszi be a \texttt{GOD}-ot, lévén az a rendezés szerint a \texttt{C++}al ekvivalens.
+%miért pocakos a dékán úr? mert has kell
+	Az eddig leírtak alapján látható, hogy az \texttt{insert} függvény nem teszi be a \texttt{GOD}-ot, lévén az a rendezés szerint a \texttt{C++}al ekvivalens. Azonban a rendezésünknek egy kellemetlen hátulütője az, hogy annak ellenére, hogy \texttt{GOD} nem került beszúrásra, ha rákérdezünk hány \texttt{GOD}-al ekvivalens elemet tartalmaz a halmaz, mégis 1-et kapunk, sőt, minden 3 hosszú \texttt{string}-re.
+	\begin{note}
+		Könnyű megállapítani, hogy a fenti rendezés szimmetrikus, reflexív és tranzitív, így ekvivalenciaosztályokra osztja a \texttt{string}-ek halmazát hossz szerint.
+	\end{note}
+	Most figyeljük meg (emlékezzünk vissza dimatra), mi történik hogyha szigorú rendezés helyett egy gyenge rendezést definiálunk! Miért lehet ez problémás?
 \begin{lstlisting}
 struct strlenWrong
 {
@@ -458,21 +505,21 @@ int main()
 	s.insert("C++");
 	s.insert("Java");
 	s.insert("Haskell");
-	s.insert("ADA");
-	std::cout << s.count("ADA") << std::endl; // 0
+	s.insert("GOD");
+	std::cout << s.count("GOD") << std::endl; // 0
 	std::cout << s.size() << std::endl; // 4
 }
 \end{lstlisting}
-	Most figyeljük meg (emlékezzünk vissza dimatra), hogy egy szigorú rendezés helyett egy gyenge rendezést definiáltunk! Miért lehet ez problémás?
+	Keressünk magyarázatot erre az eredményre, vizsgáljuk meg \texttt{C++} és \texttt{GOD} ekvivalenciáját.
+	\begin{center}
+		$\neg$\big(\texttt{\,string("GOD").length()} $\leq$ \texttt{string("C++").length()}\,\big)
+		
+		$\wedge$ $\neg$\big(\,\texttt{string("C++").length()} $\leq$ \texttt{string("GOD").length()}\,\big)
+	\end{center}
+	Látjuk, hogy ez a formula hamisat ad, így nem bizonyulnak majd ekvivalensnek. Ha nem szigorú részben rendezést használunk, hanem gyengét, akkor a reflexivitást is elvesztjük. Ez azt jelenti, hogy egy elem nem lehet ekvivalens önmagával!
 	
-	\smallskip
-	Helyettesítsünk be a rendezésünkbe.
-	\[ \neg\big(\,a.length() \leq b.length()\,\big)\quad \wedge \quad \neg\big(\,b.length() \leq a.length()\,\big) \]
-	Itt ha Ha a \texttt{C++}t és az \texttt{ADA}t behelyettesítsük, látjuk, hogy ez a formula hamisat ad, így nem bizonyulnak majd ekvivalensnek.
-	
-	Ha nem szigorú részben rendezést használunk, hanem gyengét, akkor a reflexivitást is elvesztjük. Ez azt jelenti, hogy egy elem nem lehet ekvivalens önmagával!
-	
-	Könnyen látható hogy a rendezésünk nem épp jó, mivel ha ekvivalenciát vizsgálunk, sose fog igazat adni, sose tudjuk meg, egy adott benne van-e, az elemek törlése se teljesen jó így.
+	Így \texttt{strlenWrong} nem egy jó rendezés, mivel ha ekvivalenciát vizsgálunk, sose fog igazat adni, sose tudjuk meg, egy adott benne van-e, és az elemek törlése is sok problémához vezetne.
+	\medskip
 	
 	Link: \url{http://en.cppreference.com/w/cpp/container/set}
 	
