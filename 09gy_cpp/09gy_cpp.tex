@@ -90,7 +90,7 @@ int main()
 	\end{lstlisting}
 	Fent \texttt{x} bár objektum, függvényként is funkcionál. A funktorok segítségével nagyon könnyedén tudunk objektumokat rendezni. Tekintsünk is erre egy példát!
 	\subsection{Predikátumok}
-	Írjunk egy funktort, mely egész számok számokat növekvő sorrendbe rendez.
+	Írjunk egy funktort, mely egész számok számokat tud összehasonlítani érték szerint.
 	\begin{lstlisting}
 template <class Compr>
 bool f(int a, int b, Compr c)
@@ -550,7 +550,7 @@ int main()
 {
 	std::list<int> l;
 	for (int i = 0; i < 5; i++)
-	l.push_back(i);
+		l.push_back(i);
 	std::list<int>::iterator it = l.begin();
 	++it; ++it;
 	std::cout << *it << std::endl; // 2
@@ -577,9 +577,9 @@ int main()
 {
 	std::list<int> list1, list2{};
 	for(int i = 0; i<5; i++)
-	list1.push_back(i); 
+		list1.push_back(i); 
 	for(int i = 0; i<5; i++)
-	list2.push_front(i);
+		list2.push_front(i);
 	std::cout << list1 << std::endl; // 0 1 2 3 4
 	std::cout << list2 << std::endl; // 4 3 2 1 0 
 	
