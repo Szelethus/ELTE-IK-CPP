@@ -512,9 +512,8 @@ int main()
 \end{lstlisting}
 	Keressünk magyarázatot erre az eredményre, vizsgáljuk meg \texttt{C++} és \texttt{GOD} ekvivalenciáját.
 	\begin{center}
-		$\neg$\big(\texttt{\,string("GOD").length()} $\leq$ \texttt{string("C++").length()}\,\big)
-		
-		$\wedge$ $\neg$\big(\,\texttt{string("C++").length()} $\leq$ \texttt{string("GOD").length()}\,\big)
+		$\neg$\,\texttt{strlenWrong}\big(\texttt{"GOD", "C++"}\big)\quad 
+		$\wedge$\quad $\neg$\,\texttt{strlenWrong}\big(\texttt{"C++", "GOD"}\big)
 	\end{center}
 	Látjuk, hogy ez a formula hamisat ad, így nem bizonyulnak majd ekvivalensnek. Ha nem szigorú részben rendezést használunk, hanem gyengét, akkor a reflexivitást is elvesztjük. Ez azt jelenti, hogy egy elem nem lehet ekvivalens önmagával!
 	
@@ -531,9 +530,9 @@ int main()
 	Az \texttt{std::list} konténer a \texttt{<list>} könyvtár része, és nagyon hasonló ahhoz, mint amit mi írtunk, viszont létezik fejelemmel, és kétirányú.
 	\smallskip
 	
-	Az \texttt{std::vector}-ral szemben ennek a konténernek nincs \texttt{[]} operátora, hiszen mielőtt egy adott indexű elemet vissza tudna adni, el kell oda lépegetnie egyesével. A szögletes zárójel operátort csak akkor szokás írni, hogy ha nagyon hatékony, lehetőleg konstans műveletigényű az adott elem lekérdezése, de ez a listánál nem teljesül.
+	Az \texttt{std::vector}-ral szemben ennek a konténernek nincs \texttt{[]} operátora, hiszen mielőtt egy adott indexű elemet vissza tudna adni, el kell oda lépegetnie egyesével. Szögletes zárójel operátort csak akkor szokás írni, hogy ha az nagyon hatékony, lehetőleg konstans műveletigényű, de ez a listánál nem teljesül.
 	\begin{note}
-		Bár elméletben gyorsabb egy láncolt listába beszúrni a \texttt{vector}-ral (vagy hasonló konténerrel) szemben, hisz csak pár pointert kell átállítani, ez a gyakorlatban csak kivételes esetben teljesül. Ennek az az oka, hogy bár az elemeket egyesével odébb kell tolni egy vektorban, azok szekvenciálisan vannak a memóriában, és mivel a processzor számít arra, hogy nem csak egy adott elemet, de a környezőket is módosítani szeretnénk, minden alkalommal amikor egy adott elemet kérdezünk le, azzal együtt a környező elemeket is visszaadja nekünk. Ennek következtében kevesebb processzorművelettel végrehajtható a tologatás.
+		Bár elméletben gyorsabb egy láncolt listába beszúrni a \texttt{vector}-ral (vagy hasonló konténerrel) szemben, hisz csak pár pointert kell átállítani, ez a gyakorlatban csak kivételes esetekben teljesül. Ennek az az oka, hogy bár az elemeket egyesével odébb kell tolni egy vektorban, azok szekvenciálisan vannak a memóriában, és mivel a processzor számít arra, hogy nem csak egy adott elemet, de a környezőket is módosítani szeretnénk, minden alkalommal amikor egy adott elemet kérdezünk le, azzal együtt a környező elemeket is visszaadja nekünk. Ennek következtében kevesebb processzorművelettel végrehajtható a tologatás.
 		
 		Mivel egy láncolt listában egyesével kell haladni az egyik elemről a következőre, ez gyakran annyira költséges, hogy jobban járunk a vektor alkalmazásával akkor is, ha sokat kell a konténer közepére beszúrni.
 		
@@ -556,9 +555,9 @@ int main()
 	std::cout << *it << std::endl; // 2
 }
 	\end{lstlisting}	
-	Az iterátorok léptetésére kell hogy legyen egy egyszerűbb módszer. írhatnánk ciklust, azonban beszédesebb lenne egy léptető függvény írása.
+	Az iterátorok léptetésére kell hogy legyen egy egyszerűbb módszer. Írhatnánk egy ciklust, azonban beszédesebb lenne egy léptető függvény írása.
 	
-	Azonban nem ártana, ha nem csak tetszőleges típust tároló lista iterátorát, hanem tetszőleges konténer iterátorát tudná ez a függvény léptetni. Viszont egy \texttt{std::vector}-nál bármikor ugorhatunk egy tetszőleges elemre: jó lenne egy olyan algoritmust találni, mely e kettőt egybefoglalja (erre később látunk is majd példát az STL algoritmusoknál).
+	Azonban nem ártana, ha nem csak tetszőleges típust tároló lista iterátorát, hanem tetszőleges konténer iterátorát is tudná ez a függvény léptetni. Mivel az \texttt{std::vector}-nál bármikor ugorhatunk egy tetszőleges elemre, hatékonyabb lenne annak konstans műveletigényű léptető függvényt írni: jó lenne egy olyan algoritmust találni, mely e kettőt egybefoglalja (erre később látunk is majd példát az STL algoritmusoknál).
 	
 	\medskip
 	Ha böngészünk cppreference-en, feltűnhet, hogy az \texttt{std::vector}-ral szemben létezik \texttt{push\_front} és \texttt{pop\_front} metódus: ezeket az \texttt{std::vector}-ral ellentétben konstans idő alatt el lehet végezni (elegendő a fejelemet a rákövetkező elemre állítani és kész is).
