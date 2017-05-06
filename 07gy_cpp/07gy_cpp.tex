@@ -109,9 +109,15 @@ int main()
 }
 	\end{lstlisting}
 	Ezt a folyamatot (amikor a fordító kitalálja a tempalte paramétert) \textbf{template paraméter dedukciónak} (\textit{template parameter deduction}) hívjuk.
-	
-	\medskip
+	\begin{note}
+		Természetesen a példányosítás jóval bonyolultabb annál, hogy a a fordító minden \texttt{T}-t egy konkrét típusra cserél, de ebben a könyvben az egyszerűség kedvéért elégedjünk meg ennyivel.
+	\end{note}
 	Nem csak típus lehet template paraméter -- bármi ami \textbf{nem} karakterlánc literál vagy lebegőpontos szám.
+	\begin{note}
+		A lebegőpontos számokra vonatkozó indoklást később a template specializációknál lesz leírva, de a karakterlánc literálokra már most adhatunk választ.
+		
+		Mivel a C++ban van lehetőség függvénytúlterhelésre, ezért a fordító fordítás közben nem csak a függvény nevét, de annak paraméterlistáját, visszatérési értékét és a template paraméterekre vonatkozó információkat (stb.) is kénytelen eltárolni a függvény nevével együtt. Amennyiben karakterlánc literál is lehetne template paraméter, nagyon meg tudna nőni ennek a sztringnek a hossza, és lassíthatná a fordítási időt.
+	\end{note}
 	\begin{lstlisting}
 template <typename T, int ArraySize>
 int arraySize(const T (&array)[ArraySize])
@@ -127,7 +133,7 @@ int main()
 	\end{lstlisting}
 	A fenti kód a 3. gyakorlat végén tett megjegyzésből lehet ismerős. Jól demonstrálja a template paraméter dedukciót.
 	\subsection{Osztály template-ek}
-	Nem csak függvények, osztályok is lehentek template-ek melyen nagyon hasonlóan működnek.
+	Nem csak függvények, osztályok is lehetnek template-ek melyen nagyon hasonlóan működnek. A következő kódrészletekben a template osztályok mellett megismerkedhetünk még a template-ek ,,lustaságával'' is.
 	\begin{lstlisting}
 #include <iostream>
 
@@ -208,7 +214,7 @@ int main()
 		Fent a template paraméter listában \texttt{typename} helyett \texttt{class} szerepel. Ezek gyakorlatilag ekvivalensek, mind a kettő azt jelenti, hogy az adott paraméter típus (bár a \texttt{typename} beszédesebb).
 	\end{note}
 	
-	A fenti példákban mindig egy default konstruktort használunk, amikor objektumokat hoztunk létre. Helyes lenne-e az, ha explicit módon kíírnánk a zárójeleket (hangsúlyozva a default konstruktor hívást)?
+	A fenti példákban mindig egy default konstruktort hívtunk meg, amikor objektumokat hoztunk létre. Helyes lenne-e az, ha explicit módon kíírnánk a zárójeleket (hangsúlyozva a default konstruktor hívást)?
 \begin{lstlisting}
 int main()
 {
@@ -217,11 +223,11 @@ int main()
 	Z<X> z();
 }
 \end{lstlisting}
-	A kód helyesen lefordul, de nem ugyanaz, mintha nem lenne ott a zárójel. Mivel a c++ nyelvtana nem egyértelmű, más kontextusban ugyanaz a kódrészlet mást jelenthet (egyik legegyszerűbb példa a \texttt{static} kulcsszó), így meg kellett alkotni egy olyan szabályt, miszerint amit deklarációként lehet értelmezni, azt deklarációként \textbf{kell} értelmezni. Igy ezek függvénydeklarációk lesznek: Az első esetben például egy olyan függvényt deklarálunk, melynek neve \texttt{x}, \texttt{X<Y>}-al tér vissza és nem vár paramétert. 
+	A kód helyesen lefordul, de a jelentése nem ugyanaz, mintha nem lenne ott a zárójel. Mivel a c++ nyelvtana nem egyértelmű, más kontextusban ugyanaz a kódrészlet mást jelenthet (egyik legegyszerűbb példa a \texttt{static} kulcsszó), így meg kellett alkotni egy olyan szabályt, miszerint amit deklarációként lehet értelmezni, azt deklarációként \textbf{kell} értelmezni. Igy ezek függvénydeklarációk lesznek: Az első esetben például egy olyan függvényt deklarálunk, melynek neve \texttt{x}, \texttt{X<Y>}-al tér vissza és nem vár paramétert. 
 	
 	Így ha default konstruktort szeretnék meghívni, semmilyen zárójelt nem szabad használni.
 	\begin{note}
-		C++11ben lehet \texttt{()} helyett \{\} zárójelet alkalmazni konstruktorhívásnál, így ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
+		C++11ben lehet gömbölyű zárójel helyett helyett kapcsos zárójelet alkalmazni konstruktorhívásnál, így ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
 	\end{note}
 	
 	A template-ek paramérének ismertnek kell lennie fordítási időben.
@@ -272,7 +278,14 @@ int main()
 	\end{lstlisting}
 	Mind \texttt{A} osztályhoz, mind \texttt{f} függvényhez létrehoztunk egy specializációt arra az esetre, ha a template paraméterként \texttt{int}-et kapnak. Számos okunk lehet arra hogy ezt tegyük: a standard könyvtár megfényesebb példája az \texttt{std::vector} osztály, mely egy template, és van template specializációja \texttt{bool} esetre.
 	\begin{note}
-		Az \texttt{std::vector<bool>} számos optimalizációkat tartalmazhat (persze nem feltétlenül, hisz ez implementáció függő): általában nem \texttt{bool}-okban tárolja az adatokat, hanem bitekben. Sajnos azonban ez hátrányokkal is jár, például hogy a \texttt{[]} operátor érték és nem referencia szerint ad vissza -- bár valóban hatékonyabb, sok szempontból fejfájást okozhat a használata, így c++17-ben ez a specializáció nem fogja a szabvány részét képezni.
+		Az \texttt{std::vector<bool>} számos optimalizációkat tartalmazhat (persze nem feltétlenül, hisz ez implementáció függő): általában nem \texttt{bool}-okban tárolja az adatokat, hanem bitekben. Sajnos azonban ez hátrányokkal is jár, például hogy a \texttt{[]} operátor érték és nem referencia szerint ad vissza.
+	\end{note}
+	\begin{note}
+		Visszatérve egy korábbi állításhoz, miért nem lehet lebegőpontos szám template paraméter? Lévén két lebegőpontos szám könnyedén lehet csak nagyon kis mértékben eltérő, ezért könnyű egy ilyesmi hibába belefutni: 
+		
+		Legyen adott \texttt{d1, d2}, fordítási időben ismert lebegőpontos szám! Mi azt hisszük, hogy ez a kettő egyenlő, de mivel számos módosításon mentek keresztül, minimális mértékben, de nem lesznek egyenlőek. Ilyenkor ha egy template paraméterként lebegőpontos számot váró függvénynek megadnánk őket template paraméterül, kétszer kéne példányosítani az adott függvényt.
+		
+		Ez a kisebb gond, de mi van ha pont erre az értékre mi létrehoztunk egy template specializációt, és csak (pl.) \texttt{d1} esetében került az a függvény meghívásra? Ez ellen a fordító se tudná a felhasználót megvédeni.
 	\end{note}
 	Írjunk faktoriális számoló algoritmus template-ek segítségével!
 	\begin{lstlisting}
