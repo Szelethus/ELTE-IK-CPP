@@ -88,7 +88,7 @@ int main()
 	std::cout << s2(2) << std::endl; //10
 }
 	\end{lstlisting}
-	Fent \texttt{x} bár objektum, függvényként is funkcionál. A funktorok segítségével nagyon könnyedén tudunk objektumokat rendezni. Tekintsünk is erre egy példát!
+	Bár \texttt{x} egy objektum, függvényként is funkcionál. A funktorok segítségével nagyon könnyedén tudunk objektumokat rendezni. Tekintsünk is erre egy példát!
 	\subsection{Predikátumok}
 	Írjunk egy funktort, mely egész számok számokat tud összehasonlítani érték szerint.
 	\begin{lstlisting}
@@ -123,7 +123,7 @@ int main()
 		Figyeljük meg azt is, hogy ebben az esetben érték szerint vettük át a hamradik paramétert: ez nem csak hatékonyabb, hisz \texttt{Less} mérete minimális (nincs adattagja), de mivel \texttt{Less()} egy jobbérték, csak így, vagy konstans referenciával tudnánk átvenni.
 	\end{note}
 	
-	Ez alapján az egyenlőség is levezethető: ha egy $a$ szám nem nagyobb $b$-nél, és $b$ sem nagyobb $a$-nál, akkor egyenlőek. 
+	Amennyiben egy \texttt{Less} típusú objektum gömbölyű zárójel operátorát 2 \texttt{int}-el meghívjuk, és a visszatérési érték \texttt{true}, akkor az első szám a kisebb, ellenkező esetben a második. Ez alapján az egyenlőség is levezethető: ha egy $a$ szám nem nagyobb $b$-nél, és $b$ sem nagyobb $a$-nál, akkor egyenlőek. 
 	\[a = b \quad \Leftrightarrow \quad \neg(a<b)\, \wedge\, \neg(b<a)\]
 	\begin{lstlisting}
 int main()
@@ -207,7 +207,7 @@ int main()
 	A következő leírásban nem fogunk minden létező tagfüggvénnyel foglalkozni: egyrészt olyan sok van, hogy azt teljesen irreális észben tartani, másrészt sok ilyenhez érdemi hozzáfűznivalót én nehezen tudnék tenni, így az egyes szekciók végén található link az adott konténerhez.
 	
 	\begin{note}
-		Nagyon fontos képesség az is, hogy valaki hogyan tud utánanézni valaminek, amivel nincs teljesen tisztában, így erősen javallott a \url{cppreference.com}-el való ismerkedés, illetve más helyeken lévő információk böngészése is.
+		Nagyon fontos képesség az is, hogy valaki hogyan tud utánanézni valaminek, amivel nincs teljesen tisztában, így erősen javallott a \url{cppreference.com}-el való ismerkedés, illetve más helyeken lévő információk böngészése is. A könyvben található linkek túlnyomótöbbségben kattinthatóak, és érdemes is ellátogatnunk ezen oldalakra.
 	\end{note}	
 	\subsection{vector}
 	A \texttt{<vector>} könyvtárban található, maga a konténer az \texttt{std::vector} névre hallgat. Előzménytárgyakból ismerős lehet ez a konténer, más néven mint dinamikus tömb hivatkoztunk rá. Bár a pontos definíciója mint megannyi STL-béli algoritmus és konténer implementációfüggő, vannak olyan tulajdonságok, melyeket elvár a szabvány: pl. rendelkezzen \texttt{push\_back} függvénnyel, a \texttt{[]} operator műveletigénye legyen konstans, stb.
@@ -298,11 +298,13 @@ int main()
 	\begin{lstlisting}
 int main()
 {
-	std::set<int> c = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-	for(std::vector<int>::iterator it = c.begin(); it != c.end(); )
+	std::vector<int> v;
+	for (int i = 0; i<10; i++)
+		v.push_back(i);
+	for(std::vector<int>::iterator it = v.begin(); it != v.end(); )
 	{
 		if(*it % 2 == 1)
-			it = c.erase(it);
+			it = v.erase(it); //iterátor invalidáció elkerülése végett
 		else
 			++it;
 	}
@@ -320,7 +322,7 @@ int main()
 	
 	Az \texttt{std::set} a \texttt{<set>} könyvtárban található. Ez a konténer a matematikai halmazt valósítja meg: egyedi elemeket tárol, így ha egy olyan elemet próbálnánk beszúrni, mellyel ekvivalens már szerepel a \texttt{set}-ben, nem történne semmi (\textit{no-op}). 
 	
-	A szabvány azt is megköveteli, hogy ez a konténer rendezett legyen. Ehhez szüksége van a konténernek egy bináris predikátum funktorra is mint template paraméter a tárolandó \texttt{T} típus mellett.
+	A szabvány azt is megköveteli, hogy ez a konténer rendezett legyen. Ahhoz, hogy ezt meg tudja valósítani, szüksége van a konténernek egy bináris predikátum funktorra is mint template paraméter a tárolandó \texttt{T} típus mellett.
 	\smallskip
 	
 	Ez utóbbi template paramétert nem kell feltétlenül megadni, alapértelmezetten ugyanis az \texttt{std::set} az \texttt{std::less<T>} alapján rendez, mely gyakorlatilag az \texttt{<} operátorral ekvivalens.
@@ -449,7 +451,7 @@ int main()
 	\begin{note}
 		A funktorok mellett az beszúrófüggvények használata is jó példa arra, mikor hasznosak a név nélküli temporális változók.
 	\end{note}
-	A fenti példában megfigyelhető, hogy bár 1, 1 koordinátákkal rendelkező pontot egyik halmaz sem tartalmaz, az mégis \texttt{ekvivalens} egy, a halmazokban már szereplő elemekkel.
+	A fenti példában megfigyelhető, hogy bár 1, 1 koordinátákkal rendelkező pontot egyik halmaz sem tartalmaz, az mégis \textbf{ekvivalens} egy, a halmazokban már szereplő elemekkel.
 	
 	\begin{center}	
 		\texttt{spy} esetében:\quad  $\neg$\big(\texttt{Point}(1, 1) < \texttt{Point}(3, 1)\big) \,\, $\wedge$\quad $\neg$\big(\texttt{Point}(3, 1) < \texttt{Point}(1, 1)\big)
@@ -526,6 +528,30 @@ int main()
 	\begin{note}
 		Az \texttt{std::multiset} működése az eddigiek alapján triviális, így annak megismerését ismét az olvasóra bízom.
 	\end{note}
+	\begin{figure}[t]
+		\centering
+		\begin{tikzpicture}
+			[
+				level distance=1.5cm,
+				level 1/.style={sibling distance=3cm},
+				level 2/.style={sibling distance=1.5cm},
+				edge from parent/.style={draw,-latex}
+			]
+			\tikzstyle{Node} = [rectangle, minimum width=1cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+			\node [Node]{3}
+			child {node [Node]{1}
+				child {node [Node]{0}}
+				child {node [Node]{2}}
+			}
+			child {node [Node]{5}
+				child {node [Node]{4}}
+				child {node [Node]{6}}
+			};
+		\end{tikzpicture}
+		\smallskip
+		
+		Az \texttt{std::set} egy lehetséges ábrázolása, bináris keresőfával. Erre az irányított gráfra igaz, hogy minden gyökér a bal oldali gyerekénél nagyobb, és a jobb oldali gyerekénél kisebb.
+	\end{figure}
 	\subsection{list}
 	Az \texttt{std::list} konténer a \texttt{<list>} könyvtár része, és nagyon hasonló ahhoz, mint amit mi írtunk, viszont létezik fejelemmel, és kétirányú.
 	\smallskip
@@ -591,6 +617,30 @@ int main()
 	Az \texttt{std::map} a \texttt{<map>} könyvtárban található. Ez egy egyedi kulcs-érték párokat tároló konténer, mely minden kulcshoz egy értéket rendel. Működése nagyon hasonlít az \texttt{std::set}-ére, annyi különbséggel, hogy párokat tárol (így két kötelező template paramétere van), és mindig a kulcs szerint rendez.
 	\smallskip
 	
+	\begin{figure}[t]
+		\centering
+		\begin{tikzpicture}
+			[
+				level distance=1.5cm,
+				level 1/.style={sibling distance=4cm},
+				level 2/.style={sibling distance=2cm},
+				edge from parent/.style={draw,-latex}
+			]
+			\tikzstyle{Node} = [rectangle, minimum width=1cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+			\node [Node]{\texttt{"d", 4}}
+			child {node [Node]{\texttt{"b", 3}}
+				child {node [Node]{\texttt{"a", 5}}}
+				child {node [Node]{\texttt{"c", 1}}}
+			}
+			child {node [Node]{\texttt{"f", 9}}
+				child {node [Node]{\texttt{"e", 8}}}
+				child {node [Node]{\texttt{"g", 7}}}
+			};
+		\end{tikzpicture}
+		\smallskip
+		
+		Az \texttt{std::map} egy lehetséges ábrázolása, bináris keresőfával. Az ábrán egy \texttt{std::string, int} párosokat tároló \texttt{map} szerepel -- figyeljük meg, hogy a a konténer a kulcs szerint rendez, az értékek a rendezés szempontjából nem számítanak.
+	\end{figure}
 	Van egy speciális beszúró függvénye is:
 \begin{lstlisting}
 #include <map>
@@ -650,8 +700,8 @@ for(std::map<std::string, int>::iterator i = m.begin(); i != m.end(); i++)
 	\end{lstlisting}
 	Amennyiben új elemeket szúrunk be, gyakran megkerülhető a problémás \texttt{[]} használata. Az \texttt{std::map} insert függvénye egy \texttt{std::pair}-t vár paraméterül, melyet könnyen tudunk alkotni \texttt{std::make\_pair} függvény segítségével.
 	\begin{lstlisting}
-std::set<int, char> s;
-s.insert(std::make_pair(1, 'a'));
+std::map<int, char> m;
+m.insert(std::make_pair(1, 'a'));
 	\end{lstlisting}
 	
 	Link: \url{http://en.cppreference.com/w/cpp/container/map}
