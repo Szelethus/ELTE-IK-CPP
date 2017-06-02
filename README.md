@@ -5,6 +5,7 @@ Maga a compiled pdf az bátran bárkivel megosztható ;)
 
 ## Pótlandó dolgok
 
+* Virtual tables
 * Implicit konverziók
 * using namespace std;
 * UML diagramok 11 gyakhoz
