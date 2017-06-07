@@ -66,33 +66,33 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Brunner} Tibor gyakorlatán. (\today)
 	\section{Objektum orientált programozás}
-	Objektum orientált programozásnál e hármat várjuk el:
-	\begin{itemize}
-		\item enkapszuláció
+	Manapság az egyik legnépszerűbb programozási paradigma a objektum orientált programozás (\textit{object oriented programming}, röviden \textit{OOP}). Bár sokféleképpen definiálhatjuk, e három dolgot azonban általában megköveteljük egy objektum orientált kódtól:
+	\begin{compactitem}
+		\item enkapszuláció, azaz az adatok egybefoglalása
 		\item kód újrafelhasználás
 		\item adat elrejtés
-	\end{itemize}
-	Az, hogy egy adott nyelv ezt hogyan valósítja meg, az a saját maga dolga. Vannak nyelvek, melyek jobban alkalmasan objektum orientált programozásra, mint mások. Példaképp, a C nyelvre is mondhatjuk, hogy objektum orientált, bár nincs benne örökölődés, és nem igazán kézenfekvő az adatok elrejtése sem (bár lehetséges). Nyilvánvalóan ennél egyel praktikusabb nyelvek is léteznek, példaképp Java, és nyilván a c++ is, melyek sokkal erősebb nyelvi eszközökkel rendelkeznek ezek megvalósítására.
+		%TODO elmagyarázni ezeket
+	\end{compactitem}
+	Fontos, hogy az objektum orientáltságot ne kössük feltétlenül az osztályokhoz, ezeket a követelményeket ugyanis ha körülményesen is, de nélkülük is meg tudjuk oldani. Példaképp, C-ben létrehozhatunk egy egyszerű rekordot, melynek deklarációját és a hozzá tartozó műveleteket eltároljuk egy header fájlban, magát a rekordot és a függvényeket csak egy fordítási egységben definiáljuk. Ezzel elértük az enkapszulációt, az adatok rejtve vannak, és egy ilyen rekordot el tudunk tárolni egy másik rekordban is könnyedén, ezzel megvalósítva a kód újrafelhasználást.
+
+	Így bátran kijelenthetjük, hogy a C nyelv egy olyan nyelv, mely támogatja az objektum orientált programozást. Azonban az is megállapítható, hogy ez nagyon nehézkes, és a legtöbb nyelv, melyre objektum orientáltként hivatkozunk (Pl. Java) sokkal erősebb eszközökkel rendelkeznek ennek támogatására.
 	
-	Fontos, hogy az objektum orientáltság fogalmát ne csak az osztályokhoz kössük!
-	
+	Az objektum orientált C++ kódolásról nagyon sokat lehet mesélni, az elkövetkező néhány szekcióban áttekintjük valamennyi fontosabb részét, és hogy a fenti elveket hogyan tudjuk megvalósítani vele.
 	\subsection{Öröklődés (\textit{inheritance})}
-	Tekintsük az alábbi kódot:
+	Próbáljunk megalkotni egy osztályt, mellyel egy általános síkidomot tudunk jellemezni!
 	\begin{lstlisting}
 class Sikidom
 {
-	int x;
-	int y;
+	int x, y; // a síkidom koordinátái
 public:
 	Sikidom(int x, int y) : x(x), y(y) {}
 	double terulet() const
 	{
-		//...
+		// ???
 	}
 };
 	\end{lstlisting}
-	Itt a célunk egy általános síkidom megadása, azonban bajban vagyunk, hisz nem tudjuk megmondani, hogy épp egy tetszőleges síkidomnak milyen lesz a területe. Hozzunk létre egy kört, hisz annak a területét meg tudjuk adni! Próbáljuk ehhez használni az öröklődést: vegyünk át mindent, ami a Síkidomban van, elvégre minden kör egy síkidom!
-	
+	Az egyik legelső dolgunk legyen az, hogy írunk egy területszámító függvényt. Azonban egy általános síkidomnak nem tudjuk megadni csak így a területét. Esetleg ennek az típusnak létrehozhatnánk egy \textit{altípusát}, mondjuk egy kört, amely rendelkezik a síkidom minden tulajdonságával, és még a körre vonatkozó adatokkal. Ehhez \textbf{öröklődést} fogunk alkalmazni:
 	\begin{lstlisting}
 class Kor : public Sikidom
 {
@@ -104,7 +104,9 @@ public:
 	}
 };
 	\end{lstlisting}
-	Az öröklődés következtében \texttt{Kor} osztály \texttt{Sikidom} összes adattagját és metódusát átveszi. Fentebb látható az öröklődés szintaktikája: kettőspont, és utána egy öröklődési típus (ez esetben \texttt{public}, erről nemsoká lesz bővebben szó). Mondhatjuk azt is, hogy a \texttt{Kor} \textit{az egy} \texttt{Sikidom}, hisz minden, a \texttt{Sikidom}ra jellemző tulajdonsággal rendelkezik.
+	Az öröklődés következtében \texttt{Kor} osztály \texttt{Sikidom} összes adattagját és metódusát átveszi. Fentebb látható az öröklődés szintaktikája: kettőspont, és utána egy öröklődési típus (ez esetben \texttt{public}, erről nemsoká lesz bővebben szó).
+	
+	Mondhatjuk azt is, hogy a \texttt{Kor} \textit{az egy} \texttt{Sikidom}, hisz minden, a \texttt{Sikidom}ra jellemző tulajdonsággal rendelkezik.
 	\begin{note}
 		Nagyon fontos, hogy a 3,14-nél pontot és nem vesszőt használunk. Ha ezt írnánk:
 		\begin{lstlisting}
@@ -530,7 +532,8 @@ int main()
 	\medskip
 	Forrás: \url{http://bruntib.web.elte.hu/read.php?3,52} (\textsc{Brunner} Tibor honlapja)
 	
-	\subsection{Cast-ok}
+	\section{Cast-ok}
+	\subsection{dynamic\_cast}
 	
 	Néha abba a kellemetlen helyzetbe kerülhetünk, hogy van egy adott pointerünk/referenciák, és a dinamikus típusa \texttt{Kor}, azonban statikus típusa \texttt{Sikidom}, de mégis fontos, hogy \texttt{Kor}-re vonatkozó dolgokat használjunk. Ilyenkor segíthetnek a \textit{cast}ok:
 	\begin{lstlisting}
