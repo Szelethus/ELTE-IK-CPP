@@ -5,7 +5,7 @@
 \usepackage[T1]{fontenc}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
-\usepackage{amsmath, amsthm,amssymb, paralist, tikz, multirow}
+\usepackage{amsmath, amsthm,amssymb, paralist, tikz, multirow, tikz-uml}
 \usetikzlibrary{arrows, positioning}
 
 \usepackage{listings}
@@ -104,33 +104,64 @@ public:
 	}
 };
 	\end{lstlisting}
-	Az öröklődés következtében \texttt{Kor} osztály \texttt{Sikidom} összes adattagját és metódusát átveszi. Fentebb látható az öröklődés szintaktikája: kettőspont, és utána egy öröklődési típus (ez esetben \texttt{public}, erről nemsoká lesz bővebben szó).
-	
-	Mondhatjuk azt is, hogy a \texttt{Kor} \textit{az egy} \texttt{Sikidom}, hisz minden, a \texttt{Sikidom}ra jellemző tulajdonsággal rendelkezik.
-	\begin{note}
-		Nagyon fontos, hogy a 3,14-nél pontot és nem vesszőt használunk. Ha ezt írnánk:
-		\begin{lstlisting}
-int i = 1, 2, f(), g();
-		\end{lstlisting}
+	\begin{figure}[!h]
+		\centering
+		\begin{tikzpicture} 
+		\umlclass{Sikidom}{ 
+			-- x : int \\ 
+			-- y : int 
+		}{ 
+			+terulet() : double
+		}  
+		\umlclass[x = 5]{Kor} { 
+			-- r : int
+		}{ 
+			+terulet() : double
+		} 
+		\umlinherit{Kor}{Sikidom} 
+		\end{tikzpicture}
 		
-		Akkor rendre a vessző paraméter előtti tag mindig kiértékelődik, és utána értékeli ki a következőt, a korábbi eredményt meg elhajítja. A végén az egész azzal lesz ekvivalens, mintha simán azt írnánk, hogy \texttt{int i = g();}.
-		
-		Egy fél mondat erejéig jegyezzük meg azt is, hogy lebegőpontos számokat sose hasonlítsunk össze! Jusson eszünkbe, ami Numerikus Módszereken hangzik el: minden lebegőpontos szám tartalmazhat egy kis pontatlanságot.
-		\begin{lstlisting}
-for (double d = 0; d != 1; d += 0.1)
+		\smallskip
+		A \texttt{Sikidom} és a \texttt{Kor} osztály kapcsolata, melyet a fent látható nyíllal fejezünk ki: a nyíl a leszármazott osztályból az ősosztályba mutat.
+	\end{figure}
+	Egy adott \texttt{struct}-ból illetve \texttt{class}-ból a fent látható módon tudunk örökölni: az új osztály neve után kettőspontot írunk, opcionálisan megadjuk a hozzáférés típusát, mely ebben az esetben public (erről nemsokára bővebben lesz szó), és az osztály nevét, melyből örökölni szeretnénk.
+
+	Az öröklődés hatására a \texttt{Kor} osztály \texttt{Sikidom} összes adattagját és metódusát megörökli. Ilyenkor azt mondjuk, hogy a \texttt{Kor} osztály \texttt{Sikidom} \textbf{leszármazottja} (\textit{derived class}), és a \texttt{Sikidom} osztály \texttt{Kor} \textbf{őse} (\textit{base class}). Példaképp, így tudunk hivatkozni \texttt{Kor}-ön belül \texttt{Sikidom} egy adattagjára:
+	\begin{lstlisting}
+class Kor : public Sikidom
 {
-	std::cout << d << ' ';
-}
-		\end{lstlisting}
-		Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ... 1.0} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
-	\end{note}
-	Az, hogy publikusan örököltünk (erre volt a \texttt{public} kulcsszó), azt jelenti, hogy egy {altípus}-t (\textit{subtype}) hoztunk létre. 
-	Ezt azt is jelenti, hogy minden helyre, ahol \texttt{Sikidom}-ot szeretnénk használni, \texttt{Kor}-t is használhatunk.
-	
-	Van egy apróbb probléma a fenti kóddal azonban: Az osztály azon adattagjai, melyek \texttt{private}-ként vannak deklarálva, csak az adott számára elérhetőek.
-	
-	Ez probléma hisz mi \texttt{Kor}-t azért hoztuk létre, hogy speciálisabb feladatokat tudjuk végrehajtani \texttt{Sikidom} tulajdonságaival, azonban \texttt{x} és \texttt{y} privát, és csak \texttt{Sikidom} tud hozzáférni. Írjuk át ezt protectedre:
-\begin{lstlisting}
+	double r;
+public:
+	// ...
+	void f()
+	{
+		std::cout << Sikidom::x << std::endl;
+		std::cout << x << std::endl;
+	}
+};
+	\end{lstlisting}
+	A fenti kóddal kapcsolatban két dolog állapítható meg: Mivel \texttt{x} nevű objektum csak egy darab van az osztályban, ezért nem kell explicit módon \texttt{Sikidom}-on keresztül hivatkoznunk \texttt{x}-re. A másik dolog, hogy ez a kódrészlet sajnos nem helyes, fordítási hibát okoz: \texttt{x} ugyanis privát adattagja \texttt{Sikidom}-nak, és privát adattaghoz csak és kizárólag az adott osztály fér hozzá, még a leszármazott sem.
+%	\begin{note}
+		%TODO számliterálokhoz kéne átrakni
+%		Nagyon fontos, hogy a 3,14-nél pontot és nem vesszőt használunk. Ha ezt írnánk:
+%		\begin{lstlisting}
+%int i = 1, 2, f(), g();
+%		\end{lstlisting}
+%		
+%		Akkor rendre a vessző paraméter előtti tag mindig kiértékelődik, és utána értékeli ki a következőt, a korábbi eredményt meg elhajítja. A végén az egész azzal lesz ekvivalens, mintha simán azt írnánk, hogy \texttt{int i = g();}.
+%		
+%		Egy fél mondat erejéig jegyezzük meg azt is, hogy lebegőpontos számokat sose hasonlítsunk össze! Jusson eszünkbe, ami Numerikus Módszereken hangzik el: minden lebegőpontos szám tartalmazhat egy kis pontatlanságot.
+%		\begin{lstlisting}
+%for (double d = 0; d != 1; d += 0.1)
+%{
+%	std::cout << d << ' ';
+%}
+%		\end{lstlisting}
+%		Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ... 1.0} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
+%	\end{note}
+
+	Ez probléma hisz mi \texttt{Kor}-t azért hoztuk létre, hogy speciálisabb feladatokat tudjuk végrehajtani \texttt{Sikidom} tulajdonságaival. Írjuk át ezeknek az adattagoknak a védettségét protectedre:
+	\begin{lstlisting}
 class Sikidom
 {
 protected:
@@ -140,8 +171,26 @@ public:
 	Sikidom(int x, int y) : x(x), y(y) {}
 	double terulet() const {}
 };
-\end{lstlisting}
-	A \texttt{protected} tagokhoz csak az adott osztály fér hozzá, és azon osztályok, melyek ebből örökölnek. Nem csak publikusan tudunk örökölni, \texttt{protected}-del, és \texttt{private}-el is. Az alábbi táblázat mutatja, hogy az származott osztály (\textit{derived class}) milyen adattagokhoz fér hozzá a bázisosztályból (\textit{base class}) különböző öröklődési típusok esetén:
+	\end{lstlisting}
+	A \texttt{protected} tagokhoz csak az adott osztály fér hozzá, és azon osztályok, melyek ebből örökölnek.
+	\subsection{Hozzáférés típusa (\textit{access specifier})}
+	Öröklődésnél 3 különöző hozzáférési típust különítünk meg: \texttt{public, protected, private}. Ezeket a kulcsszavak az öröklődés kontextusában \textit{access specifier}-nek nevezzük, és mind arra van kihatással, hogy az ősosztályból örökölt adattagok és metódusok milyen láthatóságot kapnak a leszármazottban, a következőféleképpen:
+	
+	\begin{center}
+		\begin{tabular}{|c||c|c|c|}
+			\hline
+			Öröklődés típusa:&public&protected&private\\
+			\hline
+			\hline
+			\texttt{public} örökölt adatok/metódusok &\cellcolor{green!20}public&\cellcolor{orange!20}protected&\cellcolor{red!20}private\\
+			\hline
+			\texttt{protected} örökölt adatok/metódusok &\cellcolor{orange!20}protected&\cellcolor{orange!20}protected&\cellcolor{red!20}private\\
+			\hline
+			\texttt{private} örökölt adatok/metódusok &\cellcolor{red!20}private&\cellcolor{red!20}private&\cellcolor{red!20}private\\
+			\hline
+		\end{tabular}
+	\end{center}
+	Az alábbi táblázat mutatja, hogy öröklődés után a bázisosztályban lévő adattagok/metódusok láthatóak-e a leszármazott osztályban:
 	\begin{center}
 		\setlength{\extrarowheight}{2pt}
 		\begin{tabular}{|c||c|c|c|}
@@ -159,26 +208,10 @@ public:
 			\hline
 		\end{tabular}
 	\end{center}
-	Ez pedig mutatja egy adott adattag/metódus védettségét öröklődés után:
-	\begin{center}
-		\begin{tabular}{|c||c|c|c|}
-			\hline
-			Öröklődés típusa:&public&protected&private\\
-			\hline
-			\hline
-			Örökölt adatok/metódusok (public)&\cellcolor{green!20}public&\cellcolor{orange!20}protected&\cellcolor{red!20}private\\
-			\hline
-			Örökölt adatok/metódusok (protected)&\cellcolor{orange!20}protected&\cellcolor{orange!20}protected&\cellcolor{red!20}private\\
-			\hline
-			Örökölt adatok/metódusok (private)&\cellcolor{red!20}private&\cellcolor{red!20}private&\cellcolor{red!20}private\\
-			\hline
-		\end{tabular}
-	\end{center}
-	Az öröklődés típusa ha \texttt{class}ból öröklünk \texttt{private}, ha \texttt{struct}ból akkor \texttt{public.}
 	\begin{note}
-		A publikus öröklődést szokás {az egy} (\textit{is a}), privátot \texttt{van egy} (\textit{has a}) kapcsolatnak is hívni.
+		Az öröklődés típusa alapértelmezetten (azaz ha nem írjuk ki az access specifiert) ha \texttt{class}ból öröklünk \texttt{private}, ha \texttt{struct}ból akkor \texttt{public.}
 	\end{note}
-	Picit térjünk visza a fenti értékadáshoz, mert ott azért van még mit megbeszélni.
+	Az, hogy publikusan örököltünk, azt is jelenti, hogy egy {altípus}-t (\textit{subtype}) hoztunk létre, és mint egy altípus hogy minden helyre, ahol \texttt{Sikidom}-ot szeretnénk használni, \texttt{Kor}-t is használhatunk. 
 	\begin{lstlisting}
 Kor k;
 Sikidom s;
@@ -186,14 +219,14 @@ s = k; //ok
 	\end{lstlisting}
 	Azt már letisztáztuk, hogy \texttt{Kor} \texttt{Sikidom} altípusa, de azonban ez akkor is két különbötő típus, hogyan lehet, hogy nem kapunk fordítási idejű hibát?
 	
-	A válasz az, hogy a fordító meg tudja oldani e két típus közötti értékadást. Mivel \texttt{Kor}-ben benne van maga \texttt{Sikidom} is, ezért meghívja az ahhoz tartozó értékadó operátort, és a \texttt{Kor}-ben lévő \texttt{Sikidom}-ot adja majd értékül.
-	
-	Ez azonban magával hordozza azt is, hogy minden információ, ami \texttt{Kor}-respecifikus (pl. sugár (\texttt{r})) elveszik. Ez az un. \textit{slicing}. Ebben az esetben, lévén a fordító generálta nekünk az értékadó operátort, és az alapértelmezetten minden adattagra meghívja az arra definiált értékadó operátort, gyakorlatilag ez fog történni:
+	A válasz az, hogy a fordító meg tudja oldani e két típus közötti értékadást. Mivel \texttt{Kor}-ben benne van maga \texttt{Sikidom} is, ezért meghívja az ahhoz tartozó értékadó operátort, és a \texttt{Kor} osztály \texttt{Sikidom}-ból örökölt adattagjait adja majd értékül, ebben az esetben (lévén nincs speciális értékadó operátor megírva \texttt{Sikidom}-ban) ez fog történni:
 	\begin{lstlisting}
 s.x = k.x;
 s.y = k.y;
 	\end{lstlisting}
+	Ez azonban magával hordozza azt is, hogy minden információ, ami \texttt{Kor}-re specifikus (pl. sugár (\texttt{r})) elveszik. Ez a folyamatot \textit{slicing}. Ebben az esetben, lévén a fordító generálta nekünk az értékadó operátort, és az alapér-nak nevezzük.
 	
+	%TODO itt hagytam félbe
 	Ezt a \textit{slicing} dolgot meg tudjuk kerülni, ha egy pointert hozunk létre: Hisz egy \texttt{Sikidom}-ra mutató pointer mutathat \texttt{Kor}-re is, és mivel az ''csak'' mutogat, nem fog levágni semmit (referenciák szintén!). 
 	\begin{lstlisting}
 Kor k;
@@ -209,7 +242,9 @@ Sikidom *sp = &k;
 sp->terulet();
 	\end{lstlisting}
 	Itt azt fogjuk tapasztalni, hogy \texttt{Sikidom} függvénye fog meghívódni. Ennek oka az, hogy \texttt{sp} statikus típusa (\textit{static type}) az \texttt{Sikidom}, és hatékonyság végett alapértelmezetten mindig a statikus típushoz tartozó függvényt hívódik meg. Egy pointernek azonban van un. dinamikus típusa is (\textit{dynamic type}), ami ebben az esetben \texttt{Kor} lesz. A dinamikus típust csak futási időben lehet ismert, hisz lehetetlen azt megállapítani fordítási időben, hogy milyen típusú objektumra fog mutatni az \texttt{sp}. Ha mindig a dinamikus típus szerint hívná meg a program függvényeket, annak nagy futási idejű költsége lenne. Ahhoz, hogy rákényszerítsük a fordítót arra, hogy a dinamikus típus szerint fordítson, használnunk kell a \texttt{virtual} kulcsszót.
-	%TODO miért szar a láncolt lista: túl költséges a processzorba pakolás ...
+	\begin{note}
+		A publikus öröklődést szokás \textbf{az egy} (\textit{is a}), privátot \textbf{van egy} (\textit{has a}) kapcsolatnak is hívni.
+	\end{note}
 	\subsection{Virtuális függvények}
 	Azokat az osztályokat, melyek legalább egy virtuális függvénnyel rendelkeznek, polimorfikus osztálynak (\textit{polymorphic class}) nevezzük.
 \begin{lstlisting}
@@ -420,6 +455,35 @@ public:
 	}
 };
 	\end{lstlisting}
+	\begin{figure}
+		\centering
+		\begin{tikzpicture} 
+		\umlclass[type=abstract]{Negyszog}{ 
+			\# x : int 
+		}{ 
+			\umlvirt{+terulet() : double}
+		}  
+		\umlclass[type=abstract, x = 3, y = -2.5]{Rombusz} { 
+		}{ 
+			\umlvirt{+terulet() : double}
+		} 
+		\umlclass[type=abstract, x = -3, y = -2.5]{Deltoid} { 
+		}{ 
+			\umlvirt{+terulet() : double}
+		} 
+		\umlclass[y = -5]{Negyzet} { 
+		}{ 
+			+terulet() : double
+		} 
+		\umlinherit{Rombusz}{Negyszog} 
+		\umlinherit{Deltoid}{Negyszog} 
+		\umlinherit{Negyzet}{Deltoid} 
+		\umlinherit{Negyzet}{Rombusz} 
+		\end{tikzpicture}
+		
+		\smallskip
+		Egy példa a gyémántöröklésre.
+	\end{figure}
 	A legutóbbi osztály természetesnek tűnhet, hisz egy négyzet deltoid is, meg rombusz is, így szeretnénk, ha minden függvény, ami \texttt{Deltoid}-ot vagy \texttt{Rombusz}-t vár, \texttt{Negyzet}-et is elfogadjon. Azonban a fenti kód nem fordul le, hisz mind \texttt{Rombusz}-ban, mind \texttt{Deltoid}-ban van egy teljes \texttt{Negyszog} is. Így \texttt{Negyzet} kétszer fogja tartalmazni annak összes adattagját, így \texttt{x}-et is, és a fordító nem tudja kitalálni, mi épp melyikre gondolunk. 2 kézenfekvő megoldás lehet:
 	\begin{lstlisting}
 class Negyzet : public Deltoid, public Rombusz
@@ -533,6 +597,7 @@ int main()
 	Forrás: \url{http://bruntib.web.elte.hu/read.php?3,52} (\textsc{Brunner} Tibor honlapja)
 	
 	\section{Cast-ok}
+	%TODO : privát öröklődés és reinterpret cast
 	\subsection{dynamic\_cast}
 	
 	Néha abba a kellemetlen helyzetbe kerülhetünk, hogy van egy adott pointerünk/referenciák, és a dinamikus típusa \texttt{Kor}, azonban statikus típusa \texttt{Sikidom}, de mégis fontos, hogy \texttt{Kor}-re vonatkozó dolgokat használjunk. Ilyenkor segíthetnek a \textit{cast}ok:
