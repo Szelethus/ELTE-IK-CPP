@@ -92,6 +92,9 @@
 			\hline
 		\end{tabular}
 	\end{center}
+	\begin{note}
+		\texttt{input iterator}-ra példa lehet az \texttt{std::istream\_iterator} osztály, míg az általunk megírt lista iterátora egy \texttt{forward\_iterator}-nak számít.
+	\end{note}
 	Világos, hogy egy flexibilisebb iterátorral több mindent meg tudunk tenni, vagy ugyanazt a funkciót hatékonyabban is meg tudjuk valósítani. Emiatt minden STL algoritmusnak (mint pl. az \texttt{std::find}) tudnia kell a template paraméterként kapott iterátor kategóriáját.
 	\medskip
 	
@@ -118,7 +121,7 @@ class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
 	//..
 };
 	\end{lstlisting}
-	A cppreference-en megfigyelhető, hogy az \texttt{std::iterator} több typedef-et tartalmaz, mely jelöli hogy az iterátorunk milyen kategóriában van, milyen típussal tér vissza a dereferáló operátor, stb.
+	A cppreference-en megfigyelhető, hogy az \texttt{std::iterator} több típust is tartalmaz, mely jelöli hogy az iterátorunk milyen kategóriában van, milyen típussal tér vissza a dereferáló operátor, stb. Ennek segítségével pl. a listánk iterátorának kategóriája lekérdezhető az \texttt{List::Iterator::iterator\_category}-val (erre nemsokára példát is látni fogunk).
 	\begin{note}
 		Ennek alaposabb megértését az olvasóra bízom.
 	\end{note}
@@ -195,7 +198,7 @@ typename std::vector<T>::const_iterator
 	return begin;
 }
 	\end{lstlisting}
-	Sajnos sikerült elég kilométer függvénydeklarációt sikerült írnunk, de a célt elértük.
+	Sajnos sikerült elég kilométer függvény fejlécet sikerült írnunk, de a célt elértük.
 	
 	\smallskip
 	Megállapítható, hogy itt még azt se kell tudnunk, minek az iterátorával dolgozunk, elegendő annyit tudnunk, hogy a \texttt{++} iterátorral lehet léptetni, és össze tudjuk hasonlítani őket az \texttt{!=} operátorral, azaz teljesítik egy input iterator feltételeit. Első körben vegyük az összehasonlítandó elem típusát külön template paraméterként.

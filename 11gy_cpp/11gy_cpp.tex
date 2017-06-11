@@ -211,13 +211,6 @@ public:
 	\medskip
 	
 	Az, hogy publikusan örököltünk, azt is jelenti, hogy egy {altípus}-t (\textit{subtype}) hoztunk létre, és mint egy altípus, minden helyre, ahol \texttt{Sikidom}-ot szeretnénk használni, \texttt{Kor}-t is használhatjuk. 
-	
-	\begin{note}
-		Az öröklődés típusa alapértelmezetten (azaz ha nem írjuk ki az access specifiert) ha \texttt{class}ból öröklünk \texttt{private}, ha \texttt{struct}ból akkor \texttt{public.}
-	\end{note}
-	\begin{note}
-		A publikus öröklődést szokás \textbf{az egy} (\textit{is a}), privátot \textbf{van egy} (\textit{has a}) kapcsolatnak is hívni.
-	\end{note}
 	\begin{lstlisting}
 Kor k;
 Sikidom s;
@@ -825,6 +818,12 @@ public:
 };
 	\end{lstlisting}
 	A védett öröklés szinte univerzálisan sosem használt.
+	\begin{note}
+		Az öröklődés típusa alapértelmezetten (azaz ha nem írjuk ki az access specifiert) ha \texttt{class}ból öröklünk \texttt{private}, ha \texttt{struct}ból akkor \texttt{public.}
+	\end{note}
+	\begin{note}
+		A publikus öröklődést szokás \textbf{az egy} (\textit{is a}), privátot \textbf{van egy} (\textit{has a}) kapcsolatnak is hívni.
+	\end{note}
 	\subsection{C++11}
 	C++11-ben lehetőségünk van picit kényelmesebbé tenni az életünket, például az \texttt{override} kulcsszóval, mely garantálja, hogy az adott függvény felülír egy másikat.
 	\begin{lstlisting}

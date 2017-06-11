@@ -626,7 +626,16 @@ int main()
 				level 2/.style={sibling distance=2cm},
 				edge from parent/.style={draw,-latex}
 			]
-			\tikzstyle{Node} = [rectangle, minimum width=1cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+			
+			\tikzstyle{Node} = [
+				rectangle, 
+				minimum width=1cm, 
+				minimum height=5mm, 
+				text centered, 
+				draw=black, 
+				fill= gray!20
+			]
+			
 			\node [Node]{\texttt{"d", 4}}
 			child {node [Node]{\texttt{"b", 3}}
 				child {node [Node]{\texttt{"a", 5}}}

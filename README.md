@@ -1,4 +1,4 @@
-# C++ gyakorlati jegyzetek
+﻿# C++ gyakorlati jegyzetek
 Itt található az összes cpp gyak jegyzete latexben. Please dont share.
 
 Maga a compiled pdf az bátran bárkivel megosztható ;)
@@ -8,7 +8,6 @@ Maga a compiled pdf az bátran bárkivel megosztható ;)
 * Virtual tables
 * Implicit konverziók
 * using namespace std;
-* UML diagramok 11 gyakhoz
 * Kiértékelési sorrend
 * Nyelvi elemek
 * istream/ostream iterator
