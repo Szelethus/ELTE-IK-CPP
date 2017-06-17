@@ -206,6 +206,21 @@ int main()
 	\begin{note}
 		Alapértelmezetten minden \texttt{int} egy \texttt{signed int}.
 	\end{note}
+	Mint tudjuk, a nem egész számoknál a törtrészt magyarban vesszővel, C++ban ponttal választjuk el. Azonban mégis, az alábbi kód helyesen lefordul:
+	\begin{lstlisting}
+int pi = 3,14;
+	\end{lstlisting}
+	Ennek oka az, hogy a vessző operátor egy szekvenciapont is, így a fordító az egyenlőség bal oldalát amikor kiértékeli, először rendre kiértékeli a 3 számliterált, eldobja, utána kiértékeli a 14-et, és értékül adja \texttt{pi}-nek. Ez azt jelenti, hogy az ilyen jellegű hibát nem olyan könnyű megfogni, mint elsőre gondolnánk.
+	
+	\smallskip
+	A lebegőpontos számok másik veszélye, az összehasonlítás. Jusson eszünkbe, ami Numerikus Módszereken hangzik el: minden lebegőpontos szám tartalmazhat egy kis pontatlanságot.
+	\begin{lstlisting}
+for (double d = 0; d != 1; d += 0.1)
+{
+	std::cout << d << ' ';
+}
+	\end{lstlisting}
+	Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ... 1.0} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
 	\begin{note}
 		Viszonylag kevés esetben éri meg \texttt{float}-ot használni \texttt{double} helyett. Modern CPU-k ugyanolyan hatékonyan dolgoznak mind a kettővel, így érdemesebb a pontosabbat választani. (Ha magát a GPU-t programozzuk, az lehet egy kivétel.)
 	\end{note}

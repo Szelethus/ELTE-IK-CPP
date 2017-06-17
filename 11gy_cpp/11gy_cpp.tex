@@ -140,24 +140,6 @@ public:
 };
 	\end{lstlisting}
 	A fenti kóddal kapcsolatban két dolog állapítható meg: Mivel \texttt{x} nevű objektum csak egy darab van az osztályban, ezért nem kell explicit módon \texttt{Sikidom}-on keresztül hivatkoznunk \texttt{x}-re. A másik dolog, hogy ez a kódrészlet sajnos nem helyes, fordítási hibát okoz: \texttt{x} ugyanis privát adattagja \texttt{Sikidom}-nak, és privát adattaghoz csak és kizárólag az adott osztály fér hozzá, még a leszármazott sem.
-%	\begin{note}
-		%TODO számliterálokhoz kéne átrakni
-%		Nagyon fontos, hogy a 3,14-nél pontot és nem vesszőt használunk. Ha ezt írnánk:
-%		\begin{lstlisting}
-%int i = 1, 2, f(), g();
-%		\end{lstlisting}
-%		
-%		Akkor rendre a vessző paraméter előtti tag mindig kiértékelődik, és utána értékeli ki a következőt, a korábbi eredményt meg elhajítja. A végén az egész azzal lesz ekvivalens, mintha simán azt írnánk, hogy \texttt{int i = g();}.
-%		
-%		Egy fél mondat erejéig jegyezzük meg azt is, hogy lebegőpontos számokat sose hasonlítsunk össze! Jusson eszünkbe, ami Numerikus Módszereken hangzik el: minden lebegőpontos szám tartalmazhat egy kis pontatlanságot.
-%		\begin{lstlisting}
-%for (double d = 0; d != 1; d += 0.1)
-%{
-%	std::cout << d << ' ';
-%}
-%		\end{lstlisting}
-%		Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ... 1.0} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
-%	\end{note}
 
 	Ez probléma hisz mi \texttt{Kor}-t azért hoztuk létre, hogy speciálisabb feladatokat tudjuk végrehajtani \texttt{Sikidom} tulajdonságaival. Írjuk át ezeknek az adattagoknak a védettségét protectedre:
 	\begin{lstlisting}
