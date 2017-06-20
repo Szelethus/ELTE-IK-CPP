@@ -64,82 +64,6 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlatán. (\today)
 	
-	\subsection{Tömbök átadása függvényparaméterként}
-	Próbáljunk meg egy tömböt érték szerint átadni egy függvénynek!
-	\begin{lstlisting}
-#include <iostream>
-
-void f(int t[])
-{
-	std::cout << sizeof(t) << std::endl;
-}
-
-int main()
-{
-	int t[] = {1,2,3,4,5};
-	std::cout << sizeof(t) << std::endl;
-	f(t);
-}
-	\end{lstlisting}
-	Kimenet: \texttt{20 8} (implementáció függő)
-	
-	Bár azt hihettük, hogy \texttt{t} tömb méretét írattuk ki ket alkalommal, valójában amikor azt érték szerint próbálunk meg átadni egy tömböt, az átkonvertálódik a tömb elejére mutató pointerré.
-	\begin{lstlisting}
-void f(int t[8])
-{
-	std::cout << sizeof(t) << std::endl;
-}
-	\end{lstlisting}
-	Hiába adunk meg egy méretet a tömbnek a függvény fejlécében, még mindig egy pointer mérete lesz a második kiírt szám. Az a tanulság, hogy ha érték szerint akarunk átadni egy tömböt, az át fog konvertálódni pointerré. A legszebb az lenne, ha a fenti szintaxis nem fordulna le. Ennek azonban történelmi oka van, a C-vel való visszafelé kompatibilitás miatt fordul le. 
-	\begin{note}
-		Tömböt értékül adni a szabvány szerint nem is lehet: \texttt{int *t2[5] = t} nem helyes.
-	\end{note}
-	Korábban megismerkedtünk egy módszerrel, mely segítségével egy tömb méretét (elemszámát) paraméterátadás után is megőriztük:
-	\begin{lstlisting}
-#include <iostream>
-
-void f(int *t, int size) // új paraméter!
-{
-	std::cout << sizeof(t) << std::endl;
-}
-
-int main()
-{
-	int t[] = {1,2,3,4,5};
-	std::cout << sizeof(t) << std::endl;
-	f(t, sizeof(t)/sizeof(t[0]));
-}
-	\end{lstlisting}
-	\begin{note}
-		Amennyiben C++11ben programozunk, érdemes az \texttt{std::array}-t használnunk, ami olyan, mint egy tömb, de nem tud pointerré konvertálódni és mindig tudja a méretét.
-	\end{note}
-	Ha szeretnénk egy tömböt egy darab paraméterként átadni, megpróbálhatunk egy tömbre mutató pointert létrehozni. Azonban figyelni kell a szintaktikára, ha \texttt{int *t[5]}-t írunk, egy öt elemű intre mutató pointereket tároló tömböt kapunk.
-	
-	\medskip
-	Ha tömbre mutató mutatót szeretnék, így csinálhatjuk:
-	\begin{lstlisting}
-void g(int (*t)[5])
-{
-	std::cout << sizeof(t) << std::endl;
-}
-	\end{lstlisting}
-	Azonban ez még mindig egy pointer méretét fogja kiírni, mert a \texttt{t} az egy sima mutató! Ahhoz, hogy megkapjuk, mire mutat, dereferálnunk kell, így a \texttt{sizeof} paraméterének \texttt{*t}-t kell megadni, ha a tömb méretére vagyunk kíváncsiak.
-	\begin{note}
-		Ha refenreciával vennénk át \texttt{t}-t, az is hasonlóan nézne ki:\, \texttt{int (\&t)[5]}.
-	\end{note}
-	\medskip
-	
-	Ha eltérő méretű tömböt próbálunk meg átadni, akkor nem fordul le a kód, mert nem egy 5 elemű tömbre mutató mutató 6 elemű tömbre mutató mutatóvá konvertálódni.
-	\begin{lstlisting}
-int main()
-{
-	int a[6];
-	g(&a); //forditasi hiba!
-	int b[5];
-	g(&b); //ok
-}
-	\end{lstlisting}
-	
 	\section{Literálok}
 	\subsection{Karakterláncok}
 	Mi lesz a \texttt{"Hello"} karakterlánc literál típusa?
@@ -202,10 +126,15 @@ int main()
 			\texttt{5ul}					&\texttt{unsigned long int}\\
 			\hline
 		\end{tabular}
-		\end{center}
-	\begin{note}
-		Alapértelmezetten minden \texttt{int} egy \texttt{signed int}.
-	\end{note}
+	\end{center}
+	Létezik C++ban \texttt{signed} kulcsszó, mely a char miatt lett bevezetve. A char is egész számokat tartalmaz, de az implementáció függő, hogy a \texttt{char} singed vagy unsigned értéket tartalmaz-e. 
+	
+	Természetesen leggyakrabban egész számoknál szoktuk használni. Alapértelmezetten minden \texttt{int} egy \texttt{signed int}, amennyiben egy előjel nélküli egész számra van szükségünk, \texttt{unsigned int}-et vagy röviden \texttt{unsigned}-t kell írnunk. Megállapítható, hogy az \texttt{unsigned} típusok ugyanannyi számjegyet tudnak tárolni, ám értékben kétszer akkorát. 
+	
+	Míg a túlcsordulás \texttt{signed} típusoknál nem definiált, addig \texttt{unsigned} típusoknál az, a maximális érték (mely implementációfüggő) utáni inkrementális 0-ra állítja a változót. Értelemszerűen, ez a determinisztikus viselkedés futási idejű költséggel jár.
+	%NOTE https://www.youtube.com/watch?v=yG1OZ69H_-o - CppCon 2016: Chandler Carruth “Garbage In, Garbage Out: Arguing about Undefined Behavior..."
+	
+	\medskip
 	Mint tudjuk, a nem egész számoknál a törtrészt magyarban vesszővel, C++ban ponttal választjuk el. Azonban mégis, az alábbi kód helyesen lefordul:
 	\begin{lstlisting}
 int pi = 3,14;
@@ -224,16 +153,16 @@ for (double d = 0; d != 1; d += 0.1)
 	\begin{note}
 		Viszonylag kevés esetben éri meg \texttt{float}-ot használni \texttt{double} helyett. Modern CPU-k ugyanolyan hatékonyan dolgoznak mind a kettővel, így érdemesebb a pontosabbat választani. (Ha magát a GPU-t programozzuk, az lehet egy kivétel.)
 	\end{note}
-	
-	Létezik C++ban \texttt{signed} kulcsszó, mely a char miatt lett bevezetve. A char is egész számokat tartalmaz, de az implementáció függő, hogy a \texttt{char} singed vagy unsigned értéket tartalmaz-e. 
 	\begin{note}
-		Érdemes mindig \texttt{int}et használnunk, hanincs jó okunk arra, hogy mást használjunk. Az \texttt{int}-el általában a leghatékonyabb a processzor.
+		Érdemes mindig \texttt{int}et használnunk, ha nincs jó okunk arra, hogy mást használjunk. Az \texttt{int}-el általában a leghatékonyabb a processzor.
 	\end{note}
+	\section{Struktúrák mérete}
+	\subsection{Primitív típusok mérete}
 	A \texttt{sizeof(char)} mindig 1-et ad vissza. A karakter mérete mindig az egység. Minden más típusra a \texttt{sizeof} függvény azt adja vissza, hogy paraméterül megadott objektum vagy típus mérete hányszorosa a \texttt{char}nak. 
 	
-  Attól, hogy \texttt{sizeof(char) == 1}, a \texttt{char} mérete byteokban még implementáció függő.
-
-  A lebegőpontos számok mindig rendelkeznek előjellel. 
+	Attól, hogy \texttt{sizeof(char) == 1}, a \texttt{char} mérete byteokban még implementáció függő.
+	
+	A lebegőpontos számok mindig rendelkeznek előjellel. 
 	
 	\medskip
 	A \texttt{char} méretén túl minden másnak a mérete implementációfüggő, bár a szabvány kimond pár relációt:
@@ -250,7 +179,8 @@ for (double d = 0; d != 1; d += 0.1)
 		\texttt{sizeof(char) $\leq$ sizeof(bool)}
 		\smallskip
 	\end{center}
-	\section{Struktúrák mérete}
+	\subsection{Nem primitív típusok mérete}
+	Egy áltlaunk megalkotott típus mérete több szabálytól is függhet.
 	\begin{lstlisting}
 #include <iostream>
 

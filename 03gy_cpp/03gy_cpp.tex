@@ -1,4 +1,4 @@
-\documentclass[a4paper,11.5pt,table]{article}
+﻿\documentclass[a4paper,11.5pt,table]{article}
 \usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
 \usepackage[normalem]{ulem}
 \usepackage[utf8]{inputenc}
@@ -219,280 +219,165 @@
 %	
 %	Ez a memóriában úgy néz ki, hogy a stacken létrejön egy pointer ami egy heapen foglalt bufferre mutat. Az objektum másolásakor a heapen lévő buffer is másolásra kerül, az objektum megsemmisülésekor a heapen lévő buffer felszabadul. A másolások költségesek lehetnek, azonban a fordító optmializációi és a C++11-es move szemantika sokat javít a hatékonyságon.
 %	
-	\section{Pointer aritmetika}
-	\subsection{Konstans korrektség}
-	Térjünk vissza a mutatókhoz. Volt már szó konstans mutatókról, ám konstans\textbf{ra} mutató mutatókról még nem.
-	\begin{lstlisting}
-const int ci = 6;
-int *p = &ci;
-	\end{lstlisting}
-	A fenti kód nem fordul le, mert \texttt{ci} konstans, de \texttt{p} nem egy nem konstansra mutató pointer. Ez sértené a C++ban ismert \textbf{konstans korrektséget} (const correctness). A probléma forrása az, ha fenti értékadás lefordulna, akkor \texttt{ci} értékét tudnánk módosítani \texttt{p}-n keresztül.
-	
-	\medskip
-	\textbf{Konstans korrektség:} ha egy értéket konstansnak jelölünk, azt nem módosíthatjuk a program futása során. 
-	\begin{lstlisting}
-const int ci = 6;
-const int *p = &ci;
-	\end{lstlisting}
-	Ez már lefordul, hiszen a \texttt{p} egy konstansra mutató pointer, azaz mutathat konstans változókra. Egy konstansra mutató pointer \textbf{nem tudja megváltoztatni} a mutatott értéket. Viszont egy konstansra mutató mutatót át lehet állítani egy másik memóriacímre.
-	\begin{lstlisting}
-const int ci = 6;
-const int *p = &ci;
 
-int c = 5;
-p = &c;
+	\section{Statikus változók/függvények}
+	A \texttt{static} kulcsszónak számos jelentése van, annak függvényében, hogy milyen kontextusban írjuk egy változó vagy függvény elé. 
+	\subsection{Fordítási egységre lokális változók}
+	A függvényeken és osztályokon kívül deklarált statikus változók az adott fordítási egységre lokálisak -- élettartamuk a futás elejétől végigtartamig tart, és kizárólagosan az adott fordítási egységben láthatóak.
+	\medskip
+	
+	\fbox{\textbf{main.cpp}}
+	\begin{lstlisting}
+#include <iostream>
+
+static int x;
+
+int main()
+{
+	x = 2;
+}
 	\end{lstlisting}
-	A fenti kód is szabályos, konstansra mutató pointerrel nem konstans is értékre mutathatunk. Érdemes átgondolni ennek a következményeit, hisz \texttt{c} nem konstans, ezért az értékét továbbra is módosíthatjuk (csak nem \texttt{p}-n keresztül)! Egy konstansra mutató mutató nem azt jelenti, hogy a mutatott érték sosem változhat meg. Csupán annyit jelent, hogy a mutatott értéket ezen a mutatón keresztül nem lehet megváltoztatni.
+	\medskip
+	
+	\fbox{\textbf{other.cpp}}
 	\begin{lstlisting}
-const int *p = &ci;
-int c = 5;
-p = &c;
-c = 5;
+#include <iostream>
+
+static int x;
+
+void f()
+{
+	x = 0;
+}
 	\end{lstlisting}
-  A \texttt{const} kulcsszó több helyre is kerülhet.
+	Ha ezt a két fájlt együtt fordítjuk, nem kapunk linkelési hibát, ugyanis a \texttt{main.cpp}-ben lévő \texttt{x} egy teljesen más változó, mint ami az \texttt{other.cpp}-ben van.
+	
+	\smallskip
+	Csak úgy mint a globális változókra, fordítási egységen belül bármikor hivatkozhatunk egy statikusra, és hasonló módon inicializálódnak.
 	\begin{lstlisting}
-const int *p;
-int const *p;
+static int x;
+
+int main()
+{
+	int x = 4;
+	std::cout << ::x << std::endl; // 0
+}
 	\end{lstlisting}
-	A fenti két sor ugyanazt jelenti, a mutatott értéket nem lehet megváltoztatni a mutatón keresztül.
+	\subsection{Függvényen belüli statikus változók}
+	Azokat a változókat, melyek függvényen belül vannak a \texttt{static} kulcsszóval definiálva, függvényszintű változónak is szokás hívni. Élettartamuk a függvény első hívásától a program futásának végéig tart, míg láthatóságuk csak az adott függvényen belül van. A hagyományos lokális változókkal ellenben tehát nem semmisülnek meg, amikor az adott függvény futása befejeződik. A következő kódrészlet szemlélteti ezt a viselkedést.
+	
 	\begin{lstlisting}
-int * const p;
-const int * const p;
-int const * const p;
-	\end{lstlisting} 
-	Amennyiben a * után van a \texttt{const}, akkor egy \textbf{konstans pointert kapunk}, mely megváltoztathatja a mutatott értéket, de nem mutathat másra (konstans pointer\quad$\not=$\quad konstanra mutató pointer). Egy létezik konstansra mutató konstans mutató is, amin keresztül nem lehet megváltoztatni a mutatott értéket és a mutatót sem lehet máshova átállítani.
-	\subsection{Mutatóra mutató mutatók} 
-	Mutatóra mutató mutatók is léteznek. Néhány példa:
-	\begin{lstlisting}
-int *p;
-int **q = &p;
-int ***r = &q;
+int f()
+{
+	static int x = 0;
+	++x;
+	return x;
+}
+
+int main() 
+{
+	for(int i = 0; i<5; i++)
+		std::cout << f() << ' '; // 1 2 3 4 5
+}
 	\end{lstlisting}
-	Példaképp \texttt{q}-n keresztül meg tudjuk változni, \texttt{p} hova mutasson.
+	Ahogy az megfigyelhető fent, \texttt{x} csak egyszer inicializálódik, majd a későbbi függvényhívások után egyre növekszik az értéke.
+	\subsection{Fordítási egységre lokális függvények}
+  Nem csak változókat, függvényeket is deklarálhatunk statikusnak, melyek a fordítási egységre lokálisak. 
 	\begin{lstlisting}
-int c, d;
-int *p = &c;
-int **q = &p;
-*q = &d;
+static int f()
+{
+	return 0;
+}
+
+int main() {std::cout << f();} // 0
 	\end{lstlisting}
-	A megfelelő szinten a mutatók konstansá tételével még bonyolultabb példákat kaphatunk:
+	Ezek a függvények csak az adott fordítási egységen belül érhetőek el.
+	\begin{note}
+		Figyelem! A később szóba kerülő metódusok esetében mást jelent a \texttt{static} kulcsszó, mint amit itt leírtunk.
+	\end{note}
+	\subsection{Névtelen/anonim névterek}
+	Fordítási egységre lokális változókat és függvényeket tudunk deklarálni névtelen névterek (\textit{unnamed namespaces}, vagy \textit{anonymous namespaces}) segítségével. Egy név nélküli névteren belül deklarált változók és függvények hasonlóan viselkednek, mintha eléjük lenne írva a \texttt{static} kulcsszó.
 	\begin{lstlisting}
-int c, d;
-int *p = &c;
-int * const *q = &p;
-*q = &d; // forditasi hiba
-	\end{lstlisting}
-	Mivel \texttt{q} egy \texttt{int}-re mutató konstans mutatóra mutató mutató, így csak egy olyan mutatóval tudunk rámutatni, ami egy \texttt{int}-re mutató konstans mutatóra mutató mutatóra mutató mutató.
-	\begin{lstlisting}
-int c, d;
-int *p = &c;
-int * const *q = &p;
-int *const ** const r = &q;
+namespace
+{
+	int x;
+	std::string y;
+	void f() {}
+}
 	\end{lstlisting}
 	\begin{note}
-		Megnyugtatás végett, ritkán van szükség mutatóra mutató mutatónál bonyolultabb szerkezetre.
+    A \texttt{static} osztályon belüli jelentéséről később lesz szó.
 	\end{note}
-	\subsection{Függvény pointerek}
-	C++ban lehetőségünk van arra is, hogy függvényeket adjunk át paraméterként.
+	\section{Függvény túlterhelés}
+	Térjünk vissza a korábban megírt swap függvényünkhöz.
 	\begin{lstlisting}
-int add(int a, int b)
+void swap(int &a, int &b)
 {
-	return a + b;
+	int tmp = a;
+	a = b;
+	b = tmp;
 }
-
-int mul(int a, int b)
+	\end{lstlisting}
+	Ez a függvény addig jó, amíg csak \texttt{int}-eket szeretnénk megcserélni. Mi van, ha \texttt{std::string}-eket kéne? A megoldás egyszerű, \textbf{túlterheljük} (\textit{overload}) a \texttt{swap} függvényt.
+	\begin{lstlisting}
+void swap(std::string &a, std::string &b)
 {
-	return a * b;
+	std::string tmp = a;
+	a = b;
+	b = tmp;
 }
-
-int reduce(int *start, int size, int initial, int (*op)(int, int))
+	\end{lstlisting}
+	Túlterhelésnek azt nevezzük, amikor két vagy több függvénynek a neve azonos, de a paramétereik különböznek. Tagfüggvényeket konstansság alapján is túl lehet terhelni.
+	\begin{note}
+		A később elhangzó osztályok tagfüggvényeinél a függvény konstanssága is számít (azonos nevű és paraméter listájú függvény különöző konstanssággal ugyanúgy túlterhelésnek számít).
+	\end{note}
+	\subsection{Operátor túlterhelés}
+	Ahogy láttuk a 2. gyakorlat elején, lehetőségünk van függvényeket túlterhelni. Ez operátorokra is igaz. Ha példaként vesszük a lineáris algebrából tanult rendezett valós számhármasokat ($\mathbb{R}^3$), lehetőségünk van arra, hogy a tanultak alapján definiáljuk a köztük értelmezett összeadást.
+	%TODO temporális változók
+	\begin{lstlisting}
+struct LinAlgVector
 {
-	int ret = initial;
-	for (int i = 0; i < size; i++)
-	{
-		ret = (*op)(ret, start[i]);
-	}
+	double x1, x2, x3;
+};
+
+LinAlgVector operator+(const LinAlgVector &lhs, const LinAlgVector &rhs)
+{
+	LinAlgVector ret;
+	ret.x1 = lhs.x1 + rhs.x1;
+	ret.x2 = lhs.x2 + rhs.x2; 
+	ret.x3 = lhs.x3 + rhs.x3;
 	return ret;
 }
 
 int main()
 {
-	int t[] = {1,2,3,4,5};
-	std::cout << reduce(t,5,0,&add) << std::endl;
-	std::cout << reduce(t,5,0,&mul) << std::endl;
+	LinAlgVector a, b;
+	a.x1 = 1; a.x2 = 2; a.x3 = 3;
+	b.x1 = 1; b.x2 = 1; b.x3 = 1;
+	
+	LinAlgVector c = a + b; 
 }
 	\end{lstlisting}
+	A \texttt{main} függvényben lévő értékadás ezzel ekvivalens: \texttt{c = operator+(a, b)}, így láthatjuk, hogy az operátorok túlterhelése gyakorlatilag a függvénytúlterhelés speciális esete. 
+	\smallskip 
 	
-	Itt \texttt{reduce} egy olyan paramétert is vár, mely igazából egy függvény, amely \texttt{int}-et ad vissza, és két \texttt{int}-et vár paraméterül.
-	\begin{note}
-		A szavakba öntés segíthet a megértésben: \texttt{op} egy olyan függvényre mutató mutató, melynek két \texttt{int} paramétere van, és \texttt{int} a visszatérési értéke.
-	\end{note}
+	Írjuk meg a \texttt{print} függvényt 3D vektorokra! A gyakran kiíratáshoz használt jobb shift operátor (\textit{right shift operator}), a \texttt{\<} is túlterhelhető. Mivel mi az \texttt{std::cout} változóval szeretnénk majd kiíratni, melynek típusa \texttt{std::ostream}, így a függvényünk első paramétere egy ilyen típus lesz, a második meg egy \texttt{LinAlgVector} típus.
 	
-	A kódban feltűnhet, hogy a tömb mellé paraméterben elkértük annak méretét is. Ennek az az oka, hogy a \texttt{t} tömb egy \texttt{int}-re mutató mutatóvá fog konvertálódni a paraméter átadás során, ami a tömb első elemére mutat. Ennek hatására elvesztjük azt az információt, hogy mekkora volt a tömb (a tömbök és paraméterátadás kapcsolátról később bévebben lesz szó). Így át kell adni ezt az információt is. 
-	
-	Mellékesen, egy függvény átadásakor csak függvénypointert tudunk átadni. Egy függvénypointeren a függvény meghívása az egyetlen értelmes művelet. Így a \texttt{\&} jel elhagyható függvényhíváskor és az \texttt{op} elől is elhagyható a * a paramétereknél.
 	\begin{lstlisting}
-int reduce(int *start, int size, int initial, int op(int, int)))
+/* ... */
+
+std::ostream& operator<<(std::ostream& os, const LinAlgVector &l)
 {
-	//...
+	os << l.x1 << ' ' << l.x2 << ' ' << l.x3;
+	return os;
 }
 
 int main()
 {
-	int t[] = {1,2,3,4,5};
-	std::cout << reduce(t,5,0,add) << std::endl;
-	std::cout << reduce(t,5,0,mul) << std::endl;
+	/* ... */
+	std::cout << c << std::endl; // 2 3 4
 }
 	\end{lstlisting}
-	\section{Tömbök}
-	A tömb a C++ egy beépített adatszerkezete, mellyel tömb azonos típusú elemet tárolhatunk és kezelhetünk egységesen. Előzménytárgyakból már megismertük valamennyi funkcionalitását, ám számos veszélyét még nem.
-		\begin{lstlisting}
-int main()
-{
-	int i = 5;
-	int t[] = {5,4,3,2,1};
-}
-		\end{lstlisting}
-		\texttt{t} egy 5 elemű \textbf{tömb}. Nézzük meg, mekkora a mérete (figyelem, ez \textbf{implementációfüggő!})!
-		\begin{lstlisting}
-std::cout << sizeof(i) << std::endl;
-std::cout << sizeof(t) << std::endl;
-		\end{lstlisting}
-		A \texttt{sizeof} operátor megadja a paraméterként megadott típus, vagy objektum esetében annak típusának méretét (bővebben később). Ez minden implementációra specifikus. Azt látjuk, hogy mindig ötszöröse lesz a \texttt{t} az \texttt{i}-nek. Azaz a tömbök tiszta adatok.  Stacken ábrázolva így képzeljük el:
-		
-		\begin{figure}[!h]
-			\centering
-			\begin{tikzpicture}
-				\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-				\tikzstyle{arrow} = [thick,->,>=stealth]
-				
-				\draw [thick, black] (0, 0) -- (2, 0);
-				\draw [thick, black] (0, 0) -- (0, 3.5);
-				\draw [thick, black] (2, 0) -- (2, 3.5);
-				\node (c2) [Node] at (1,0.25) {\texttt{i} (5)};
-				\node (d2) [Node] at (1,0.75) {\texttt{t[0]} (5)};
-				\node (d2) [Node] at (1,1.25) {\texttt{t[1]} (4)};
-				\node (d2) [Node] at (1,1.75) {\texttt{t[2]} (3)};
-				\node (d2) [Node] at (1,2.25) {\texttt{t[3]} (2)};
-				\node (d2) [Node] at (1,2.75) {\texttt{t[4]} (1)};
-			\end{tikzpicture}
-			\smallskip
-			
-			A \texttt{main} függvény változói.
-		\end{figure}
-		\subsection{Biztonsági rések nem definiált viselkedés kihasználásával}
-		Irassuk ki a a tömb elemeit! A példa kedvéért rontsuk el a kódot.
-		\begin{lstlisting}
-for (int i = 0; i < 6; i++) // Hupsz. A csak 5 elem van.
-{
-	std::cout << t[i] << std::endl;
-}
-		\end{lstlisting} 
-		Itt látható, hogy túl fogunk indexelni. Ez {nem definiált viselkedés}hez vezet. Várhatóan memóriaszemetet fog kiolvasni az utolsó elem helyett, de sose tudhatjuk pontosan mi fog történni. Fordítási időben ezt a hibát a fordító nem veszi észre. A gyakorlaton a programot futtatva nem következett be futási idejű hiba.
-		
-		Most növeljük meg az elemeket, és indexeljünk túl egészen 100ig!
-		\begin{lstlisting}
-for (int i = 0; i < 100; i++)
-{
-	++t[i];
-}
-std::cout << "sajt" << std::endl;
-		\end{lstlisting} 
-		Ez a program továbbra is nem definiált viselkedést tartalmaz. Mivel több memóriához nyúlunk hozzá indokolatlanul, ezért nagyobb rá az esély, hogy futási idejű hibába ütközzünk. Az órán a {sajt} szöveg ki lett írva, mégis kaptunk egy szegmentálási hibát (\textit{segmentation fault}).
-		
-		\begin{lstlisting}
-for (int i = 0; i < 100000; i++)
-{
-	++t[i];
-}
-std::cout << "sajt" << std::endl;
-		\end{lstlisting} 
-		A túlindexelést tovább fokozva a program még mielőtt sajt-ot ki tudta volna írni, szegmentálási hibával leállt. Ez jól demonstrálja, hogy ugyanolyan jellegű  a hibát követtük el, de mégis más volt a végeredmény. Ez az egyik ok, amiért veszélyesek a nem definiált viselkedések. Mivel számos különböző hibát okozhatnak, ezért a diagnosztizálásuk sem mindig egyszerű. Az alábbi kód szemléltet egy példát, hogyan lehet biztonsági rés a nem definiált viselkedésből.
-		\begin{lstlisting}
-#include <iostream>
-#include <string>
-
-int main()
-{
-	int t[] = {5,4,3,2,1};
-	int isAdmin = 0;
-	std:string name;
-	std::cin >> name;
-	for (int i = 0; i < name.size(); ++i)
-	{
-		t[i] = 1;
-	}
-	if (name == "pityu")
-		isAdmin = 1;
-	std::cout << "Admin?: " << (isAdmin != 0 ) << std::endl;
-}
-		\end{lstlisting}
-		Ha a programnak \texttt{pityu}-t adunk meg amikor be akarja olvasni \texttt{name}-et, akkor minden rendben. De mivel a forráskódot ismerjük, azért ha hosszú nevet adnánk (nagyobb mint 5), akkor a túlindexelés miatt ki tudjuk használni a nem definiált viselkedéseket. Az is előfordulhat, hogy az \texttt{isAdmin} memóriacímére írunk, és elérjük, hogy a szoftver adminként authentikáljon valakit, aki nem az.
-		\medskip
-		
-		Hogyan lehet ezeket a hibákat elkerülni? Túl azon, hogy figyelni kell, vannak programok amik segítenek. Ehhez használhatunk \texttt{sanitizer}-eket. Ezek módosítanak a fordító által generált kódon. Létrehoz ellenőrzéseket, amik azelőtt észrevesznek bizonyos nem definiált viselkedéseket, mielőtt azok megtörténnének. Pl. itt a túlindexelés, egy futási idejű hibához és egy jól olvasható hibaüzenethez vezetne. Használatukhoz elég egy extra paranccsal fordítanunk:
-		
-		{\centering\texttt{g++ main.cpp -fsanitize=address}\par }
-		
-		A sanitizerek csa abban az esetben találnak meg egy hibát, ha a probléma előfordul (azaz futási időben, nem fordítási időben ellenőriz). Amennyiben előfordul, akkor elég pontos leírást tudunk kapni arról, hogy merre van a probléma. Fordítási időben a figyelmeztetések használata segíthet bizonyos hibák elkerülésében.
-		
-		{\centering \texttt{g++ main.cpp -Wall -Wextra} \par}
-		
-		A fenti két kapcsoló szintén extra ellenőrzéseket vezet be, de nem változtatják meg a generált kódot.
-	\subsection{Hivatkozás tömb elemeire}
-		\begin{lstlisting}
-#include <iostream>
-
-int main()
-{
-	int t[] = {5,4,3,2,1};
-	int *p = t;
-	std::cout << *p << std::endl; // 5
-	std::cout << sizeof(int) << std::endl; // implementációfüggő, legyen x
-	std::cout << sizeof(p) << std::endl; // implementációfüggő, legyen y
-	std::cout << sizeof(t) << std::endl; // 5*x
-}
-		\end{lstlisting}
-		Könnyű azt hinni (hibásan), hogy a pointerek ekvivalensek a tömbökkel. A fenti program jól szemlélteti, hogy ez nem igaz. A tömb típusa tartalmazza azt az információt, hogy hány elemű a tömb. Egy pointer típusa csak azt az információt tartalmazza, hogy a mutatott elem mekkora. Számos más különbség is van. A tévhit oka az, hogy tömb könnyen konvertálódik első elemre mutató pointerré.
-		
-		Egy tömb adott elemére több módon is hivatkozhatunk:
-		
-		{\centering \texttt{*(p + 3) == *(3 + p) == p[3] == 3[p]} \par}
-		\
-		\begin{lstlisting}
-#include <iostream>
-
-int main()
-{
-	int t[][3] = {{1,2,3},{4,5,6}};
-	return 0;
-}
-		\end{lstlisting}
-		Tekintsük a fenti két dimenziós tömböt. Az első \texttt{[]} jelek közt nincs méret, mert a fordító az inicializáció alapján meg tudja állapítani. A második dimenzió méretének megadása viszont kötelező.
-		
-		\medskip
-		Fentebb a tömböknél megadott ekvivalenciát a mátrixra alkalmazva számos indexelési módot le tudunk vezetni:
-		\medskip
-		
-		\begin{center}
-			\texttt{t[1][] == *(*(t+1)+0) == *(1[t]+0) == 0[1[t]] == 0[*(t+1)] == *(t+1)[0] == 1[t][0] } 
-		\end{center}
-	\begin{note}
-		Ahhoz, hogy egy olyan függvényt írjunk, ami minden méretű tömböt elfogad paraméterül, a legegyszerűbb megoldás, ha hagyjuk, hogy a tömb átkonvertálódjon egy első elemre mutató pointerré, és átadjuk külön paraméterben a tömb méretét. Bár van megoldás arra is, hogy egy darab "rugalmas" függvényt írjunk, és az egész tömbről csak egy paramétert vegyünk át. Majd a 7-8. gyakorlaton lesz részletesen szó, de a következő a szintaxis:
-		\begin{lstlisting}
-template <class T, int ArraySize>
-void ( T (&param)[ArraySize] )
-{
-	//...
-}
-		\end{lstlisting}
-		\smallskip
-		A működésének az elvét még nem baj, ha nem értjük. A háttérben egy template paraméter dedukció fog végbemenni: a fordító kitalálja \texttt{param} méretét. 
-		
-		\smallskip
-		A tömbök átvétele paraméterként azért ilyen körülményes, mert egy tömbnek a méretét fordítási időben ismernünk kell. Ha változó méretű tömböt várnánk paraméterül, az szembemenne ezzel a követelménnyel.  
-	\end{note}
-	\begin{note}
-		Előzmény tárgyakból elképzelhető, hogy azt tanultuk, hogy egy tömb méretének egy változót is megadhatunk. Ezt a \texttt{gcc} fordító elfogadja és jó kódot is generál belőle. De ez egy nem szabványos kiterjesztés, ezért nem garantált, hogy ezt minden fordító megteszi. Ez jól demonstrálja, hogy a fordítók nem mindenben követik szorosan a szabványt.
-	\end{note}
+	
+	Feltűnhet, hogy a stream objektumra mutató referenciát a függvény végén vissza is adjuk, hogy tudjuk a kiíratást láncolni.
 \end{document}
