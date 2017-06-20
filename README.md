@@ -1,7 +1,9 @@
 ﻿# C++ gyakorlati jegyzetek
-Itt található az összes cpp gyak jegyzete latexben. Please dont share.
+Itt található az összes cpp gyak jegyzete latexben. Idővel lehetőleg átalakul general ea/gy jegyzetté.
 
 Maga a compiled pdf az bátran bárkivel megosztható ;)
+
+**A pluszminuszhoz tartozó forrásfájlok itt előrhetőek, de a hallgatóság számára még a compiled pdf sem publikus!**
 
 ## Pótlandó dolgok
 
@@ -30,3 +32,4 @@ A hallgatóság az alábbi linkeken fér hozzá a jegyzetekhez:
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/10gy_cpp/10gy_cpp.pdf
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/11gy_cpp/11gy_cpp.pdf
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/12gy_cpp/12gy_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/cpp_book/cpp_book.pdf

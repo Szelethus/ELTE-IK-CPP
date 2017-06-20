@@ -450,14 +450,14 @@ List(int _data, List *_next = 0)
 }
 	\end{lstlisting}
 	  Az inicializációs lista használata azonban hatékonyabb.
-	Mire a konstruktor törzséhez ér a vezérlés, addigra az adattagoknak inicializálva kell lenniük. A törzsben ezért már inicializált értékeket írunk felül, ami erőforrás pazarlás. Primitív típusok esetén ez nem jelent problémát, összetett típusok esetén viszont számottevő lehet.
+  Mire a konstruktor törzséhez ér a vezérlés, addigra az adattagokat inicializálni kell. A törzsben ezért már inicializált értékeket írunk felül, ami erőforrás pazarlás. Primitív típusok esetén ez nem jelent problémát (mivel a fordító várhatóan kioptimalizálja), összetett típusok esetén viszont számottevő lehet.
 	\begin{note}
-	    A konstruktor törzsében történő értékadás 2 lépés (mivel előtte egy alapértelmezett konstruktor már inicializálta az objektumot), az inicializálás csak 1.
+	    A konstruktor törzsében történő értékadás két lépés (mivel előtte egy alapértelmezett konstruktor már inicializálta az objektumot), az inicializálás csak egy.
 	\end{note}
-	Fontos megjegyzés, hogy az a struktúra elemei a mezők definiálásának a sorrendjében inicializálódnak. Tehát, bármilyen sorrendben írjuk mi az inicializációs listát, mindig először a \texttt{data}, és utána a \texttt{next} fog inicializálódni.
+	Fontos megjegyzés, hogy az a struktúra elemei a mezők definiálásának a sorrendjében inicializálódnak. Tehát, bármilyen sorrendben írjuk mi az inicializációs listát, mindig először a \texttt{data}, és utána a \texttt{next} kerül inicializálásra. Ennek az az oka, hogy konstruktorból több is lehet, így nem lenne egyértelmű az inicializációs sorrend, függne attól, hogy mely konstruktort hívtuk meg. A mezők sorrendje ezzel szemben egyértelmű.
 	
 	\medskip
-	Előfordulhat olyan, hogy szeretnénk létrehozni egy listát, de azt szeretnénk, hogy élettartama mennél minimálisabb legyen. Ezt megtehetjük például úgy, hogy ha egy külön blokkban hozzuk létre.
+	Előfordulhat olyan, hogy szeretnénk létrehozni egy listát, de azt szeretnénk, hogy élettartama mennél kisebb legyen. Ezt megtehetjük például úgy, ha egy külön blokkban hozzuk létre.
 	\begin{lstlisting}
 void printFirstElement(const List &l) { std::cout << l.data << std::endl; }
 
@@ -471,17 +471,17 @@ int main
 	//...
 }
 	\end{lstlisting}
-	Ha valóban csak ideiglenesen van szükségünk erre a listára azonban, létrehozhatunk egy temporális változót is, vagy más néven egy \textbf{név nélküli temporális változót}. Ehhez csupán annyit kell tennünk, hogy elhagyjuk a változó nevét, és a típus után egyből a konstruktor paramétereit adjuk meg.
+	Ha csak egy kifejezésben van szükségünk erre a listára, létrehozhatunk egy \textbf{név nélküli temporális változót}. Ennek a létrehozásához elhagyjuk a változó nevét, és a típus után egyből a konstruktor paramétereit adjuk meg.
 	\begin{lstlisting}
 List(4); //amint létrejön ez a változó, meg is fog semmisülni.
 //...
 printFirstElement(List(4)); //a lista élettartama a függvényhívástól a függ-vény futásának végéig tart.
 	\end{lstlisting}
 	\begin{note}
-		Név nélküli temporális változó az is, ha egy literált írunk. Ha pl. az \texttt{f} függvény egy darab \texttt{int}-et vár paraméterül, akkor \texttt{f(5)} hívásakor \texttt{5} egy név nélküli temporális változó.
+    A literálok is név nélküli temporális értékek (bár nem változók). Ha pl. az \texttt{f} függvény egy darab \texttt{int}-et vár paraméterül, akkor \texttt{f(5)} hívásakor \texttt{5} egy név nélküli temporális érték.
 	\end{note}
 	\begin{note}
-		A temporális változók jobb értékek, így csak konstans referenciával, vagy érték szerint tudjuk őket átvenni.
+		A temporális változók jobb értékek, így csak konstans referenciával, vagy érték szerint tudjuk őket átvenni. Ha konstans referenciához kötjük, akkor a változó élettartama kiterjesztésre kerül, meg fogy egyezni a referencia élettartamával.
 	\end{note}
 	\subsection{Destrukorok}
 	Ahogy gondoskodtunk a listaelemek létrehozásáról, gondoskodhatnánk annak megfelelő megsemmisüléséről is.
