@@ -1,4 +1,4 @@
-\documentclass[a4paper,11.5pt,table]{article}
+﻿\documentclass[a4paper,11.5pt,table]{article}
 \usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
 \usepackage[normalem]{ulem}
 \usepackage[utf8]{inputenc}
@@ -19,7 +19,7 @@
 	%identifierstyle=\color{blue},
 	keywordstyle=\bfseries\color{green!40!black},
 	stringstyle=\color{orange},
-	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}, 
+	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, detail, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}, 
 	emphstyle = \color{blue},
 	tabsize = 4
 }
@@ -42,8 +42,6 @@
 	{€}{{\euro}}1 {£}{{\pounds}}1	
 }
 
-\lstset{escapechar=@,style=customc}
-
 \usepackage{hyperref}
 
 \begin{document}
@@ -63,362 +61,339 @@
 		7. óra.
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlatán. (\today)
+	\subsection{Header fájlra és fordításra egységre szétbontás}
+	Visszatérve a korábban írt láncolt listánkhoz, bátran állíthatjuk, hogy mindennel rendelkezik ami számunkra fontos. Azonban ha egy darab header fájlban tárolnánk mindent, számos problémába ütköznénk. Ha több fordítási egységbe illesztenénk be a headert, fordítási idejű hibát kapnánk, hogy számos függvényt többször próbáltunk definiálni (sértenénk az ODR-t). Erre megoldás lehet, hogy a definíciókat és deklarációkat elválasztjuk: az osztályban lévő függvények deklarációit hagyjuk meg a header fájlban, és a definíciókat egy külön fordítási egységbe tegyük!
 	
-	\section{Template}
-	\subsection{Függvény template-ek}
-	Térjünk vissza a régebben megírt swap függvényünkhöz.
-	\begin{lstlisting}
-void swap(int &a, int &b)
-{
-	int tmp = a;
-	a = b;
-	b = tmp;
-}
-	\end{lstlisting}
-	Ahogy azt láttuk, túl tudjuk terhelni ezt a függvényt, hogy más típusú objektumokat is meg tudjunk cserélni.
-	Azonban gyorsan megállapítható, hogy állandóan egy újabb overloadot létrehozni nem épp ideális megoldás. Ez a kisebb gond, a nagyobb az, hogy a kódismétlés áldozatai leszünk: ha bármi miatt megváltozna a \texttt{swap} belső implementációja (pl. találunk hatékonyabb megoldást), az összes létező swap függvényben meg kéne ejteni a változtatást. E probléma elkerülésére egy megoldás lehet, ha létrehozunk egy sablont, melynek mintájára a fordító maga tud generálni egy megfelelő függvényt.
-	\begin{lstlisting}
-template <typename T>
-void swap(T &a, T &b)
-{
-	T tmp = a;
-	a = b;
-	b = tmp;
-}
-	\end{lstlisting}
-	Az így implementált \texttt{swap} függvény egy \textit{template}, és a template paramétere (\texttt{T}) egy típus. Ez alapján a fordító már létre tud hozni hozni megfelelő függvényeket:
-	\begin{lstlisting}
-int main()
-{
-	int a = 2, b = 3;
-	swap<int>(a, b);
-	
-	double c = 1.3, d = 7.8;
-	swap<double>(c, d);
-}
-	\end{lstlisting}
-	A fordítónak csak annyi dolga van, hogy minden \texttt{T}-t lecseréljen \texttt{int}-re, és már kész is a függvény. A fenti példában mi explicit megmondtuk a fordítónak, hogy \texttt{swap}-ot milyen template paraméterrel {példányosítsa} (\textit{instantiate}), azonban függvényeknél erre nem feltétlenül van szükség: a fordító tudja \texttt{a} és \texttt{b} típusát, így ki tudja találni hogy mit kell behelyettesítenie.
-	\begin{lstlisting}
-int main()
-{
-	int a = 2, b = 3;
-	swap(a, b);
-	
-	double c = 1.3, d = 7.8;
-	swap(c, d);
-}
-	\end{lstlisting}
-	Ezt a folyamatot (amikor a fordító kitalálja a tempalte paramétert) \textbf{template paraméter dedukciónak} (\textit{template parameter deduction}) hívjuk.
 	\begin{note}
-		Természetesen a példányosítás jóval bonyolultabb annál, hogy a a fordító minden \texttt{T}-t egy konkrét típusra cserél, de ebben a könyvben az egyszerűség kedvéért elégedjünk meg ennyivel.
+		Feltűnhet majd, hogy pár függvénydefiníció bent maradt. Erre később lesz magyarázat.
 	\end{note}
-	Nem csak típus lehet template paraméter -- bármi ami \textbf{nem} karakterlánc literál vagy lebegőpontos szám.
-	\begin{note}
-		A lebegőpontos számokra vonatkozó indoklást később a template specializációknál lesz leírva, de a karakterlánc literálokra már most adhatunk választ.
-		
-		Mivel a C++ban van lehetőség függvénytúlterhelésre, ezért a fordító fordítás közben nem csak a függvény nevét, de annak paraméterlistáját, visszatérési értékét és a template paraméterekre vonatkozó információkat (stb.) is kénytelen eltárolni a függvény nevével együtt. Amennyiben karakterlánc literál is lehetne template paraméter, nagyon meg tudna nőni ennek a sztringnek a hossza, és lassíthatná a fordítási időt.
-	\end{note}
-	\begin{lstlisting}
-template <typename T, int ArraySize>
-int arraySize(const T (&array)[ArraySize])
-{
-	return ArraySize;
-}
+	
+	\medskip
+	\fbox{\textbf{list.hpp:}}
+\begin{lstlisting}
+#ifndef LIST_H
+#define LIST_H
 
-int main()
+#include <iosfwd>
+
+class List;
+
+class Iterator 
 {
-	int i[10];
-	std::cout << arraySize(i) << std::endl; //10
-}
-	\end{lstlisting}
-	A fenti kód a 3. gyakorlat végén tett megjegyzésből lehet ismerős. Jól demonstrálja a template paraméter dedukciót.
-	\subsection{Osztály template-ek}
-	Nem csak függvények, osztályok is lehetnek template-ek melyen nagyon hasonlóan működnek. A következő kódrészletekben a template osztályok mellett megismerkedhetünk még a template-ek ,,lustaságával'' is.
-	\begin{lstlisting}
+public:
+	explicit Iterator(List *p) : p(p) {}
+	bool operator==(Iterator other) const { return p == other.p; }
+	bool operator!=(Iterator other) const { return !(*this == other); }
+	Iterator operator++();
+	int& operator*() const;
+private:
+	friend class ConstIterator;
+	List *p;
+};
+
+class ConstIterator
+{
+public:
+	ConstIterator(Iterator it) : p(it.p) {}
+	explicit ConstIterator(const List *p) : p(p) {}
+	bool operator==(ConstIterator other) const { return p == other.p; }
+	bool operator!=(ConstIterator other) const { return !(*this == other); }
+	ConstIterator operator++();
+	int operator*() const;
+private:
+	const List *p;
+};
+
+class List 
+{
+public:
+	explicit List(int data_, List *next = 0) : data(data_), next(next) {}
+	~List() { delete next; }
+	List(const List &other);
+	List& operator=(const List &other);
+	void add(int data);
+	Iterator begin() { return Iterator(this); }
+	ConstIterator begin() const { return ConstIterator(this); }
+	Iterator end() { return Iterator(0); }
+	ConstIterator end() const { return ConstIterator(0); }
+private:
+	friend Iterator;
+	friend ConstIterator;
+	int data;
+	List *next;
+};
+
+#endif
+\end{lstlisting}
+
+	\fbox{\textbf{list.cpp:}}
+\begin{lstlisting}
 #include <iostream>
 
-template <typename T>
-struct X
+#include "list.hpp"
+#include <iostream>
+
+List::List(const List &other) : data(other.data), next(0) 
 {
-	void f()
+	if (other.next != 0) 
 	{
-		T t;
-		t.foo();
+		next = new List(*other.next);
 	}
-};
-struct Y
+}
+
+List& List::operator=(const List &other) 
 {
-	void bar() {}
-};
-int main() {}
-	\end{lstlisting}
-	Ez a kód úgy tűnhet, hogy nem fog lefordulni, lévén mi soha semmilyen \texttt{foo} tagfüggvényt nem írtunk, azonban mégis le fog. Ez azért van, mert a template osztályok (és függvények) csak sablonok, amiből aminek alapján a fordító generálhat egy konkrét osztályt (vagy függvényt), és mivel sose példányosítottuk, fordítás után az \texttt{X} template osztály nem fog szerepelni a kódban. Szintaktikus ellenőrzést végez a fordító, (pl. zárójelek be vannak-e zárva, pontosvessző nem hiányzik-e stb.), de azt, hogy van-e olyan \texttt{T} típus, ami rendelkezik \texttt{foo()} függvénnyel, már nem.
-	
-	\smallskip
-	Példányosítsuk az \texttt{X} osztályt \texttt{Y}-nal!
-\begin{lstlisting}
-int main()
+	if (this == &other)
+		return *this;
+	delete next;
+	data = other.data;
+	if (other.next) 
+	{
+		next = new List(*other.next);
+	} 
+	else 
+	{
+		next = 0;
+	}
+	return *this;
+}
+
+void List::add(int data) 
 {
-	X<Y> x;
+	if (next == 0) 
+	{
+		next = new List(data);
+	} 
+	else 
+	{
+		next->add(data);
+	}
+}
+
+Iterator Iterator::operator++() 
+{
+	p = p->next;
+	return *this;
+}
+
+int& Iterator::operator*() const 
+{
+	return p->data;
+}
+
+ConstIterator ConstIterator::operator++() 
+{
+	p = p->next;
+	return *this;
+}
+
+int ConstIterator::operator*() const 
+{
+	return p->data;
 }
 \end{lstlisting}
-	Ekkor már azt várnánk hogy fordítási hibát dobjon a fordító, hisz \texttt{Y}-nak nincs \texttt{foo()} metódusa, azonban mégis gond nélkül lefordul, mivel az \texttt{f()} tagfüggvényt nem hívtuk meg, így nem is példányosult az osztályon belül.
-	\begin{lstlisting}
-int main()
+	\fbox{\textbf{main.cpp:}}
+\begin{lstlisting}
+#include <iostream>
+#include "list.hpp"
+
+void print(const List &l)
 {
-	X<Y> x;
-	x.f();
+	for(ConstIterator it = l.begin(); it != begin(); ++it)
+	{
+		std::cout << *i << ' ';
+	}
+	std::cout << std::endl;
 }
+
+int main() 
+{
+	List head(5);
+	head.add(8);
+	head.add(10);
+	head.add(8);
+}
+
+\end{lstlisting}
+	
+	Ez a szétválasztás sok egyéb előnnyel is jár: a \texttt{List}-hez tartozó információk sokkal kisebb helyen elférnek. Azonban ahogy a fenti megjegyzés is felhívta rá a figyelmet, a list.hpp továbbá is tartalmaz definíciókat! Ennek ellenére azt tapasztaljuk, hogyha több fordítási egységbe illesztjük be a headert, még akkor sem kapunk fordítási idejű hibát. Ennek a magyarázatához tegyünk egy kisebb kitérőt.
+	\subsection{Inline függvények}
+	
+	Tekintsük azt a példát, amikor a \texttt{void f() \{\}} függvényt is beillesztjük a headerbe: ha több fordítási egységet fordítanánk egyszerre, melybe ez a header be van illesztve, linkelési hibát kapnánk, mert \texttt{f} többször lesz definiálva. Ez azonban megkerülhető az \texttt{inline} kulcsszó használatával, segítségével ugyanis kiküszöbölhető a linker hiba: minden azonos nevű, visszatérési értékű, és paraméter listájú inline-ként definiált függvény definícióval együtt beilleszthető több különböző fordítási egységbe, és nem fog fordítási hibát okozni.
+	
+	Ez úgy oldható meg, hogy a fordító a linkelés folyamán a definíciók közül egyet tetszőlegesen kiválasztást. Az osztályon belül kifejtett függvények implicit inline-ok, így sose okozhatnak fordítási hibát.
+	\begin{lstlisting}
+inline void f() {}
 	\end{lstlisting}
-	Itt már végre kapunk fordítási hibát, mert példányosul \texttt{f()}. Ez jól mutatja, hogy a template-ek lusták, és csak akkor példányosulnak, ha ,,nagyon muszáj''.
+	
+	\medskip
+	Az ábra jól demonstrálja a problémát.
+	\begin{figure}[t]
+		\centering
+		\begin{tikzpicture}
+		\tikzstyle{HeaderName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+		\tikzstyle{CppName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+		\tikzstyle{FunctionName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= white]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		
+		\node (listHpp) [HeaderName] {\texttt{list.hpp}};
+		\node (listHppF) [FunctionName, below = 0 mm of listHpp] {\texttt{f() \{\}}};
+		
+		\node (mainCpp) [CppName, below left = of listHpp] {\texttt{main.cpp}};
+		\node (mainCppF) [FunctionName, below  = 0 mm of mainCpp] {\texttt{f() \{\}}};
+		
+		\node (listCpp) [CppName, below right = of listHpp] {\texttt{list.cpp}};
+		\node (listCppF) [FunctionName, below  = 0 mm of listCpp] {\texttt{f() \{\}}};
+		
+		\node (exe) [CppName, below = 2.7 cm of listHpp] {\texttt{exe file}};
+		\node (exeF) [FunctionName, below  = 0 mm of exe] {\texttt{f() ???}};
+		
+		\draw[arrow] (listHppF) -- (mainCpp);
+		\draw[arrow] (listHppF) -- (listCpp);
+		\draw[arrow] (mainCppF) -- (exe);
+		\draw[arrow] (listCppF) -- (exe);
+		\end{tikzpicture}
+		\smallskip
+		
+		A \texttt{main.cpp}-ben vagy a \texttt{list.cpp}-ben lévő definíciója szerepeljen \texttt{f}-nek a futtatható fájlban?
+	\end{figure}
+	\texttt{f()} egy un. \textit{strong reference}-el jön létre ha nem inline, így a linker hibát dob ha több fordítási egységben definiálva van. Ha azonban inline-ként adjuk meg, akkor  \textit{weak reference}-ként értelmezi, a meglevő definíciók közül tetszőlegesen kerül egy kiválasztásra. Ez nyilván azt is jelenti, hogy minden ilyen függvény definíciójának meg kell egyeznie, hisz kellemetlen meglepetés érhet minket, ha különböző definíciók közül olyat választ a fordító, melyre nem számítanánk (és ez egyben nem definiált viselkedés is).
+	\begin{note}
+		A legtöbb fordítónál lehet egy LTO (\textit{link time optimalization}) funkciót bekapcsolni, mely a linkelésnél optimalizál, többek között ott végzi el az inlineolást.
+	\end{note}
+	\begin{note}
+		Az inline függvények hajlamosak erősen megnövelni a bináris kódot, így az erőltetett használatuk nem javallott.
+	\end{note}
+	\begin{note}
+		Az inline kulcsszó egy javaslat a fordítónak, de nem parancs. Nem inline függvények lehetnek inline-ok, és inlineként definiált függvények lehet mégsem lesznek azok.
+	\end{note}
+	Azok a tagfüggvények, melyek nem az osztály törzsében vannak definiálva, nem lesznek inline-ok, ezért volt az, hogy mielőtt szétszedtük a listánkat header fájlra és fordítási egységre, linkelési hibát kaptunk (\texttt{Iterator} és \texttt{ConstIterator} pár tagfüggvénye külön volt véve).
 	\medskip
 	
-	A template-eknek adhatunk meg alapértelmezett értéket.
-
-\begin{lstlisting}
-template <typename T = void> //alapértelmezett paraméter
-struct X {/* ... */};
-
-struct Y {/* ... */};
-
-int main()
+	Cseréljük le a print függvényt:
+	%TODO nem ártana megmagyarázni, ez miért nem tagfüggvény
+	\begin{lstlisting}
+std::ostream& operator<<(std::ostream &os, const List &l)
 {
-	X<Y> x;
-	X<> x2;
+	for(ConstIterator it = l.begin(); it != l.end(); ++it)
+	{
+		os << *it;
+	}
+	return os;
+}
+	\end{lstlisting}
+	Sajnos ismét fordítási hibát kapunk, hisz a fordító nem tudja mi az az \texttt{ostream}, hisz az ismerős \texttt{iostream} könyvtár nincs include-olva. Ilyenkor azonban érdemes inkább az \texttt{iosfwd} headert beilleszteni az \texttt{iostream} helyett, mert ez minden beolvasással és kiíratással kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység mérete (azonban a cpp fájlban muszáj \texttt{iostream}-et használni, hogy a definíciók meglegyenek).
+	\begin{note}
+		Ha szeretnénk egy \texttt{std::ostream} típusú objektumot használni, szükségünk lenne az \texttt{iostream} könyvtárra, hisz a fordítónak tudnia kéne, mekkora az \texttt{std::ostream} mérete, és ehhez szüksége van a teljes osztálydefinícióra. Azonban a referencia vagy pointer típusoknál erre nincs szükség, amíg nem akarunk egy tagfüggvényüket meghívni.
+	\end{note}
+	\section{Névterek}
+	A kódunkkal kapcsolatban felmerülhet egy másik probléma is: nagyon sok hasznos nevet elhasználtunk, pl. több \texttt{Iterator} nevű osztályt nem hozhatunk létre (az un. globális névtérbe vagy \textit{global namespace}-be kerültek), különben a névütközés áldozatai leszünk. Pedig várhatóan nem csak ennek az egy konténernek szeretnék iterátort írni.
+	\smallskip
+	
+	Megoldás lehet, hogyha inline class-t hozunk létre, azaz az iterátor teljes deklarációját beillesztjük a \texttt{List}-be, így csak a \texttt{List} lát rá \texttt{Iterator}-ra követlenül, mindenhol máshol úgy kell hivatkozni rá, hogy \texttt{List::Iterator}.
+	\begin{lstlisting}
+class List
+{
+public:
+	class Iterator
+	{
+		//...
+	};
+	//...
+};
+	\end{lstlisting}
+	
+	Azonban szerencsésebb, ha az iterátorainkat egy névtérbe (\textit{namesspace}) rakjuk.
+\begin{lstlisting}
+namespace detail
+{
+	class Iterator
+	{
+		//...
+	};
+	class ConstIterator
+	{
+		//...
+	};
 }
 \end{lstlisting}
-	Ilyenkor nem szükséges megadni template paramétert (mely esetben értelemszerűen \texttt{X<> == X<void>}). 
+	Így az \texttt{Iterator} és \texttt{ConstIterator} osztályra a későbbiekben csak úgy hivatkozhatunk, ha megmondjuk, mely névtérből származnak. Ugyanezzel a módszerrel, ha létrehozunk pl. egy \texttt{Vector} nevű osztályt, annak is írhatunk egy \texttt{Iterator} nevű osztályt, amit pl. egy \texttt{VectorDetail} névtérbe tehetünk.
+	\begin{lstlisting}
+detail::Iterator it;
+detail::ConstIterator cit;
+	\end{lstlisting}
+
+	A névterek segíthetnek abban, hogy logikai egységebre rendezzük a kódunkat. Az egyik legnagyobb ilyen egység az \texttt{std} névtér, mely tartalmaz minden függvényt, változót, stb, ami a standard részét alkotja. 
+	
+	Lehet névtereket egymásba is ágyazni, erre lehet példa a C++11-es \texttt{chrono} könyvtár, mely az \texttt{std} névteren belül számos dolgot a \texttt{chrono} alnévtérben tárol.
+	
+	\subsection{Typedef}
+	A \texttt{typedef} kulcsszó szinonimák létrehozására használatos, és ha ügyesen használjuk, ki lehet használni valamennyi előnyét. 
 	
 	\smallskip
-	Ahogyan az említve volt korábban, szinte bármi lehet template paraméter, akár egy másik template is.
-
-\begin{lstlisting}
-template <typename T>
-struct X {/* ... */};
-
-struct Y {/* ... */};
-
-template <template <typename> class Templ>
-struct Z
-{
-	Templ<int> t;
-};
-
-int main()
-{
-	Z<X> z;
-}
-\end{lstlisting}
-	Fent \texttt{Templ} egy olyan template, aminek a template paramétere egy típus. Így \texttt{Z}-nek a template paramétere egy olyan template, aminek a template paramétere egy típus. Mivel \texttt{X} egy template (és template paramétere egy típus), így megadható \texttt{Z}-nek template paraméterként.
-	\begin{note}
-		Fent a template paraméter listában \texttt{typename} helyett \texttt{class} szerepel. Ezek gyakorlatilag ekvivalensek, mind a kettő azt jelenti, hogy az adott paraméter típus (bár a \texttt{typename} beszédesebb).
-	\end{note}
-	
-	A fenti példákban mindig egy default konstruktort hívtunk meg, amikor objektumokat hoztunk létre. Helyes lenne-e az, ha explicit módon kíírnánk a zárójeleket (hangsúlyozva a default konstruktor hívást)?
-\begin{lstlisting}
-int main()
-{
-	X<Y> x();
-	X<> y2();
-	Z<X> z();
-}
-\end{lstlisting}
-	A kód helyesen lefordul, de a jelentése nem ugyanaz, mintha nem lenne ott a zárójel. Mivel a c++ nyelvtana nem egyértelmű, más kontextusban ugyanaz a kódrészlet mást jelenthet (egyik legegyszerűbb példa a \texttt{static} kulcsszó), így meg kellett alkotni egy olyan szabályt, miszerint amit deklarációként lehet értelmezni, azt deklarációként \textbf{kell} értelmezni. Igy ezek függvénydeklarációk lesznek: Az első esetben például egy olyan függvényt deklarálunk, melynek neve \texttt{x}, \texttt{X<Y>}-al tér vissza és nem vár paramétert. 
-	
-	Így ha default konstruktort szeretnék meghívni, semmilyen zárójelt nem szabad használni.
-	\begin{note}
-		C++11ben lehet gömbölyű zárójel helyett helyett kapcsos zárójelet alkalmazni konstruktorhívásnál, így ez a probléma nem fordulhat elő. pl: \texttt{X<Y> x\{\};}
-	\end{note}
-	
-	A template-ek paramérének ismertnek kell lennie fordítási időben.
+	Hozzunk létre egy osztályt, melynek adatokat kell tárolnia. Tegyük fel, hogy egyenlőre nem fontos számunkra az, hogy milyen konténerben tároljuk az adatokat az osztályon belül, és a példa kedvéért követeljük meg ettől a leendő konténertől hogy rendelkezzen \texttt{push\_back} tagfüggvénnyel. Az \texttt{std::vector} konténerrel ez így nézhetne ki:
 	\begin{lstlisting}
-template <int N>
-void f() {}
-
-int main()
+class StoreIntData
 {
-	int n;
-	std::cin >> n;
-	f<n>(); //hiba, n nem ismert fordítási időben
-}
+private:
+	std::vector<int> data;
+};
 	\end{lstlisting}
-	Ez nyilvánvaló, hisz a template-eknek az a funkciója, hogy a fordító generáljon belőlük példányokat, és a fordítási idő végeztével erre nincs lehetőség.
-	\begin{note}
-		Fontos még, hogy a template-ek nagyon megnövelik a fordítási időt, így nem mindig éri meg egy olyan függvényt is template-ként megírni, melyet nem feltétlenül muszáj.
-	\end{note}
-	\subsection{Template specializáció}
-	Néha szeretnénk, hogy bizonyos speciális behelyettesítéseknél más legyen az implementáció mint az alap sablonban. Ilyenkor szokás \textbf{specializációkat} (\textit{template specialization}) létrehozni:
-	
+	Írjunk egy tagfüggvényt, mellyel két \texttt{StoreIntData} típus tárolt adatait össze tudjuk fűzni.
 	\begin{lstlisting}
-template <class T>
-struct A
+class StoreIntData
 {
-	A()	{ std::cout << "general A" << std::endl; }
-};
-
-template <> //template specializáció
-struct A<int>
-{
-	A() { std::cout << "special A" << std::endl; }
-};
-
-template <class T>
-void f() { std::cout << "general f" << std::endl; }
-
-template<> //template specializáció
-void f<int>() { std::cout << "special f" << std::endl; }
-
-int main() 
-{
-	A<std::string> a1; //general A
-	f<std::string>(); //general f
-	A<int> a2; //special A
-	f<int>(); //special f
-}
-	\end{lstlisting}
-	Mind \texttt{A} osztályhoz, mind \texttt{f} függvényhez létrehoztunk egy specializációt arra az esetre, ha a template paraméterként \texttt{int}-et kapnak. Számos okunk lehet arra hogy ezt tegyük: a standard könyvtár megfényesebb példája az \texttt{std::vector} osztály, mely egy template, és van template specializációja \texttt{bool} esetre.
-	\begin{note}
-		Az \texttt{std::vector<bool>} számos optimalizációkat tartalmazhat (persze nem feltétlenül, hisz ez implementáció függő): általában nem \texttt{bool}-okban tárolja az adatokat, hanem bitekben. Sajnos azonban ez hátrányokkal is jár, például hogy a \texttt{[]} operátor érték és nem referencia szerint ad vissza.
-	\end{note}
-	\begin{note}
-		Visszatérve egy korábbi állításhoz, miért nem lehet lebegőpontos szám template paraméter? Lévén két lebegőpontos szám könnyedén lehet csak nagyon kis mértékben eltérő, ezért könnyű egy ilyesmi hibába belefutni: 
-		
-		Legyen adott \texttt{d1, d2}, fordítási időben ismert lebegőpontos szám! Mi azt hisszük, hogy ez a kettő egyenlő, de mivel számos módosításon mentek keresztül, minimális mértékben, de nem lesznek egyenlőek. Ilyenkor ha egy template paraméterként lebegőpontos számot váró függvénynek megadnánk őket template paraméterül, kétszer kéne példányosítani az adott függvényt.
-		
-		Ez a kisebb gond, de mi van ha pont erre az értékre mi létrehoztunk egy template specializációt, és csak (pl.) \texttt{d1} esetében került az a függvény meghívásra? Ez ellen a fordító se tudná a felhasználót megvédeni.
-	\end{note}
-	Írjunk faktoriális számoló algoritmus template-ek segítségével!
-	\begin{lstlisting}
-template<int N>                           
-struct Fact 
-{                             
-	static const int val = N*Fact<N-1>::val;
-};
-
-template<>                                
-struct Fact<0>
-{                          
-	static const int val = 1;               
-};               
-
-int main() 
-{                                          
-	std::cout << Fact<5>::val << std::endl; //120
-}
-	\end{lstlisting}
-	\texttt{Fact} 4szer példányosul: \texttt{Fact<5>, \ldots, Fact<1>,} majd a legvégén az általunk specializált \texttt{Fact<0>}-t hívja meg.
-	\begin{note}
-		Ahogyan ezt korábban megállapítottunk, egy \textbf{konstans} osztályszintű változót függvénytörzsön belül is inicializálhatunk.
-	\end{note}
-	Ez fel is hívja a figyelmet a template-ek veszélyeit statikus változók használatakor.
-	
-	\begin{lstlisting}
-template <class T>
-class A
-{
-	static int count;
 public:
-	A()
+	std::vector<int> merge(StoreIntData &other)
 	{
-		std::cout << ++count << ' ';
+		std::vector<int> ret;
+		for(int i = 0; i<data.size(); i++)  ret.push_back(data[i]);
+		for(int i = 0; i<other.size(); i++) ret.push_back(other.data[i]);
+		return ret;
 	}
+private:
+	std::vector<int> data;
 };
-
-template <class T>
-int A<T>::count = 0;
-
-int main() 
+	\end{lstlisting}
+	\begin{note}
+		Később látunk majd példát egy ennél jóval elegánsabb megoldásra is.
+	\end{note}
+	Tegyük fel, hogy az implementáció egy pontján úgy döntünk, mégse \texttt{std::vector}-ban, hanem \texttt{std::deque}-ban szeretnénk tárolni (erről a konténerről részletesen szó lesz később, egyenlőre legyen elég annyi, hogy az \texttt{std::vector}-hoz hasonló). Ekkor rákényszerülünk arra, hogy minden helyen, ahova \texttt{std::vector}-t írtunk, módosítanunk kelljen, és a kódismétlés áldozatai lettünk. Ehelyett használjunk egy \texttt{typedef}-et!
+	\begin{lstlisting}
+class StoreIntData
 {
-	for(int i = 0; i<5; i++)
+public:
+	typedef std::deque<int> Container;
+	
+	Container merge(StoreIntData &other)
 	{
-		A<int> a;
-		A<double> b;
+		Container ret;
+		for(int i = 0; i<data.size(); i++)  ret.push_back(data[i]);
+		for(int i = 0; i<other.size(); i++) ret.push_back(other.data[i]);
+		return ret;
 	}
-}
+private:
+	Container data;
+};
 	\end{lstlisting}
-	Kimenet: \texttt{1 1 2 2 3 3 4 4 5 5}
+	Így ha módosítanunk kell a konténerünk típusát, elég a typedefet átírni.
+	\medskip
 	
-	Bár arra számítanánk, hogy 1-től 10ig lesznek a számok kiírva, ne felejtsük, hogy itt két teljesen különböző osztály fog létrejönni: \texttt{A<int>} és \texttt{A<double>}, így a \texttt{count} adattag hiába osztályszintű, 2 teljesen különböző példánya lesz ennek is: \texttt{A<int>::count} és \texttt{A<double>::count}.
-	
-	\subsection{Dependent scope}
-	
-	Lehetőségünk van arra hogy osztályon belül deklaráljunk még egy osztályt. Bár erről bővebben a következő órai jegyzetben lesz szó, egy igen fontos problémát vet fel.
+	Visszatérve a láncolt listánkra, a módosítás után \texttt{List} nem tudja, mi az az \texttt{Iterator}, hisz az egy \texttt{datail} nevű névtérben van, ezért vagy minden \texttt{Iterator}-t lecserélünk \texttt{detail::Iterator}-ra, vagy pedig létrehozunk egy szinonimát.
 	\begin{lstlisting}
-class A
+class List
 {
 public:
-	class X {};
+	typedef detail::Iterator Iterator;
+	typedef detail::ConstIterator ConstIterator;
+	//...
 };
-
-void f(A a)
-{
-	A::X x;
-}
-
-int main()
-{
-	A a;
-	f(a);
-}
 	\end{lstlisting}
-	Ezzel semmi probléma nincs. Legyen A egy template osztály!
+	A typedef segítségével viszont még egy dolgot nyertünk: mivel ezen a szinonimák publikusak, így az osztályon kívül is tudunk rájuk hivatkozni így:
 	\begin{lstlisting}
-template <class T>
-class A
-{
-public:
-	class X {};
-};
-
-template <class T>
-void f(A<T> a)
-{
-	A<T>::X x;
-}
-
-int main()
-{
-	A<int> a;
-	f(a);
-}
+List::Iterator it = head.begin();
 	\end{lstlisting}
-	Itt máris bajba jutottunk, a fordító azt a hibát fogja jelezni, hogy \texttt{X} egy un. \textbf{dependent scope}-ban van. Ez azt jelenti, hogy attól függően, milyen template paraméterrel példányosítjuk \texttt{A}-t, \texttt{X}-nek lehet más a jelentése. Az alábbi kód ezt jól demonstrálja:
-	\begin{lstlisting}
-template <typename T>
-struct A
-{
-	class X{};
-};
-
-template <>
-struct A <int>
-{
-	static int X;
-};
-
-int A<int>::X = 0;
-
-template <typename T>
-void f()
-{
-	A<T>::X;
-}
-	\end{lstlisting}
-	Itt az \texttt{f} függvényben vajon mi lesz \texttt{A<T>::X}? A válasz az hogy nem tudni, hisz ha \texttt{int}-el példányosítunk akkor statikus adattag, ha bármi mással, akkor meg egy típus. Ezért kell a fordítónak biztosítani, hogy a template paramétertől függetlenül garantáltan típust fog oda kerülni. Ezt a \texttt{typename} kulcssszóval tehetjük meg.
-	\begin{lstlisting}
-template <typename T>
-void f()
-{
-	typename A<T>::X;
-}
-	\end{lstlisting}
-	A \texttt{typename} garantálja a fordítónak, hogy bármi is lesz \texttt{T}, \texttt{A<T>::X} mindenképpen típus lesz. Ha mégis olyan template paramétert adunk meg, aminél ez nem teljesülne (ez esetben \texttt{T = int}) akkor fordítási idejű hibát kapunk.
-	\begin{note}
-		A fordító általában szokott szólni, hogy a \texttt{typename} kulcsszó hiányzik.
-	\end{note}
-	\begin{note}
-		A dependent scope problémája nem csupán az osztályon belüli osztályokra érvényes. Nemsokára meglátjuk, hogy a \texttt{typedef} kulcsszó is ide tud vezetni.
-	\end{note}
-	Így viszont felmerülhet a kérdés hogy van-e szükség \texttt{typename} kulcsszóra, ha egy \texttt{std::vector<int>::iterator} típusú objektumot akarunk létrehozni (\texttt{std::vector<int>::iterator vit;}). A válasz az hogy nem, hisz ha konkrétan megadjuk a típust, amellyel példányosítanánk, akkor a fordító arra a konkrét típusra vissza tudja keresni, hogy \texttt{std::vector<int>::iterator} típus-e, vagy sem.
+	
 	
 \end{document}
