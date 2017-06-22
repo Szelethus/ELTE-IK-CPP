@@ -31,7 +31,7 @@
 	frame=L,
 	language=[x86masm]Assembler,
 	basicstyle=\ttfamily,
-	commentstyle=\itshape\color{purple!40!black},
+	commentstyle=\itshape\color{yellow!40!black},
 }
 
 \lstset{
@@ -43,7 +43,7 @@
 	{ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
 	{€}{{\euro}}1 {£}{{\pounds}}1	
 }
-\usepackage{hyperref}
+\usepackage[unicode]{hyperref}
 
 \begin{document}
 	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
@@ -52,7 +52,7 @@
 	
 	\theoremstyle{definition}
 	\newtheorem{note}{Megjegyzés}[subsection]
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	\begin{center}
 		{\LARGE\textbf{C++}}
@@ -75,12 +75,87 @@
 	Cél: a tárgy során kialakítani a nyelvvel kapcsolatban egy intuíciót, ami segítéségével elkerülhetőek alapvető hibák is. Az előzménytárgyakban az egyszerűség kedvéért gyakran féligazságok hangzottak el, ezeket is helyre kell rakni.
 	\subsection{Mi az a C++?}
 	Alapvetően a nyelv két összetevőből áll. Az aktuális szabványból és annak implementációiból (fordítók + szabványkönyvtárak). A szabvány, ami meghatározza a nyelv nyelvtanját, valamint a szemantikát: mit jelentenek a leforduló programok (nem definiál minden részletet). Emellett a szabvány definiálja a szabványkönyvtárat is, amit minden szabványos C++ fordító mellé szállítani kell. Az első C++ szabvány a {C++98} volt. További szabványai: {C++03}, {C++11}, {C++14}, {C++17}.
-		
-		\medskip
+%		
+	\medskip
 	%% TODO linkek.
-	A szabvány alapján számos fordító (implementáció) létezik a C++ kódok fordítására: MSVC (Visual Studio), GCC, Clang.
-	Létezik számos fejlesztői környezet is, mint például: CLion, QtCreator, CodeBlocks, VIM. De ezek nem fordítók, legtöbbször a fent említett fordítók közül használnak egyet.
+	A szabvány alapján számos fordító (implementáció) létezik a C++ kódok fordítására: MSVC, GCC, Clang.
+	Létezik számos fejlesztői környezet is, mint például: CLion, QtCreator, CodeBlocks, VIM. De ezek nem fordítók! Példaképp alapértelmezetten a CodeBlocks GCC-vel, a Visual Studio MSVC-vel fordít.
+	%TODO Valami hülye oknál fogva nem fordult a kód, át nem írtam ezt a mondatot. Ez nonszensz, és utána kéne járni mi okozza.
+	\subsection{Szükséges háttértudás}
+	Ez a jegyzet feltételezi, hogy az Olvasó elvégezte a Programozási Alapismeretek c. tárgyat, és a Programozás tárgyat vagy ezzel párhuzamosan végzi, vagy már teljesítette. Így támaszkodunk arra, hogy az Olvasó tisztában van a primitív típusokkal (\texttt{int}, \texttt{float}, \texttt{double}, stb.), alap szinten a kiíratással és beolvasással, a konstanssággal, létre tud hozni függvényeket és meg is tudja hívni azokat, képes egy helyes C++ kódot lefordítani (még ha csak fejlesztői környezettel is), valamint egyszerűbb algoritmusokat is tud (pl. maximum keresés, rendezés).
+	\section{A nyelv alapjai}
+	\subsection{A C++ nyelvi elemei}
+	Minden C++ kód tokenekből áll. A token a legkisebb nyelvi egység, ami még értelmes a fordító számára. %https://msdn.microsoft.com/en-us/library/3yx2xe3h.aspx
 	
+	Tokeneknek az alábbiakat tekintjük:
+	\begin{compactitem}
+		\item Kulcsszavak (\textit{keywords}), pl. \texttt{int}, \texttt{return}. Ezek a szavak a C++ nyelvhez tartoznak, így mi újakat létrehozni nem tudunk. A jelentésük sose változhat.
+		\item Azonosítók (\textit{identifiers}), pl. \texttt{std} névtérre hivatkozás. Lényegében ezek azok a nevek, melyket mi hozunk létre: függvénynév, osztálynév, változónév, stb. Ez csak betűkből állhat, nem kezdődhet számmal és nem lehet kulcsszó. Fontos megjegyezni való, hogy a C++ nyelv különbséget tesz a kis- és nagybetűk között (\textit{case sensitive}).
+ 		\item Literálok:
+		\begin{compactitem}
+			\item Egész számliterálok (pl. \texttt{0xa23}, \texttt{123})
+			\item Karakterliterálok (pl. \texttt{'a'}, \texttt{'\textbackslash n'})
+			\item Lebegőpontos számliterálok (pl. \texttt{0.12}, \texttt{3e10})
+			\item Konstans szövegliterálok (pl. \texttt{"Hello"})
+		\end{compactitem}
+		A literálokkal később egy teljes fejezet fog foglalkozni.
+		\item Operátorok, pl. \texttt{\<}, \texttt{::}, \texttt{+}, \texttt{-}
+		\item Szeparátorok (\textit{punctuators}), pl. \texttt{;}, \texttt{\{}, \texttt{\}}
+	\end{compactitem}
+	\begin{figure}[!h]
+		\centering
+		\begin{tikzpicture}
+		\tikzstyle{Node} = [rectangle, text width=5mm, minimum height=5mm]
+		\tikzstyle{Token} = [rectangle, minimum height=5mm]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		\node (int) [Node, text = green] {\texttt{int}};
+		\node (main) [Node, right = 0mm of int, text = red] {\texttt{main}};
+		\node (parantheses) [Node, right = 0mm of main, text = blue] {\texttt{()}};
+		\node (leftBracket) [Node, below = 0mm of int, text = blue] {\texttt{\{}};
+		\node (std1) [Node,, text = red,text width=10mm, below right = 0mm and 0mm of leftBracket] {\texttt{std}};
+		\node (colon) [Node, right = -5mm of std1, text = yellow!60!black] {\texttt{::}};
+		\node (cout) [Node, right = 0mm of colon, text = red] {\texttt{cout}};
+		\node (rightShift) [Node, right = 2mm of cout, text = yellow!60!black] {\texttt{\<}};
+		\node (hello) [Node, text width=30mm,right = 0mm of rightShift] {\texttt{"Hello World!"}};
+		\node (semicolon1) [Node, right = -5mm of hello, text = blue] {\texttt{;}};
+		\node (return) [Node,text width=10mm, below = 0mm of std1, text = green] {\texttt{return}};
+		\node (0) [Node, right = 0mm of return] {\texttt{0}};
+		\node (semicolon2) [Node,text width=3mm, right = -5mm of 0, text = blue] {\texttt{;}};
+		\node (rightBracket) [Node, below = 10mm of leftBracket, text = blue] {\texttt{\}}};
+		
+		
+		\node (keyword) [Token, below left = 2mm and 10mm of int, text = green] {Kulcsszó};
+		\node (operator) [Token, above left = 5mm and -8mm of rightShift, text = yellow!60!black] {Operátor};
+		\node (literal) [Token, below = 5mm of hello] {Literál};
+		\node (punctuator) [Token, below = 5mm of semicolon2, text = blue] {Szeparátor};
+		\node (identifier) [Token, below = 10mm of keyword, text = red] {Azonosító};
+		
+		\draw[arrow] (keyword) -- (int);
+		\draw[arrow] (keyword) -- (return);
+		\draw[arrow] (operator) -- (rightShift);
+		\draw[arrow] (operator) -- (colon);
+		\draw[arrow] (literal) -- (hello);
+		\draw[arrow] (punctuator) -- (rightBracket);
+		\draw[arrow] (punctuator) -- (semicolon2);
+		\draw[arrow] (identifier) -- (std1);
+		\end{tikzpicture}
+	\end{figure}
+	\subsection{Aritmetikai konverziók}
+	Meglepő módon, két \texttt{int} szám hányadosa C++ban nem lebegőpontos típussal fog rendelkezni, hanem szintúgy \texttt{int}-el. A primitív típusok között szigorú konverziós szabály van. Amennyiben például azt szeretnénk, hogy a 10/4 osztás végeredménye ne egész legyen, akkor az \texttt{/} operátor legalább egyik operandusának lebegőpontosnak kell lennie, pl. így: \texttt{10/4.0}
+	
+	Általános szabály az, hogy ha két típus eltér aritmetikai műveleteknél, akkor konvertálni kell, és mindig a kisebb méretű típust konvertáljuk a nagyobba.
+	\begin{compactenum}
+		\item Ha az egyik típusa \texttt{long double}, akkor a másikat is \texttt{long double}-ra konvertáljuk.
+		\item Különben ha az egyik operandus \texttt{double}, akkor másik is \texttt{double} lesz.
+		\item Különben, ha az egyik \texttt{float}, akkor a másik is \texttt{float} lesz.
+		\item Amennyiben egyik operandus se lebegőpontos, akkor ha az egyik operandus \texttt{unsigned long}, akkor a másik is ez lesz.
+		\item Ha az egyik operandus \texttt{long}, a másik pedig \texttt{unsigned int}, akkor előfordulhat az, hogy a két típus ugyanakkora tárterületen van tárolva (a primitív típusok méreteiről később lesz részletesekben szó). Ha az \texttt{int} és a \texttt{long} mérete megegyezik, akkor \texttt{unsigned
+		long} lesz mindkét operandus. Különben ha a \texttt{long} nagyobb, akkor \texttt{long}-gá konvertálódik a másik.
+		\item Különben ha az egyik \texttt{long}, a másik pedig NEM \texttt{unsigned int}, akkor \texttt{long}-gá konvertálódik a másik operandus.
+		\item Különben, ha az egyik operandus \texttt{unsigned int}, a másik is kovnertálódik \texttt{unsigned int}-té.
+		\item Különben minden \texttt{int}-té konvertálódik, ha egyik korábbi sem teljesült.
+	\end{compactenum}
 	\section{Különböző viselkedések kategorizálása}
 	Egy reménytelen megközelítés lenne a szabványban minden szintaktikusan (nyelvtanilag) helyes kódhoz pontos szemantikát (működést) társítani. Ennek mind elméleti és gyakorlati oka van. Ezért a C++ szabvány néhány esetben nem vagy csak részben definiálja egy adott program működését. A következőkben erre fogunk példákat látni.
 
