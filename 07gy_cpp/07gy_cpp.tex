@@ -1,4 +1,4 @@
-﻿\documentclass[a4paper,11.5pt,table]{article}
+\documentclass[a4paper,11.5pt,table]{article}
 \usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
 \usepackage[normalem]{ulem}
 \usepackage[utf8]{inputenc}
@@ -62,7 +62,7 @@
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlatán. (\today)
 	\subsection{Header fájlra és fordításra egységre szétbontás}
-	Visszatérve a korábban írt láncolt listánkhoz, bátran állíthatjuk, hogy mindennel rendelkezik ami számunkra fontos. Azonban ha egy darab header fájlban tárolnánk mindent, számos problémába ütköznénk. Ha több fordítási egységbe illesztenénk be a headert, fordítási idejű hibát kapnánk, hogy számos függvényt többször próbáltunk definiálni (sértenénk az ODR-t). Erre megoldás lehet, hogy a definíciókat és deklarációkat elválasztjuk: az osztályban lévő függvények deklarációit hagyjuk meg a header fájlban, és a definíciókat egy külön fordítási egységbe tegyük!
+	Ha egy darab header fájlban tárolnánk mindent, számos problémába ütköznénk. Ha több fordítási egységbe illesztenénk be a headert, fordítási idejű hibát kapnánk, hogy számos függvényt többször próbáltunk definiálni (sértenénk az ODR-t). Erre megoldás lehet, hogy a definíciókat és deklarációkat elválasztjuk: az osztályban lévő függvények deklarációit hagyjuk meg a header fájlban, és a definíciókat egy külön fordítási egységbe tegyük!
 	
 	\begin{note}
 		Feltűnhet majd, hogy pár függvénydefiníció bent maradt. Erre később lesz magyarázat.

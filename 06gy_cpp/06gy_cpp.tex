@@ -451,7 +451,13 @@ void print(List &l)
 	Nézzük meg, hogy miért jobb az iterátor, mint a felsoroló. Annyi \texttt{Iterator}-t hozunk létre, amennyit csak akarunk, nem vagyunk korlátozva a \texttt{cursor}ok darabszáma által. Az iterátorok emellett tetszőlegesen tárolhatóak, átadhatóak függvényeknek. Nincs elrejtve az objektum belsejébe. Továbbá, tudjuk módosítani a listában található elemeket anélkül, hogy a lista reprezentációját ismernünk kellene. Egy iterátorokat használó kód módosítása nélkül megváltoztatható a lista belső reprezentációja. Ez lehetővé teszi azt, hogy több programozó csapatban dolgozzon, egymástól független kódrészleteket úgy tudjon módosítani, hogy ne kelljen egymás kódját átírni.
 	
 	\medskip
-	Megfigyelhető, hogy \texttt{print} nem módosítja a paraméterként kapott listát, így átvehetnénk konstansk referenciával is. Ennek az eredménye fordítási hiba: az \texttt{end} és \texttt{begin} nem konstans metódusok, hiszen ami iterátort visszaad, azokon keresztül tudjuk módosítani az objektumot.
+	Azon metódusok, amik után \texttt{const} kulcsszó szerepel (ld. fenti példa) nem tudják megváltoztatni az adott osztály adattagjait. Ezeket a metódusokat \textbf{konstans metódusok}nak (\textit{const method}) hívják. Egy konstans objektumon csak akkor lehet meghívni egy metódust, ha az a metódus konstans.
+	
+	\medskip
+	Megfigyelhető, hogy \texttt{print} nem módosítja a paraméterként kapott listát, így átvehetnénk konstans referenciával is. Ennek az eredménye fordítási hiba: az \texttt{end} és \texttt{begin} nem konstans metódusok, hiszen ami iterátort visszaad, azokon keresztül tudjuk módosítani az objektumot.
+	\begin{note}
+		Ami lehet \texttt{const}, az \textbf{legyen} \texttt{const}!
+	\end{note}
 	\subsection{Konstans iterátorok}
 	Erre a megoldás, ha konstans iterátort is írunk, ami egy konstansra mutató mutató általánosítása.
 \begin{lstlisting}
@@ -509,11 +515,6 @@ int ConstIterator::operator*() const
 	return p->data;
 }
 \end{lstlisting}
-	Azon metódusok, amik után \texttt{const} kulcsszó szerepel (ld. fenti példa) nem tudják megváltoztatni az adott osztály adattagjait. Ezeket a metódusokat \textbf{konstans metódusok}nak (\textit{const method}) hívják. Egy konstans objektumon csak akkor lehet meghívni egy metódust, ha az a metódus konstans.
-	\begin{note}
-		Ami lehet \texttt{const}, az \textbf{legyen} \texttt{const}!
-	\end{note}
-
 	Egy \texttt{const List} típusú objektumon csak a konstans metódusok hívhatóak meg, így a meghívott \texttt{begin()} visszatérési értékének típusa \texttt{ConstIterator} lesz. Egy nem konstans \texttt{List} objektumnál viszont \texttt{Iterator} lesz.
 	\begin{lstlisting}
 int main()

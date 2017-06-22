@@ -510,7 +510,7 @@ int main()
 {
 	int c = 5, d = 8;
 	swapP(&c, &d);
-	std::cout << c << ' ' << d << std::endl; // 5 8
+	std::cout << c << ' ' << d << std::endl; // 8 5
 }
 	\end{lstlisting}
 	\begin{note}
@@ -683,8 +683,8 @@ int& addOne(int &i)
 	\begin{note}
 		Értelemszerűen pointerekkel ez ugyanúgy probléma.
 	\end{note}
-	\subsection{Függvény pointerek}
-	C++ban lehetőségünk van arra is, hogy függvényeket adjunk át paraméterként.
+	\subsection{Függvények átadása paraméterként}
+	C++ban lehetőségünk van arra is, hogy függvényeket adjunk át paraméterként. Azokat az objektumokat függvény mutatónak (\textit{function pointer}) hívjuk.
 	\begin{lstlisting}
 int add(int a, int b)
 {
