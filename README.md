@@ -8,10 +8,8 @@ Maga a compiled pdf az bátran bárkivel megosztható ;)
 ## Pótlandó dolgok
 
 * Virtual tables
-* Implicit konverziók
 * using namespace std;
 * Kiértékelési sorrend
-* Nyelvi elemek
 * istream/ostream iterator
 * jobb és balérték
 * hivatkozások, linkek
