@@ -73,8 +73,6 @@
 
 	\medskip
 	Cél: a tárgy során kialakítani a nyelvvel kapcsolatban egy intuíciót, ami segítéségével elkerülhetőek alapvető hibák is. Az előzménytárgyakban az egyszerűség kedvéért gyakran féligazságok hangzottak el, ezeket is helyre kell rakni.
-	\subsection{Szükséges háttértudás}
-	Ez a jegyzet feltételezi, hogy az Olvasó elvégezte a Programozási Alapismeretek c. tárgyat, és a Programozás tárgyat vagy ezzel párhuzamosan végzi, vagy már teljesítette. Így támaszkodunk arra, hogy az Olvasó tisztában van a primitív típusokkal (\texttt{int}, \texttt{float}, \texttt{double}, stb.), alap szinten a kiíratással és beolvasással, a konstanssággal, létre tud hozni függvényeket és meg is tudja hívni azokat, képes egy helyes C++ kódot lefordítani (még ha csak fejlesztői környezettel is), valamint egyszerűbb algoritmusokat is tud (pl. maximum keresés, rendezés).
 	\subsection{Mi az a C++?}
 	Alapvetően a nyelv két összetevőből áll. Az aktuális szabványból és annak implementációiból (fordítók + szabványkönyvtárak). A szabvány, ami meghatározza a nyelv nyelvtanját, valamint a szemantikát: mit jelentenek a leforduló programok (nem definiál minden részletet). Emellett a szabvány definiálja a szabványkönyvtárat is, amit minden szabványos C++ fordító mellé szállítani kell. Az első C++ szabvány a {C++98} volt. További szabványai: {C++03}, {C++11}, {C++14}, {C++17}.
 %		
@@ -82,15 +80,17 @@
 	%% TODO linkek.
 	A szabvány alapján számos fordító (implementáció) létezik a C++ kódok fordítására: MSVC, GCC, Clang.
 	Létezik számos fejlesztői környezet is, mint például: CLion, QtCreator, CodeBlocks, VIM. De ezek nem fordítók! Példaképp alapértelmezetten a CodeBlocks GCC-vel, a Visual Studio MSVC-vel fordít.
-	%TODO Valami hülye oknál fogva nem fordult a kód, át nem írtam ezt a mondatot. Ez nonszensz, és utána kéne járni mi okozza. Netál illegális karakter okozza? Nem találtam nyomát.
-	%\section{A nyelv alapjai} %TODO this section name is retarded
+	%TODO Valami hülye oknál fogva nem fordult a kód, át nem írtam ezt a mondatot. Ez nonszensz, és utána kéne járni mi okozza.
+	\subsection{Szükséges háttértudás}
+	Ez a jegyzet feltételezi, hogy az Olvasó elvégezte a Programozási Alapismeretek c. tárgyat, és a Programozás tárgyat vagy ezzel párhuzamosan végzi, vagy már teljesítette. Így támaszkodunk arra, hogy az Olvasó tisztában van a primitív típusokkal (\texttt{int}, \texttt{float}, \texttt{double}, stb.), alap szinten a kiíratással és beolvasással, a konstanssággal, létre tud hozni függvényeket és meg is tudja hívni azokat, képes egy helyes C++ kódot lefordítani (még ha csak fejlesztői környezettel is), valamint egyszerűbb algoritmusokat is tud (pl. maximum keresés, rendezés).
+	\section{A nyelv alapjai}
 	\subsection{A C++ nyelvi elemei}
 	Minden C++ kód tokenekből áll. A token a legkisebb nyelvi egység, ami még értelmes a fordító számára. %https://msdn.microsoft.com/en-us/library/3yx2xe3h.aspx
 	
 	Tokeneknek az alábbiakat tekintjük:
 	\begin{compactitem}
 		\item Kulcsszavak (\textit{keywords}), pl. \texttt{int}, \texttt{return}. Ezek a szavak a C++ nyelvhez tartoznak, így mi újakat létrehozni nem tudunk. A jelentésük sose változhat.
-		\item Azonosítók (\textit{identifiers}), pl. \texttt{std} névtérre hivatkozás. Lényegében ezek azok a nevek, melyket mi hozunk létre: függvénynév, osztálynév, változónév, stb. Ez csak betűkből és számokból állhat, nem kezdődhet számmal és nem lehet kulcsszó. Fontos megjegyezni való, hogy a C++ nyelv különbséget tesz a kis- és nagybetűk között (\textit{case sensitive}).
+		\item Azonosítók (\textit{identifiers}), pl. \texttt{std} névtérre hivatkozás. Lényegében ezek azok a nevek, melyket mi hozunk létre: függvénynév, osztálynév, változónév, stb. Ez csak betűkből állhat, nem kezdődhet számmal és nem lehet kulcsszó. Fontos megjegyezni való, hogy a C++ nyelv különbséget tesz a kis- és nagybetűk között (\textit{case sensitive}).
  		\item Literálok:
 		\begin{compactitem}
 			\item Egész számliterálok (pl. \texttt{0xa23}, \texttt{123})
@@ -107,7 +107,7 @@
 		\begin{tikzpicture}
 		\tikzstyle{Node} = [rectangle, text width=5mm, minimum height=5mm]
 		\tikzstyle{Token} = [rectangle, minimum height=5mm]
-		\tikzstyle{arrow} = [->,>=stealth]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
 		
 		\node (int) [Node, text = green] {\texttt{int}};
 		\node (main) [Node, right = 0mm of int, text = red] {\texttt{main}};
@@ -139,9 +139,23 @@
 		\draw[arrow] (punctuator) -- (rightBracket);
 		\draw[arrow] (punctuator) -- (semicolon2);
 		\draw[arrow] (identifier) -- (std1);
-		\draw[arrow] (identifier) -- (main);
 		\end{tikzpicture}
 	\end{figure}
+	\subsection{Aritmetikai konverziók}
+	Meglepő módon, két \texttt{int} szám hányadosa C++ban nem lebegőpontos típussal fog rendelkezni, hanem szintúgy \texttt{int}-el. A primitív típusok között szigorú konverziós szabály van. Amennyiben például azt szeretnénk, hogy a 10/4 osztás végeredménye ne egész legyen, akkor az \texttt{/} operátor legalább egyik operandusának lebegőpontosnak kell lennie, pl. így: \texttt{10/4.0}
+	
+	Általános szabály az, hogy ha két típus eltér aritmetikai műveleteknél, akkor konvertálni kell, és mindig a kisebb méretű típust konvertáljuk a nagyobba.
+	\begin{compactenum}
+		\item Ha az egyik típusa \texttt{long double}, akkor a másikat is \texttt{long double}-ra konvertáljuk.
+		\item Különben ha az egyik operandus \texttt{double}, akkor másik is \texttt{double} lesz.
+		\item Különben, ha az egyik \texttt{float}, akkor a másik is \texttt{float} lesz.
+		\item Amennyiben egyik operandus se lebegőpontos, akkor ha az egyik operandus \texttt{unsigned long}, akkor a másik is ez lesz.
+		\item Ha az egyik operandus \texttt{long}, a másik pedig \texttt{unsigned int}, akkor előfordulhat az, hogy a két típus ugyanakkora tárterületen van tárolva (a primitív típusok méreteiről később lesz részletesekben szó). Ha az \texttt{int} és a \texttt{long} mérete megegyezik, akkor \texttt{unsigned
+		long} lesz mindkét operandus. Különben ha a \texttt{long} nagyobb, akkor \texttt{long}-gá konvertálódik a másik.
+		\item Különben ha az egyik \texttt{long}, a másik pedig NEM \texttt{unsigned int}, akkor \texttt{long}-gá konvertálódik a másik operandus.
+		\item Különben, ha az egyik operandus \texttt{unsigned int}, a másik is kovnertálódik \texttt{unsigned int}-té.
+		\item Különben minden \texttt{int}-té konvertálódik, ha egyik korábbi sem teljesült.
+	\end{compactenum}
 	\section{Különböző viselkedések kategorizálása}
 	Egy reménytelen megközelítés lenne a szabványban minden szintaktikusan (nyelvtanilag) helyes kódhoz pontos szemantikát (működést) társítani. Ennek mind elméleti és gyakorlati oka van. Ezért a C++ szabvány néhány esetben nem vagy csak részben definiálja egy adott program működését. A következőkben erre fogunk példákat látni.
 
