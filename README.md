@@ -8,7 +8,6 @@ Maga a compiled pdf az bátran bárkivel megosztható ;)
 ## Pótlandó dolgok
 
 * Virtual tables
-* using namespace std;
 * Kiértékelési sorrend
 * istream/ostream iterator
 * jobb és balérték
