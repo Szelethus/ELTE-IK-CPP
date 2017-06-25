@@ -41,7 +41,7 @@
 	{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
 	{ö}{{\"o}}1 {ü}{{\"u}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
 	{ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
-	{€}{{\euro}}1 {£}{{\pounds}}1	
+	{€}{{\euro}}1 {£}{{\pounds}}1 {~}{$\sim$}{1}	
 }
 \usepackage[unicode]{hyperref}
 
@@ -62,6 +62,10 @@
 		1. óra
 	\end{center}
 	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlatán. (\today)
+	\section{Előszó}
+	...
+	\subsection{Szükséges háttértudás}
+	Ez a jegyzet feltételezi, hogy az Olvasó elvégezte a Programozási Alapismeretek c. tárgyat, és a Programozás tárgyat vagy ezzel párhuzamosan végzi, vagy már teljesítette. Így támaszkodunk arra, hogy az Olvasó tisztában van a primitív típusokkal (\texttt{int}, \texttt{float}, \texttt{double}, stb.), alap szinten a kiíratással és beolvasással, a konstanssággal, létre tud hozni függvényeket és meg is tudja hívni azokat, képes egy helyes C++ kódot lefordítani (még ha csak fejlesztői környezettel is), valamint egyszerűbb algoritmusokat is tud (pl. maximum keresés, rendezés).
 	\section{Bevezető}
 	A C++ többek között a hatákonyságáról is híres. Andrei Alexandrescu azt nyilatkozta, hogy amikor a Facebooknál a backend kódján 1\%ot sikerült optimalizálni, több mint 10 évnyi fizetését spórolta meg a cégnek havonta csak az áramköltségen. Nem használ garbage collectort: nincs nem várt szünet a program végrehajtásában a menedzselt nyelvekkel szemben.
 
@@ -73,17 +77,58 @@
 
 	\medskip
 	Cél: a tárgy során kialakítani a nyelvvel kapcsolatban egy intuíciót, ami segítéségével elkerülhetőek alapvető hibák is. Az előzménytárgyakban az egyszerűség kedvéért gyakran féligazságok hangzottak el, ezeket is helyre kell rakni.
-	\subsection{Szükséges háttértudás}
-	Ez a jegyzet feltételezi, hogy az Olvasó elvégezte a Programozási Alapismeretek c. tárgyat, és a Programozás tárgyat vagy ezzel párhuzamosan végzi, vagy már teljesítette. Így támaszkodunk arra, hogy az Olvasó tisztában van a primitív típusokkal (\texttt{int}, \texttt{float}, \texttt{double}, stb.), alap szinten a kiíratással és beolvasással, a konstanssággal, létre tud hozni függvényeket és meg is tudja hívni azokat, képes egy helyes C++ kódot lefordítani (még ha csak fejlesztői környezettel is), valamint egyszerűbb algoritmusokat is tud (pl. maximum keresés, rendezés).
 	\subsection{Mi az a C++?}
 	Alapvetően a nyelv két összetevőből áll. Az aktuális szabványból és annak implementációiból (fordítók + szabványkönyvtárak). A szabvány, ami meghatározza a nyelv nyelvtanját, valamint a szemantikát: mit jelentenek a leforduló programok (nem definiál minden részletet). Emellett a szabvány definiálja a szabványkönyvtárat is, amit minden szabványos C++ fordító mellé szállítani kell. Az első C++ szabvány a {C++98} volt. További szabványai: {C++03}, {C++11}, {C++14}, {C++17}.
-%		
+	
 	\medskip
-	%% TODO linkek.
 	A szabvány alapján számos fordító (implementáció) létezik a C++ kódok fordítására: MSVC, GCC, Clang.
 	Létezik számos fejlesztői környezet is, mint például: CLion, QtCreator, CodeBlocks, VIM. De ezek nem fordítók! Példaképp alapértelmezetten a CodeBlocks GCC-vel, a Visual Studio MSVC-vel fordít.
-	%TODO Valami hülye oknál fogva nem fordult a kód, át nem írtam ezt a mondatot. Ez nonszensz, és utána kéne járni mi okozza.
-%	\section{A nyelv alapjai}
+	\section{Alapok}
+
+	\subsection{A Hello World program}
+	Bizonyára az alábbi program nem ismeretlen:
+	
+	\fbox{\textbf{main.cpp}}
+	\medskip
+	
+	\begin{lstlisting}
+#include <iostream>
+
+using namespace std;
+	
+int main()
+{
+	cout << "Hello World!" << endl;
+}
+	\end{lstlisting}
+	\texttt{main.cpp} itt egy \textbf{fordítási egység} (\textit{compilation unit}). Fordításkor fordítási egységeket fordítunk gépi kódra.
+	
+	A kód legelső sorában található az ismerős \texttt{\#include <iostream>}. Az \texttt{iostream} egy un. \textbf{header fájl}, mely tartalmaz valamennyi beolvasással és kiíratással kapcsolatos sztenderd osztályt, függvényt és változót. Maga az \texttt{iostream} header természetesen egy ugyanolyan C++ kódot tartalmaz, melyet mi magunk is írunk, a \texttt{\#include} parancs hatására pedig a teljes tartalma a mi fordítási egységünkbe kerül. A fordító számára a mi fordítási egységünk (\texttt{main.cpp}) úgy néz ki, mintha mi magunk írtuk volna meg az egész \texttt{iostream}-ben található kódot, melynek a végén szerepel a mi kis Hello World programunk.
+	
+	A header fájlokról később bővebben beszélünk, egyenlőre mondjuk róluk annyit, hogy fordítási egységekbe szoktuk őket beilleszteni, önmagukban nem szokás őket fordítani.
+	
+	\medskip
+	Ez alatt található a \texttt{using namespace std;} sor. Ennek hatására a fordító hogyha nem ismer fel egy változót egyből, megkeresi, hogy az \texttt{std} névtérben nem található-e meg. 
+	
+	Az \texttt{std} névtér (melyekről szintén később beszélünk részletesebben) tartalmazza a közel a teljes standard könyvtárat, benne változókat, függvényeket, osztályokat, stb. Azonban a standard könyvtár rengeteg mindent tartalmaz, példaképp olyan nevű függvényeket is, mint a \texttt{find}, \texttt{max}, stb. Ez nem mindig kifizetődő számunkra, hiszen ha mi is létre akarunk hozni ilyen nevű függvényeket azonos paraméterezéssel, akkor a fordító összezavarodna. Éppen ezért gyakran nem éri meg ezt a sort beleilleszteni a kódunkba, és érdemesebb minden standard könyvtárbeli elemre az alábbi módon hivatkozni:
+	\begin{lstlisting}
+int main()
+{
+	std::cout << "Hello World!" << std::endl;
+}
+	\end{lstlisting}
+	\begin{note}
+		A fenti kódba nem írtuk ki megint a \texttt{\#include <iostream>} sort. Ilyen rövidítésekkel gyakran fogunk élni a továbbiakban is. 
+	\end{note}
+	Fentebb explicit módon jeleztük a fordítónak, hogy az \texttt{std} névtérból keressi ki a \texttt{cout} és \texttt{endl} változókat.
+	
+	\medskip
+	Lentebb megtalálható maga a kiíratás a \textbf{right shift operátor} (\texttt{\<}) segítségével. Ezt azonban így is írhatnánk (most egyenlőre egyszerűsítsük le a kódot annyira, hogy az \texttt{\< endl} részt lehagyjuk):
+	\begin{lstlisting}
+operator<<(std::cout, "Hello World");
+	\end{lstlisting}
+	Ebből látható, hogy az operátorok is tulajdonképpen függvények.
+	%TODO \section{Fordítás konzolból}
 	\subsection{A C++ nyelvi elemei}
 	Minden C++ kód tokenekből áll. A token a legkisebb nyelvi egység, ami még értelmes a fordító számára. %https://msdn.microsoft.com/en-us/library/3yx2xe3h.aspx
 	
@@ -142,22 +187,35 @@
 		\draw[arrow] (identifier) -- (main);
 		\end{tikzpicture}
 	\end{figure}
-	\subsection{Aritmetikai konverziók}
-	%TODO Ezt a szekciót a literálokhoz kéne rakni, azonban annak hatására a nagy jegyzet (../cpp_book/cpp_book.tex) nem fordul.
-	Meglepő módon, két \texttt{int} szám hányadosa C++ban nem lebegőpontos típussal fog rendelkezni, hanem szintúgy \texttt{int}-el. A primitív típusok között szigorú konverziós szabály van. Amennyiben például azt szeretnénk, hogy a 10/4 osztás végeredménye ne egész legyen, akkor az \texttt{/} operátor legalább egyik operandusának lebegőpontosnak kell lennie, pl. így: \texttt{10/4.0}
+	\subsection{Fordítás konzolból}
+	Windowson nyomjuk le a windows gombot és az R-t egyszerre. Ennek hatására felugrik egy ablak, melyből lehet futtatni programokat. Írjuk be hogy \texttt{cmd}, és nyomjunk entert. 
 	
-	Általános szabály az, hogy ha két típus eltér aritmetikai műveleteknél, akkor konvertálni kell, és mindig a kisebb méretű típust konvertáljuk a nagyobba.
-	\begin{compactenum}
-		\item Ha az egyik típusa \texttt{long double}, akkor a másikat is \texttt{long double}-ra konvertáljuk.
-		\item Különben ha az egyik operandus \texttt{double}, akkor másik is \texttt{double} lesz.
-		\item Különben, ha az egyik \texttt{float}, akkor a másik is \texttt{float} lesz.
-		\item Amennyiben egyik operandus se lebegőpontos, akkor ha az egyik operandus \texttt{unsigned long}, akkor a másik is ez lesz.
-		\item Ha az egyik operandus \texttt{long}, a másik pedig \texttt{unsigned int}, akkor előfordulhat az, hogy a két típus ugyanakkora tárterületen van tárolva (a primitív típusok méreteiről később lesz részletesekben szó). Ha az \texttt{int} és a \texttt{long} mérete megegyezik, akkor \texttt{unsigned
-		long} lesz mindkét operandus. Különben ha a \texttt{long} nagyobb, akkor \texttt{long}-gá konvertálódik a másik.
-		\item Különben ha az egyik \texttt{long}, a másik pedig NEM \texttt{unsigned int}, akkor \texttt{long}-gá konvertálódik a másik operandus.
-		\item Különben, ha az egyik operandus \texttt{unsigned int}, a másik is kovnertálódik \texttt{unsigned int}-té.
-		\item Különben minden \texttt{int}-té konvertálódik, ha egyik korábbi sem teljesült.
-	\end{compactenum}
+	Hozzunk létre egy tetszőleges mappában (pl. \texttt{C:\textbackslash test\textbackslash}) egy egyszerű Hello World programot \texttt{main.cpp} néven. Üssük be a következőket:
+	\begin{lstlisting}
+>cd C:\test
+>g++ main.cpp
+	\end{lstlisting}
+	Amennyiben azt a hibaüzenetet kaptuk, hogy 
+	
+	{\centering\texttt{"g++" is not recognized as an internal or external command.}\par}
+	
+	az azt jelenti, hogy ha installálva is van a program, a Windows nem találja. Amennyiben van CodeBlocks installálva a gépen mely sikeresen le tud fordítani egy helyes C++ kódot, akkor közel biztosan rendelkezünk a GCC programmal, mely nagy valószínűséggel itt található: \texttt{c:\textbackslash Program Files (x86)\textbackslash CodeBlocks\textbackslash MinGW\textbackslash bin\textbackslash }. Ebben a mappában található a \texttt{g++.exe} fájl.
+	 
+	Amennyiben nem rendelkezünk CodeBlocks-al, töltsük le a fordítót, és installáljuk (ennek megoldását az Olvasóra bízzuk), és keressük meg a \texttt{bin} mappát, és másoljuk ki az abszolút elérési útvonalát.
+	 
+	Ezek után hozzá kell adnunk ezt a mappát a PATH változóhoz.
+	\begin{note}
+	 	A PATH változóhoz való eljutás minden Windows verziónál más lehet, különösképpen, ha pl. magyar nyelvű operációs rendszerünk van. Ez okból kifolyólag ennek megoldását ismét az Olvasóra bízzuk.
+	\end{note}
+	Amennyiben a fordítás sikes volt, létrejött egy \texttt{a.exe} nevű fájl, melyet tudunk futtatni. Ha módosítjuk a kódot, akkor fordítani és futtatni 1 sorban így tudunk:
+	\begin{lstlisting}
+>g++ main.cpp && a.exe
+	\end{lstlisting}
+	Linuxon általában előre installálva van a GCC program. Ennek használata szintén hasonló, azonban a létrejött fájl kiterjesztése \texttt{.out} lesz.
+	\begin{lstlisting}
+~$ g++ main.cpp && ./a.out
+	\end{lstlisting}
+	A jegyzetben később számos extra parancsot megismerünk a fordításhoz.
 	\section{Különböző viselkedések kategorizálása}
 	Egy reménytelen megközelítés lenne a szabványban minden szintaktikusan (nyelvtanilag) helyes kódhoz pontos szemantikát (működést) társítani. Ennek mind elméleti és gyakorlati oka van. Ezért a C++ szabvány néhány esetben nem vagy csak részben definiálja egy adott program működését. A következőkben erre fogunk példákat látni.
 
@@ -322,8 +380,8 @@ ALMA ALMA ALMA
 	\end{lstlisting}
 	Az \texttt{\#undef} paranccsal a paraméterként megadott makrót a preprocesszor nem tekinti továbbá makrónak, így a kimenetben \texttt{KORTE} lesz.
 	
-	Látható, hogy az előfeldolgozót kódrészletek kivágására is lehet használni. 
-  Felmerülhet a kérdés, ha az eredeti forrásszövegből az előfeldolgozó kivág illetve beilleszt részeket, akkor a fordító honnan tudja, hogy a hiba jelentésekor melyik sorra jelezze a hibát? Hiszen az előfeldolgozás előtti és utáni sorszámok egymához képest eltérnek. Ennek a problémának a megoldására az előfeldolgozó beszúr a fordító számára plusz sorokat, amik hordozzák azt az információt, hogy a feldolgozás előtt az adott sor melyik fájl hányadik sorában volt megtalálható. 
+	Látható, hogy a preprocesszort kódrészletek kivágására is lehet használni. 
+  Felmerülhet a kérdés, ha az eredeti forrásszövegből a preprocesszor kivág illetve beilleszt részeket, akkor a fordító honnan tudja, hogy a hiba jelentésekor melyik sorra jelezze a hibát? Hiszen az preprocesszálás előtti és utáni sorszámok egymához képest eltérnek. Ennek a problémának a megoldására az preprocesszor beszúr a fordító számára plusz sorokat, amik hordozzák azt az információt, hogy a feldolgozás előtt az adott sor melyik fájl hányadik sorában volt megtalálható. 
 	\begin{note}
 		 A fordítás közbeni ideiglenes fájlokat a \texttt{g++ -save-temps hello.cpp} paranccsal lehet lementeni.
 	\end{note}
@@ -335,7 +393,7 @@ ALMA ALMA ALMA
 #include "pp.h"
 	\end{lstlisting}
 		
-	Rekurzív include-nál, mint a fenti példában, az előfeldolgozó egy bizonyos mélységi limit után leállítja a preprocesszálást.
+	Rekurzív include-nál, mint a fenti példában, az preprocesszor egy bizonyos mélységi limit után leállítja a preprocesszálást.
 	
 	Sok és hosszú include láncok esetén azonban nehéz megakadályozni, hogy kör kerüljön az include gráfba, így akaratlanul is a rekurzív include-ok aldozatai lehetünk.
 	\bigskip
@@ -367,14 +425,15 @@ ALMA ALMA ALMA
 	A preprocesszor az itt bemutatottaknál sokkal többet tud, de általában nem érdemes túlhasználni a fent említett okok miatt.
 	
 	\subsection{Linkelés}
-	\bigskip
+	Tekintsük az alábbi fordítási egységeket:
 	
+	\smallskip
 	\fbox{\textbf{fecske.cpp}}
 	\begin{lstlisting}
 void fecske() {}
 	\end{lstlisting}
-	\bigskip
 	
+	\smallskip
 	\fbox{\textbf{main.cpp}}
 	\begin{lstlisting}
 int main()
@@ -382,10 +441,24 @@ int main()
 	fecske();
 }
 	\end{lstlisting}
-		
-	Ez nem fog lefordulni, mert vagy csak a main.cpp-ből létrejövő fordítási egységet, vagy a fecske.cpp-ből létrejövő fordítási egységet látja a fordító, egyszerre a kettőt nem. Megoldás az ha \textbf{forward deklarálunk}, \texttt{void fecske();}-t beillesztjük a main függvény fölé, mely jelzi a fordítónak, hogy a \texttt{fecske} az egy függvény, \texttt{void} a visszatérési értéke és nincs paramétere. 
-	\medskip
+	Fordítsuk le és linkeljük össze őket az alábbi parancsok kiadásával:
 	
+	{\centering\texttt{g++ main.cpp}\par}
+	
+	{\centering\texttt{g++ fecske.cpp}\par}
+	
+	Ez nem fog lefordulni, mert vagy csak a main.cpp-ből létrejövő fordítási egységet, vagy a fecske.cpp-ből létrejövő fordítási egységet látja a fordító, egyszerre a kettőt nem. Megoldás az ha \textbf{forward deklarálunk}, \texttt{void fecske();}-t beillesztjük a main függvény fölé, mely jelzi a fordítónak, hogy a \texttt{fecske} az egy függvény, \texttt{void} a visszatérési értéke és nincs paramétere. 
+	
+	\smallskip
+	\fbox{\textbf{main.cpp}}
+	\begin{lstlisting}
+void fecske();
+
+int main()
+{
+	fecske();
+}
+	\end{lstlisting}
 	Ekkor \texttt{g++ main.cpp} paranccsal történő fordítás a linkelési fázisánál kapunk hibát, mert nem találja a \texttt{fecske} függvény definícióját. Ezt ahogy korábban láttuk, úgy tudjuk megoldani, ha \texttt{main.cpp}-ből és \texttt{fecske.cpp}-ből is tárgykódot készítünk, majd összelinkeljük őket. \texttt{main.cpp}-ben lesz egy hivatkozás egy olyan \texttt{fecske} függvényre, melynek \texttt{void} a visszatérési értéke és paramétere nincs, és \texttt{fecske.cpp} fogja tartalmazni e függvény definícióját. 
 		
     {\centering\texttt{g++ -c main.cpp}\par}
