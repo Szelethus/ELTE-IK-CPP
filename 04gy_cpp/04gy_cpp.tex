@@ -158,6 +158,21 @@ for (double d = 0; d != 1; d += 0.1)
 	\begin{note}
 		Érdemes mindig \texttt{int}et használnunk, ha nincs jó okunk arra, hogy mást használjunk. Az \texttt{int}-el általában a leghatékonyabb a processzor.
 	\end{note}
+	\subsection{Aritmetikai konverziók}
+	Meglepő módon, két \texttt{int} szám hányadosa C++ban nem lebegőpontos típussal fog rendelkezni, hanem szintúgy \texttt{int}-el. A primitív típusok között szigorú konverziós szabály van. Amennyiben például azt szeretnénk, hogy a 10/4 osztás végeredménye ne egész legyen, akkor az \texttt{/} operátor legalább egyik operandusának lebegőpontosnak kell lennie, pl. így: \texttt{10/4.0}
+	
+	Általános szabály az, hogy ha két típus eltér aritmetikai műveleteknél, akkor konvertálni kell, és mindig a kisebb méretű típust konvertáljuk a nagyobba.
+	\begin{compactenum}
+		\item Ha az egyik típusa \texttt{long double}, akkor a másikat is \texttt{long double}-ra konvertáljuk.
+		\item Különben ha az egyik operandus \texttt{double}, akkor másik is \texttt{double} lesz.
+		\item Különben, ha az egyik \texttt{float}, akkor a másik is \texttt{float} lesz.
+		\item Amennyiben egyik operandus se lebegőpontos, akkor ha az egyik operandus \texttt{unsigned long}, akkor a másik is ez lesz.
+		\item Ha az egyik operandus \texttt{long}, a másik pedig \texttt{unsigned int}, akkor előfordulhat az, hogy a két típus ugyanakkora tárterületen van tárolva (a primitív típusok méreteiről később lesz részletesekben szó). Ha az \texttt{int} és a \texttt{long} mérete megegyezik, akkor \texttt{unsigned
+			long} lesz mindkét operandus. Különben ha a \texttt{long} nagyobb, akkor \texttt{long}-gá konvertálódik a másik.
+		\item Különben ha az egyik \texttt{long}, a másik pedig NEM \texttt{unsigned int}, akkor \texttt{long}-gá konvertálódik a másik operandus.
+		\item Különben, ha az egyik operandus \texttt{unsigned int}, a másik is kovnertálódik \texttt{unsigned int}-té.
+		\item Különben minden \texttt{int}-té konvertálódik, ha egyik korábbi sem teljesült.
+	\end{compactenum}
 	\section{Struktúrák mérete}
 	\subsection{Primitív típusok mérete}
 	A \texttt{sizeof(char)} mindig 1-et ad vissza. A karakter mérete mindig az egység. Minden más típusra a \texttt{sizeof} függvény azt adja vissza, hogy paraméterül megadott objektum vagy típus mérete hányszorosa a \texttt{char}nak. 
