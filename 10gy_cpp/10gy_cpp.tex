@@ -73,16 +73,17 @@
 	E listán látható, hogy pl. egy random access iterator sokkal flexibilisebb, és gyorsabb is, hisz bármikor bármelyik elemhez hozzáférhetünk, míg a mi listánk forward iteratora sokkal limitáltabb.
 	
 	\smallskip
-	Az STL konténerek iterátorai is különböző iterator kategóriákban vannak:
+	Az STL konténerek iterátorai is többek között különböző iterator kategóriákban vannak:
 	\begin{center}
 		\setlength{\extrarowheight}{2pt}
 		\begin{tabular}{|l|l|}
 			\hline
-			STL konténer&Iteratorának kategóriája\\
+			Konténer&Iteratorának kategóriája\\
 			\hline
 			\hline
-			\texttt{std::vector} & \multirow{2}{*}{\texttt{random access iterator}}\\
+			\texttt{std::vector} & \multirow{3}{*}{\texttt{random access iterator}}\\
 			\texttt{std::deque} &\\
+			Tömb &\\
 			\hline
 			\texttt{std::list} & \multirow{5}{*}{\texttt{bidirectional iterator}}\\
 			\texttt{std::set} & \\
@@ -90,15 +91,37 @@
 			\texttt{std::map} & \\
 			\texttt{std::multimap} & \\
 			\hline
+			\texttt{List} (általálunk írt)& \multirow{2}{*}{\texttt{forward iterator}}\\
+			\texttt{std::forward\_list} (C++11)&\\
+			\hline
+			\texttt{std::istream\_iterator}& \multirow{2}{*}{\texttt{input iterator}}\\
+			\texttt{std::ostream\_iterator}&\\
+			\hline
 		\end{tabular}
 	\end{center}
-	\begin{note}
-		\texttt{input iterator}-ra példa lehet az \texttt{std::istream\_iterator} osztály, míg az általunk megírt lista iterátora egy \texttt{forward\_iterator}-nak számít.
-	\end{note}
 	Világos, hogy egy flexibilisebb iterátorral több mindent meg tudunk tenni, vagy ugyanazt a funkciót hatékonyabban is meg tudjuk valósítani. Emiatt minden STL algoritmusnak (mint pl. az \texttt{std::find}) tudnia kell a template paraméterként kapott iterátor kategóriáját.
 	\medskip
 	
-	Egy iterátornak úgy tudjuk a legegyszerűbben megadni a típusát, ha származunk az \texttt{std::iterator} típusból.
+	Azonban ezt hogyan tudjuk elérni? Kézenfekvő megoldás lenne pl. ez:
+	\begin{lstlisting}
+struct input_iterator_tag {};
+struct forward_iterator_tag {};
+struct bidirectional_iterator_tag {};
+struct random_access_iterator_tag {};
+
+class ExampleIterator
+{
+public:
+	typedef iterator_category forward_iterator_tag;
+	//...
+};
+	\end{lstlisting}
+	Ezzel a trükkel könnyedén tudunk hivatkozni egy iterátor típusára, elég csupán annyit írnunk hogy 
+	
+	\texttt{ExampleIterator::iterator\_category}. Sőt, ha tartjuk ahhoz a konvencióhoz magunkat, hogy minden iterátor-nak legyen egy \texttt{iterator\_category} típusa, mely a fentebb felsoroltak egyike, akkor nagyon egyszerűen tudunk olyan algoritmusokat megalkotni, melyek bármilyen iterátorral tudnak dolgozni (erre nemsokára egy példát is látunk).
+	
+	\smallskip
+	Természetesen számos egyéb információra is szükségünk lehet egy iterátorral kapcsolatban. A dereferáló perátor visszatérési értéke, erre a típusra mutató pointer típusa, stb. Ezt a legegyszerűbben úgy tudjuk megadni, ha származunk az \texttt{std::iterator} típusból.
 	\begin{note}
 		Az öröklődés később lesz alaposabban boncolgatva, egyenlőre mondjuk azt, hogy az öröklődés követekztében mindent átpakolunk az \texttt{std::iterator} osztályból a mi iterátorunkba.
 	\end{note}
@@ -112,38 +135,39 @@
 template <class T>
 class Iterator : public std::iterator<std::forward_iterator_tag, T>
 {
-	//..
+	//...
 };
 
 template <class T>
 class ConstIterator : public std::iterator<std::forward_iterator_tag, T>
 {
-	//..
+	//...
 };
 	\end{lstlisting}
-	A cppreference-en megfigyelhető, hogy az \texttt{std::iterator} több típust is tartalmaz, mely jelöli hogy az iterátorunk milyen kategóriában van, milyen típussal tér vissza a dereferáló operátor, stb. Ennek segítségével pl. a listánk iterátorának kategóriája lekérdezhető az \texttt{List::Iterator::iterator\_category}-val (erre nemsokára példát is látni fogunk).
-	\begin{note}
-		Ennek alaposabb megértését az olvasóra bízom.
-	\end{note}
-	Így már fogjuk tudnuk majd használni az \texttt{STL} algoritmusokat is a konténereinken. 
-	%TODO
-%	\begin{note}
-%		Ez egy baromi nagy dolog: létrehoztunk egy új adatszerkezetet, és ez tök jól együttműködik az eddigi algoritmusokkal.
-%		
-%		Azaz még viszonylag egyszerűen egy új függvényt is létre tudunk hozni, ami minden adatszerkezettel működni fog! C++ban az algoritmusok nem a konténereken működnek: lévén úgy szokás konténereket létrehozni, hogy írunk hozzá iterátort is, így elegendő egy algirtmusnak azt tudnia, hogy hogyan kell használni azt az iterátort. Emiatt várja el egy STL algoritmus, hogy közöüljük, milyen típusú iterátorunk van. Igaz, a konténereinkkel többet kell dolgoznunk, mert ezt az iterátort egyszer meg kell írni, de hosszú távon még így is rengeteg munkát tudunk megspórolni.
-%	\end{note}
+	A cppreference-en megfigyelhető, hogy az \texttt{std::iterator} több típust is tartalmaz, mellyel az iterátorunk jellemezhető. Minden STL konténer iterátora rendelkezik ezekkel a típusokkal, és számunkra is kifizetődő használni.
 	
+	\smallskip
+	Ennek hála, most már tudjuk az STL algoritmusokat használni a láncolt listánkkal!
+	
+	\smallskip
+	A fenti táblázatban megfigyelhettük, hogy a tömbnek is van iterátora -- természetesen ez az a pointer, amivel végig tudunk lépegetni a tömb elemein (pl. egy \texttt{int[]} tömb típus esetén ez \texttt{int*} lenne). Ez valóban iterátor, hisz dereferálható, léptethető, stb. Azonban egy \texttt{int*} típusnak nincs \texttt{iterator\_category}-ja! Ezt a problémát megoldhatjuk úgy, hogy ha egy tetszőleges \texttt{It} iterátor esetén nem \texttt{It::iterator\_category}-val kérdezzük le az iterátor kategóriáját, hanem az \texttt{std::iterator\_traits} osztállyal:
+	\begin{lstlisting}
+std::iterator_traits<std::vector<int>::iterator> >::iterator_category cat1;
+std::iterator_traits<int*>::iterator_category cat2;
+std::iterator_traits<List::Iterator>::iterator_category cat3;
+	\end{lstlisting}
 	\section{STL algoritmusok}
-	\subsection{Bevezető az algortmusokhoz}
 	Az STL algoritmusok az \texttt{<algorithm>} könyvtárban találhatóak, és számos jól ismert és fontos függvényt foglalnak magukba, mint pl. adott tulajdonságú elem keresése, partícionálás, szimmetrikus differencia meghatározása, stb.
-	\medskip
+	
+	Az egyik legnagyobb erősségük, hogy nagyon jól olvasható kódot eredményez a használatuk -- túl azon hogy valószínűleg évtizedek óta fejlesztett könyvtár hatékonyabban implementációkat tartalmaz mint amiket mi tudnánk rövid idő alatt írni, sokkal beszédesebb, kifejezőbb kódot tudunk alkotni velük, ami ezáltal könnyebben debugolható és értelmezhető.
+	\subsection{Bevezető az algoritmusokhoz}
 	
 	Az STL algoritmusok alap gondolatmenetét jól demonstrálja az alábbi példa : Írjunk egy függvény mely egy \texttt{std::vector<int>} konténernek a második adott értékű elemére hivatkozó iterátort ad vissza!
 	\begin{lstlisting}
 #include <vector>
 #include <iostream>
 
-typedef std::vector<int>::const_iterator VectIt;
+typedef std::vector<int>::iterator VectIt;
 
 VectIt findSecond(VectIt begin, VectIt end, const int &v)
 {
@@ -173,15 +197,14 @@ int main()
 }
 	\end{lstlisting}
 	Amennyiben \texttt{findSecond} nem talál két \texttt{v}-vel ekvivalens elemet, egy past-the-end iterátort ad vissza.
-	\begin{note}
-		Lévén a konténert nem módosítjuk, bátran dolgozhatunk a nagyobb biztonságot nyújtó \texttt{const\_iterator}-ral.
-	\end{note}
+	
+	\smallskip
 	Azonban könnyű látni, hogy egyáltalán nem fontos információ az algoritmus szempontjából, hogy a \texttt{vector} \texttt{int}-eket tárol.
 	\begin{lstlisting}
 template<class T>
-typename std::vector<T>::const_iterator 
-	findSecond(typename std::vector<T>::const_iterator begin, 
-			   typename std::vector<T>::const_iterator end, 
+typename std::vector<T>::iterator 
+	findSecond(typename std::vector<T>::iterator begin, 
+			   typename std::vector<T>::iterator end, 
 			   const T &v)
 {
 	while(begin != end && *begin != v)
@@ -234,7 +257,7 @@ RAIT algorithm(RAIT it, int pos, std::random_access_iterator_tag)
 template<typename IT> 
 IT advance(IT it, int pos) 
 {
-	typedef typename IT::iterator_category cat;
+	typedef typename std::iterator_traits<IT>::iterator_category cat;
 	return algorithm(it, pos, cat());
 }
 
@@ -254,7 +277,7 @@ int main()
 	\begin{note}
 		Az \texttt{std::vector} és \texttt{std::list}-nél felmerült iterátor lépegetésre találtunk megoldást: a fentihez hasonló működésű \texttt{std::advance} alkalmazható e célra.
 	\end{note}
-	Így tudjuk elérni azt, hogy különböző iterátor kategóriára különböző algoritmust használjunk (bár nyilván ez jóval hatékonyabban van megoldva a standard könyvtárban).
+	Így tudjuk elérni azt, hogy különböző iterátor kategóriára különböző algoritmust használjunk. Természetesen, ez csak egy demonstráció volt, elképzelhető hogy máshogy (és nyilván hatékonyabban) néz ki ennek az implementációja.
 	\medskip
 	
 	Ezek ismeretében vágjunk bele az STL algoritmusokba!
@@ -319,7 +342,6 @@ int main()
 }
 \end{lstlisting}
 	Ezzel semmi komolyabb gond nincs, de nem szabad meglepődni, amikor az ember ettől függően más megoldást kap mint amire számít.
-	%TODO xazaxos rész
 	\subsection{sort és stable\_sort}
 	A következő példában próbáljuk rendezni egy \texttt{vector} elemeit!
 	\begin{lstlisting}
