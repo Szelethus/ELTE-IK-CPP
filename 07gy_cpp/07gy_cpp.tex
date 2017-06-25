@@ -327,8 +327,12 @@ detail::ConstIterator cit;
 	A névterek segíthetnek abban, hogy logikai egységebre rendezzük a kódunkat. Az egyik legnagyobb ilyen egység az \texttt{std} névtér, mely tartalmaz minden függvényt, változót, stb, ami a standard részét alkotja. 
 	
 	Lehet névtereket egymásba is ágyazni, erre lehet példa a C++11-es \texttt{chrono} könyvtár, mely az \texttt{std} névteren belül számos dolgot a \texttt{chrono} alnévtérben tárol.
+	\subsection{Argument Dependent Lookup}
+	A szokásos Hello World programban nem feltétlenül kell használni a \texttt{using namespace std;} sort. Azonban megállapítható, hogy a \texttt{\<} operátor globális, \texttt{std} névtérbeli, mégse kellett elé \texttt{std} névtérre hivatkozás (azaz \textit{explicit namespace resolution}). Ez az úgynevezett ADL-nek (\textit{Argument Dependent Lookup}) köszönhető, melyet a fordító alkalmaz: az adott függvényt abban a névtérben keresi először, ahol az argumentumai megtalálhatóak.
 	
-	\subsection{Typedef}
+	\smallskip
+	Példaképp, a Hello World programban a \texttt{cout} változó az \texttt{std} névtér tagja, így a fordító először az \texttt{std} névtérben fogja keresni a \texttt{\<} operátort.
+	\section{Typedef}
 	A \texttt{typedef} kulcsszó szinonimák létrehozására használatos, és ha ügyesen használjuk, ki lehet használni valamennyi előnyét. 
 	
 	\smallskip
