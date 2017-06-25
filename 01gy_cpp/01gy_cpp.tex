@@ -103,12 +103,12 @@ int main()
 	\end{lstlisting}
 	\texttt{main.cpp} itt egy \textbf{fordítási egység} (\textit{compilation unit}). Fordításkor fordítási egységeket fordítunk gépi kódra.
 	
-	A kód legelső sorában található az ismerős \texttt{\#include <iostream>}. Az \texttt{iostream} egy un. \textbf{header fájl}, mely tartalmaz valamennyi beolvasással és kiíratással kapcsolatos sztenderd osztályt, függvényt és változót. Maga az \texttt{iostream} header természetesen egy ugyanolyan C++ kódot tartalmaz, melyet mi magunk is írunk, a \texttt{\#include} parancs hatására pedig a teljes tartalma a mi fordítási egységünkbe kerül. A fordító számára a mi fordítási egységünk (\texttt{main.cpp}) úgy néz ki, mintha mi magunk írtuk volna meg az egész \texttt{iostream}-ben található kódot, melynek a végén szerepel a mi kis Hello World programunk.
+	A kód legelső sorában található az ismerős \texttt{\#include <iostream>}. Az \texttt{iostream} egy un. \textbf{header fájl}, mely tartalmaz valamennyi beolvasással és kiíratással kapcsolatos standard osztályt, függvényt és változót. Maga az \texttt{iostream} header természetesen egy ugyanolyan C++ kódot tartalmaz, melyet mi magunk is írunk, a \texttt{\#include} parancs hatására pedig a teljes tartalma a mi fordítási egységünkbe kerül. A fordító számára a mi fordítási egységünk (\texttt{main.cpp}) úgy néz ki, mintha mi magunk írtuk volna meg az egész \texttt{iostream}-ben található kódot, melynek a végén szerepel a mi kis Hello World programunk.
 	
 	A header fájlokról később bővebben beszélünk, egyenlőre mondjuk róluk annyit, hogy fordítási egységekbe szoktuk őket beilleszteni, önmagukban nem szokás őket fordítani.
 	
 	\medskip
-	Ez alatt található a \texttt{using namespace std;} sor. Ennek hatására a fordító hogyha nem ismer fel egy változót egyből, megkeresi, hogy az \texttt{std} névtérben nem található-e meg. 
+	Ez alatt található a \texttt{using namespace std;} sor. Ennek hatására a fordító hogyha nem ismer fel egy változót egyből, megnézi, hogy az \texttt{std} névtérben nem található-e meg. 
 	
 	Az \texttt{std} névtér (melyekről szintén később beszélünk részletesebben) tartalmazza a közel a teljes standard könyvtárat, benne változókat, függvényeket, osztályokat, stb. Azonban a standard könyvtár rengeteg mindent tartalmaz, példaképp olyan nevű függvényeket is, mint a \texttt{find}, \texttt{max}, stb. Ez nem mindig kifizetődő számunkra, hiszen ha mi is létre akarunk hozni ilyen nevű függvényeket azonos paraméterezéssel, akkor a fordító összezavarodna. Éppen ezért gyakran nem éri meg ezt a sort beleilleszteni a kódunkba, és érdemesebb minden standard könyvtárbeli elemre az alábbi módon hivatkozni:
 	\begin{lstlisting}
@@ -120,7 +120,7 @@ int main()
 	\begin{note}
 		A fenti kódba nem írtuk ki megint a \texttt{\#include <iostream>} sort. Ilyen rövidítésekkel gyakran fogunk élni a továbbiakban is. 
 	\end{note}
-	Fentebb explicit módon jeleztük a fordítónak, hogy az \texttt{std} névtérból keressi ki a \texttt{cout} és \texttt{endl} változókat.
+	Fentebb explicit módon jeleztük a fordítónak, hogy az \texttt{std} névtérból keresse ki a \texttt{cout} és \texttt{endl} változókat.
 	
 	\medskip
 	Lentebb megtalálható maga a kiíratás a \textbf{right shift operátor} (\texttt{\<}) segítségével. Ezt azonban így is írhatnánk (most egyenlőre egyszerűsítsük le a kódot annyira, hogy az \texttt{\< endl} részt lehagyjuk):
@@ -128,7 +128,6 @@ int main()
 operator<<(std::cout, "Hello World");
 	\end{lstlisting}
 	Ebből látható, hogy az operátorok is tulajdonképpen függvények.
-	%TODO \section{Fordítás konzolból}
 	\subsection{A C++ nyelvi elemei}
 	Minden C++ kód tokenekből áll. A token a legkisebb nyelvi egység, ami még értelmes a fordító számára. %https://msdn.microsoft.com/en-us/library/3yx2xe3h.aspx
 	
@@ -207,7 +206,7 @@ operator<<(std::cout, "Hello World");
 	\begin{note}
 	 	A PATH változóhoz való eljutás minden Windows verziónál más lehet, különösképpen, ha pl. magyar nyelvű operációs rendszerünk van. Ez okból kifolyólag ennek megoldását ismét az Olvasóra bízzuk.
 	\end{note}
-	Amennyiben a fordítás sikes volt, létrejött egy \texttt{a.exe} nevű fájl, melyet tudunk futtatni. Ha módosítjuk a kódot, akkor fordítani és futtatni 1 sorban így tudunk:
+	Amennyiben a fordítás sikeres volt, létrejött egy \texttt{a.exe} nevű fájl, melyet tudunk futtatni. Ha módosítjuk a kódot, akkor fordítani és futtatni 1 sorban így tudunk:
 	\begin{lstlisting}
 >g++ main.cpp && a.exe
 	\end{lstlisting}
@@ -441,7 +440,7 @@ int main()
 	fecske();
 }
 	\end{lstlisting}
-	Fordítsuk le és linkeljük össze őket az alábbi parancsok kiadásával:
+	Fordítsuk le őket az alábbi parancsok kiadásával:
 	
 	{\centering\texttt{g++ main.cpp}\par}
 	
