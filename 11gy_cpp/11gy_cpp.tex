@@ -911,7 +911,7 @@ Kor *k = dynamic_cast<Kor*>(*s);
 	\begin{lstlisting}
 class Base 
 {
-	virtual int f(){} //polimorfizmus szükséges
+	virtual ~Base(){} //polimorfizmus szükséges
 };
 class DerivedOne : virtual public Base {};
 class DerivedTwo : virtual public Base {};
