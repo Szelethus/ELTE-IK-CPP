@@ -45,6 +45,18 @@
 }
 \usepackage[unicode]{hyperref}
 
+%IMPORTANT https://tex.stackexchange.com/questions/376763/incomplete-iffalse-all-text-was-ignored-after-line-x-with-lstlisting
+\makeatletter
+\expandafter\let\csname active@char\string?\endcsname\relax
+\expandafter\let\csname active@char\string!\endcsname\relax
+\expandafter\let\csname active@char\string:\endcsname\relax
+
+
+\initiate@active@char{?}
+\initiate@active@char{!}
+\initiate@active@char{:}
+\makeatletter
+
 \begin{document}
 	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
 	\setlength\parindent{0pt}
@@ -128,6 +140,23 @@ int main()
 operator<<(std::cout, "Hello World");
 	\end{lstlisting}
 	Ebből látható, hogy az operátorok is tulajdonképpen függvények.
+	
+	\medskip
+	\textbf{Függvény deklaráció}nak nevezzük azt, amikor függvény használatáról adunk információt. A paraméterek típúsáról, visszatérési értékről és a függvény nevéről.
+	
+	\medskip
+	\textbf{Függvény definíció}nak nevezzük azt, amikor megmondjuk a függvénynek hogy mit csináljon. Ez egyben deklaráció is, hiszen a paraméterekről és visszatérési értékekről is tartalmazza a szükséges információkat.
+	
+	\medskip
+	Fentebb a \texttt{main} függvényt definiáltuk. Természetesen deklarálni is tudjuk, így:
+	\begin{lstlisting}
+int main(); //deklaráció	
+
+int main() //definíció
+{
+	std::cout << "Hello World!" << std::endl;
+}
+	\end{lstlisting}
 	\subsection{A C++ nyelvi elemei}
 	Minden C++ kód tokenekből áll. A token a legkisebb nyelvi egység, ami még értelmes a fordító számára. %https://msdn.microsoft.com/en-us/library/3yx2xe3h.aspx
 	
@@ -323,7 +352,6 @@ int main()
 			\draw[arrow] (objectFile1FileName) -- (exe);
 			\draw[arrow] (objectFile2FileName) -- (exe);
 			\draw[arrow] (libFile1FileName) -- (exe);
-			%TODO lehet az utolsó két oszlopot fel kéne cserélni
 		\end{tikzpicture}
 		\smallskip
 		
@@ -468,7 +496,7 @@ int main()
 	
 	{\centering\texttt{g++ main.o fecske.o}\par}
 	
-	Ezzel a paranccsal pedig az eredményül kapott tárgykódokat lehet összelinkelni. Rövidebb, ha egyből a cpp fájlokat adjuk meg a fordítónak, így ezt a folyamatot egy sorral letudhatjuk..
+	Ezzel a paranccsal pedig az eredményül kapott tárgykódokat lehet összelinkelni. Rövidebb, ha egyből a cpp fájlokat adjuk meg a fordítónak, így ezt a folyamatot egy sorral letudhatjuk.
 
 	{\centering\texttt{g++ main.cpp fecske.cpp} \par}
 	
@@ -483,15 +511,8 @@ int main()
 #endif
 	\end{lstlisting}
 	Ilyenkor elég a \texttt{fecske.h}-t includeolni.
-	\medskip
 	
-	\textbf{Függvény definíció}nak nevezzük azt, amikor megmondjuk a függvénynek hogy mit csináljon. Ez egyben deklaráció is, hiszen a paraméterekről és visszatérési értékekről is tartalmazza a szükséges információkat.
-	\medskip
-	
-	\textbf{Függvény deklaráció}nak nevezzük azt, amikor függvény használatáról adunk információt. A paraméterek típúsáról, visszatérési értékről és a függvény nevéről.
-	\medskip
-	
-  Szokás a fecske.h-t a fecske.cpp-be is includeolni, mert ha véletlenül ellent mondana egymásnak a definíció a cpp fájlban és a deklaráció a header fájlban akkor a fordító hibát fog jelezni. (Például ha eltérő visszatérési érték típust adtunk meg a definíciónak a C++ fájlban és a deklarációnak a header fájlban.)
+	Szokás a fecske.h-t a fecske.cpp-be is includeolni, mert ha véletlenül ellent mondana egymásnak a definíció a cpp fájlban és a deklaráció a header fájlban akkor a fordító hibát fog jelezni. (Például ha eltérő visszatérési érték típust adtunk meg a definíciónak a C++ fájlban és a deklarációnak a header fájlban.)
 	
 	Valami akárhányszor deklarálhatunk, azonban ha a deklarációk ellentmondanak egymásnak, akkor fordítási hibát kapunk. Definiálni viszont mindent pontosan egyszer kell. Több definíció vagy a definíció hiánya problémát okozhat. Ezt az elvet szokás \textbf{One Definition Rule}-nak, vagy röviden \textbf{(ODR)}-nek hívni.
 	\bigskip
@@ -589,7 +610,6 @@ int main()
 }
 	\end{lstlisting}
 	Itt szintén az \texttt{f()} kiértékelése a \texttt{main} függvény meghívása előtt történik, hogy a globális változót létre lehessen hozni.
-	%TODO névtelen névtér
 	\subsection{Globális változók definíciója és deklarációja}
 	Globális változókat úgy tudunk létrehozni, hogy közvetlen egy névteren belül (erről később) definiáljuk őket.
 	\medskip
