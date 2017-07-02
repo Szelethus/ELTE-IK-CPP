@@ -7,12 +7,10 @@ Maga a compiled pdf az bátran bárkivel megosztható ;)
 
 ## Pótlandó dolgok
 
-* Virtual tables
+* Implicit konverziók
 * Kiértékelési sorrend
 * istream/ostream iterator
-* jobb és balérték
 * hivatkozások, linkek
-* előszó
 
 ## Linkek
 

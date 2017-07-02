@@ -98,7 +98,21 @@ int main()
 	}
 }
 	\end{lstlisting}
-	
+	\subsection{Jobb- és balérték}
+	A láthatóság és élettartam fogalmával szoros összeköttetésben áll a \textbf{jobb- és balérték} fogalma. Egy objektumot \textbf{balértéknek} (\textit{left value}, röviden \textit{lvalue}) nevezzük, ha címképezhető, és \textbf{jobbértéknek} (\textit{right value}, röviden \textbf{rvalue}) ha nem. Példaképp:
+	\begin{lstlisting}
+int main()
+{
+	int *p, r; //balértékek
+	&p; //ok, p pointer memóriacímére mutat
+	&r; //ok, r memóriacímére mutat
+	&5; //nem ok, 5 jobbérték
+	&"Hello World!"; //nem ok, "Hello World!" jobbérték
+	&&r; //nem ok, címképzés eredménye jobbérték
+	5 = r; //nem ok, jobbértéknek nem lehet értéket adni
+}
+	\end{lstlisting}
+	A jobbértékek többnyire ideiglenes objektumok, pl. egy érték szerint visszatérő függvény visszatérési értéke,  literálok mint pl. \texttt{5}, \texttt{"Hello World!"}. Lévén ezek az objektumok csak ideiglenesen szerepelnek a memóriában (sőt, gyakran egyáltalán nem, ha a fordító kioptimalizálja, ahogy azt korábban láthattuk), ezért hiba lenne a memóriacímükre hivatkozni, így a fordító ezt nem is engedi.
 	\section{A stack működése}
 	A stack a C++ alapértelmezett tárolási osztálya lokális változók esetén: minden változó alapértelmezetten itt jön létre és semmisül meg. Az itt létrejött változók automatikusan megsemmisülnek. Az élettartamuk a definíciójuktól az adott blokk végéig tart.
 	

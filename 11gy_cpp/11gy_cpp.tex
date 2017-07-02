@@ -284,6 +284,10 @@ int main()
 }
 	\end{lstlisting}
 	Ezt explicit névfeloldásnak (\textit{explicit scope resolution}) nevezzük.
+	
+	\medskip
+	Felmerülhet a kérdés, hogy a fordító mégis hogy oldja meg, hogy futási időben kikeresi a hívandó függvényt? Erre a megoldás az, hogy minden polimorfikus osztályhoz hozzárendel egy \textbf{virtuális táblát}, mely lényegében egy függvény pointer tömb, ami tartalmazza a ,,legleszármazottabb'' virtuális függvényeket. Ezek után a fordító az ősosztályban elhelyez egy újabb adattagot, egy un. \textbf{virtuális tábla pointert} (ne feledjük, ez öröklődik tovább!), ez pedig mindig az adott osztály virtuális táblájára mutat.
+	%NOTE http://www.learncpp.com/cpp-tutorial/125-the-virtual-table/
 	\subsection{Tisztán virtuális függvények}
 	Matematikailag, ha egy síkidomot háromszögekre felvágunk, meg tudjuk mondani a területét, ez azonban a jelenlegi példánkban ennyi adat segítségével aligha lehetséges. Ezért gyakran úgy dönthetünk, hogy egy adott függvénynek csak a fejlécét (\textit{interface}) örököltetjük, de implementációját nem.
 	
