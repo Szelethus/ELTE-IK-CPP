@@ -7,8 +7,10 @@ Maga a compiled pdf az bátran bárkivel megosztható ;)
 
 ## Pótlandó dolgok
 
+* Implicit konverziók
 * Kiértékelési sorrend
 * istream/ostream iterator
+* hivatkozások, linkek
 
 ## Linkek
 
