@@ -217,12 +217,11 @@ private:
   Az osztály minden tagja, mely a \texttt{public} kulcsszó után jön, elérhető bárki számára. A \texttt{private} kulcsszó után következő adatok csak is kizárólag az adott osztályon belül érhető el (leszámítva a \texttt{friend}eket, de erről később).
 
 	A \texttt{class} és a \texttt{struct} abban tér el, hogy alapértelmezetten a \texttt{struct} minden tagja publikus, míg \texttt{class}-nak privát. A \texttt{public} ill. \texttt{private} kulcsszóval mind a kettőnél explicit megadhatjuk a láthatóságot.
-	
-	\medskip
+	\subsection{Iterátorok}
 	Van egy súlyos következménye az imént bevezetett adatrejtésnek. Például, így nem tudunk hozzáférni a második elemhez kívülről. Vagy bármelyik másikhoz. Ilyenkor a naív megoldás az, ha módosítjuk a listát, és minden olyan függvényt, aminek hozzá kéne férnie az elemekhez, metódussá tesszük. Hiszen a lista metódusai hozzáférnek a privát adattagokhoz is.
 	
 	Ezt ugyanakkor nem akarjuk minden egyes függvénnyel megtenni. A végén nagyra nőne a lista osztály, ami nagyban rontja az kód érthetőségét és fenntarthatóságát. Emellett a reprezentáció változtatásával megint sok függvényt kellene módosítani.
-	
+		
 	Írjunk felsorolót, amivel hozzáférhetünk az elemekhez kívülről is.
 \begin{lstlisting}
 class List
@@ -302,8 +301,7 @@ private:
 	List *cursor2;
 };
 \end{lstlisting}
-	Ezzel már egy rendezést meg tudunk oldani. De talán érezhető, hogy ez nem a legszebb megoldás. Ha három \texttt{cursor} kéne egy algoritmushoz, akkor megint bajban lennénk. Ennél létezik sokkal szofisztikáltabb megoldás.
-	\subsection{Iterátorok}
+	Ezzel már egy rendezést meg tudunk oldani. De talán érezhető, hogy ez nem a legszebb megoldás. Ha három \texttt{cursor} kéne egy algoritmushoz, akkor megint bajban lennénk. Ennél létezik sokkal szofisztikáltabb megoldás: az \textbf{iterátorok}.
 	Az iterátorok a pointerek általánosításai, segítségükel tudunk végigiterálni egy konténer elemein (azaz velük tudjuk lekérdezni a konténer elemeit). Ehhez szükségünk van arra, hogy tudjuk hol kezdődik és végződik a konténerünk. E láncolt lista esetében hozzá tudunk férni az első elemhez (az lesz ugye \texttt{head} a fenti példákban) és tudjuk hogy mindig nullpointerrel az utolsó elemben lévő mutató értéke. Legyen az iterátunk neve \texttt{Iterator}!
 \begin{lstlisting}
 class List
