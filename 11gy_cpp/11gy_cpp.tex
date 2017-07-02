@@ -1027,4 +1027,43 @@ int main()
 }
 	\end{lstlisting}
 	A \texttt{reinterpret\_cast}-tal ellentétben \textbf{soha} sincs szükség erre a cast-ra, csak a C-vel való kompatibilitás miatt része még a nyelvnek.
+	\section{Implicit konverziók}
+	%TODO ez most legyen elég, de azért lehet kéne ezen finomhangolni.
+	Implicit konverzióról akkor beszélünk, ha egy adott típusú objektumnak egy másik típusú objektumot adunk értékül, és az egyik objektum a másik típusára konvertálódik anélkül, hogy mi ezt a konverziót külön (explicit módon, pl. cast-ok segítségével) ,,kértük'' volna.
+	
+	A nyelv egyik érdekessége, hogy lévén a \texttt{char} típusok tudnak számokat tárolni, így egy \texttt{char} objektum könnyedén át tud konvertálni \texttt{int} típusúra. Példaképp, az \texttt{'a' + 'b'} összeadásnál a karakterek összeadása nem definiált, azonban \texttt{int}-ek között igen, így a fordító implicit módon átkonvertálja azokat \texttt{int}-é.
+	
+	Amennyiben a fordító megpróbál egy műveletet elvégezni, de típushiba miatt ez meghiúsul, megpróbálja az objektumokat átkonvertálni, lehetőleg veszteségmentesen. A fordító először implicit konverzióval próbálkozik, aztán egy felhasználó által definiált konverzióval, majd ismét egy implicit konverzióval. Amennyiben ezek után sem megvalósítható a művelet típushiba miatt, fordítási hibát kapunk.
+	\subsection{Aritmetikai konverziók}
+	Meglepő módon, két \texttt{int} szám hányadosa C++ban nem lebegőpontos típussal fog rendelkezni, hanem szintúgy \texttt{int}-el. A primitív típusok között szigorú konverziós szabály van. Amennyiben például azt szeretnénk, hogy a 10/4 osztás végeredménye ne egész legyen, akkor az \texttt{/} operátor legalább egyik operandusának lebegőpontosnak kell lennie, pl. így: \texttt{10/4.0}
+	
+	Általános szabály az, hogy ha két típus eltér aritmetikai műveleteknél, akkor konvertálni kell, és mindig a kisebb méretű típust konvertáljuk a nagyobba.
+	\begin{compactenum}
+		\item Ha az egyik típusa \texttt{long double}, akkor a másikat is \texttt{long double}-ra konvertáljuk.
+		\item Különben ha az egyik operandus \texttt{double}, akkor másik is \texttt{double} lesz.
+		\item Különben, ha az egyik \texttt{float}, akkor a másik is \texttt{float} lesz.
+		\item Amennyiben egyik operandus se lebegőpontos, akkor ha az egyik operandus \texttt{unsigned long}, akkor a másik is ez lesz.
+		\item Ha az egyik operandus \texttt{long}, a másik pedig \texttt{unsigned int}, akkor előfordulhat az, hogy a két típus ugyanakkora tárterületen van tárolva (a primitív típusok méreteiről később lesz részletesekben szó). Ha az \texttt{int} és a \texttt{long} mérete megegyezik, akkor \texttt{unsigned
+			long} lesz mindkét operandus. Különben ha a \texttt{long} nagyobb, akkor \texttt{long}-gá konvertálódik a másik.
+		\item Különben ha az egyik \texttt{long}, a másik pedig NEM \texttt{unsigned int}, akkor \texttt{long}-gá konvertálódik a másik operandus.
+		\item Különben, ha az egyik operandus \texttt{unsigned int}, a másik is kovnertálódik \texttt{unsigned int}-té.
+		\item Különben minden \texttt{int}-té konvertálódik, ha egyik korábbi sem teljesült.
+	\end{compactenum}
+	\subsection{Logikai konverzió}
+	Amikor \texttt{for} ciklusban vagy \texttt{if} ágban meg kell adnunk egy logikai értéket, akkor ott gyakran történhez implicit konverzió. Példaképp minden lebegőpontos vagy egész szám ami 0-tól különböző \texttt{true} értékre konvertálódik, míg 0 érték \texttt{false}-ra. Pointereknél minden nem nullpointer \texttt{true}.
+	\subsection{Template-ek és az implicit konverzió}
+	Template-eknél nem minden esetben megengedett az implicit konverzió. Tekintsük az alábbi kódot:
+	\begin{lstlisting}
+template <class T>
+T max(T a, T b)
+{
+	return a < b ? b : a;
+}
+
+int main()
+{
+	std::cout << max(1, 1.5) << std::endl;
+}
+	\end{lstlisting}
+	Hibaüzenetet kapunk, miszerint a template paraméter dedukció nem volt sikeres, hiszen \texttt{T}-nek vagy \texttt{int}-nek, vagy \texttt{double}-nak kéne lennie, de egyszerre nem tud az lenni.
 \end{document}
