@@ -418,17 +418,23 @@ int List::count = 0;
 	\medskip
 	Határozott előrelépést értünk el, de van még hova fejleszteni a listánkat. Szerencsére nem csak adattagokat, de tagfüggvényeket is tudunk struct-okba írni.
 	\subsection{Konstruktorok}
-	Egy trükkel megoldható, hogy tömörebb szintaxissal tudjuk inicializálni a listaelemeinket.
+	Kényelmesebbé tehetjük az életünket, ha írunk egy tagfüggvényt, mellyel kényelmesebben tudjuk létrehozni a listaelemeket:
 	\begin{lstlisting}
 struct List
 {
-	List(int _data, List *_next = 0) : data(_data), next(_next) {}
+	//tagfüggvények
+	List(int _data, List *_next = NULL)
+	{
+		data = _data;
+		next = _next;
+	}
 	
+	//adattagok
 	int data;
 	List *next;
 };
 	\end{lstlisting}
-	A fenti tagfüggvényt, vagy metódust \textbf{konstruktor}nak (\textit{constructor}, vagy röviden \textit{ctor}) hívjuk. A konstruktorok hozzák létre az objektumokat; vannak paraméterei, és nincs visszatérési értéke. A fenti konrtruktor még egy alapértelmezett paraméterrel is rendelkezik - ha mi csak egy \texttt{int} paraméterrel hívjuk meg a konstruktort, akkor a \texttt{\_next}-et alapértelmezetten nullpointernek veszi.
+	A fenti tagfüggvényt, vagy metódust \textbf{konstruktor}nak (\textit{constructor}, vagy röviden \textit{ctor}) hívjuk. A konstruktorok hozzák létre az objektumokat; vannak paraméterei, és nincs visszatérési értéke. A fenti konrtruktor még egy alapértelmezett paraméterrel is rendelkezik - ha mi csak egy \texttt{int} paraméterrel hívjuk meg a konstruktort, akkor a \texttt{\_next}-et alapértelmezetten nullpointernek veszi. Mint minden tagfüggvény, ez a konstruktor is hozzáfér az adott struktúra adattagjaihoz.
 	
 	\medskip
 	Azonban a struktúránk működött eddig is, pedig nem írtunk konstruktort. Ha konstruktorra szükség van objektum létrehozáshoz, akkor hogyan lehet ez? Úgy, hogy a fordító a hiányzó kulcsfontosságú függvényeket legenerálja nekünk. Létrehoz (többek között) egy un. \textbf{default konstruktort}, ha mi explicit nem hoztunk létre konstruktort. A default konstruktor 0 paraméterrel meghívható. Fontos azonban, ha mi írunk egy konstruktort, akkor a fordító már nem fog generálni ilyet.
@@ -439,22 +445,36 @@ struct List
 List head(5); //ok, létrehoz egy 5 értékkel rendelkező, 1 elemű listát
 List head2; //nem ok, már nincs paraméter nélküli konstruktor
 	\end{lstlisting}
+	Egy trükkel megoldható, hogy tömörebb szintaxissal tudjuk inicializálni a listaelemeinket.
+	\begin{lstlisting}
+List(int _data, List *_next = 0) : data(_data), next(_next) {}
+	\end{lstlisting}
 	
 	\medskip
-	A konstruktor fejléce után található egy un. \textbf{inicializációs lista}. Az inicializációs listával rendelkező konstruktor hasonló jelentéssel bír, mint a következő kód:
-	\begin{lstlisting}
-List(int _data, List *_next = 0)
-{
-	data = _data;
-	next = _next;
-}
-	\end{lstlisting}
-	  Az inicializációs lista használata azonban hatékonyabb.
-  Mire a konstruktor törzséhez ér a vezérlés, addigra az adattagokat inicializálni kell. A törzsben ezért már inicializált értékeket írunk felül, ami erőforrás pazarlás. Primitív típusok esetén ez nem jelent problémát (mivel a fordító várhatóan kioptimalizálja), összetett típusok esetén viszont számottevő lehet.
+	A konstruktor fejléce után (kettősponttól kezdve) található egy un. \textbf{inicializációs lista}. Az inicializációs listával rendelkező konstruktor hasonló jelentéssel bír, mint a korábbi kód, azonban inicializációs lista használata hatékonyabb.
+	
+	Mire a konstruktor törzséhez ér a vezérlés, addigra az adattagokat inicializálni kell. A törzsben ezért már inicializált értékeket írunk felül, ami erőforrás pazarlás. Primitív típusok esetén ez nem jelent problémát (mivel a fordító várhatóan kioptimalizálja), összetett típusok esetén viszont számottevő lehet.
+	
+	Sőt, mivel a referenciákat és konstansokat inicializálni \textbf{kell}, ezért ilyen adattagjaink csak akkor lehetnek, ha minden konstruktor inicializálja őket az inicializációs listájukban.
 	\begin{note}
 	    A konstruktor törzsében történő értékadás két lépés (mivel előtte egy alapértelmezett konstruktor már inicializálta az objektumot), az inicializálás csak egy.
 	\end{note}
 	Fontos megjegyzés, hogy az a struktúra elemei a mezők definiálásának a sorrendjében inicializálódnak. Tehát, bármilyen sorrendben írjuk mi az inicializációs listát, mindig először a \texttt{data}, és utána a \texttt{next} kerül inicializálásra. Ennek az az oka, hogy konstruktorból több is lehet, így nem lenne egyértelmű az inicializációs sorrend, függne attól, hogy mely konstruktort hívtuk meg. A mezők sorrendje ezzel szemben egyértelmű.
+	
+	Ennek többek között ilyen következményei lehetnek:
+	\begin{lstlisting}
+struct Printer
+{
+	Printer(int i) : x(i), y(x) 
+	{
+		std::cout << y << " " << x << std::endl; // nem definiált viselkedés
+	}
+	int y, x;
+};
+
+int main() { Printer a(5); }
+	\end{lstlisting}
+	Ekkor \texttt{x}-nek az értéke \texttt{y} inicializálásakor még nem definiált, így (lévén a sorrend miatt \texttt{y}-nak előbb kell értéket adni) \texttt{y} értéke is nem definiált lesz.
 	
 	\medskip
 	Előfordulhat olyan, hogy szeretnénk létrehozni egy listát, de azt szeretnénk, hogy élettartama mennél kisebb legyen. Ezt megtehetjük például úgy, ha egy külön blokkban hozzuk létre.
@@ -481,14 +501,14 @@ printFirstElement(List(4)); //a lista élettartama a függvényhívástól a fü
     A literálok is név nélküli temporális értékek (bár nem változók). Ha pl. az \texttt{f} függvény egy darab \texttt{int}-et vár paraméterül, akkor \texttt{f(5)} hívásakor \texttt{5} egy név nélküli temporális érték.
 	\end{note}
 	\begin{note}
-		A temporális változók jobb értékek, így csak konstans referenciával, vagy érték szerint tudjuk őket átvenni. Ha konstans referenciához kötjük, akkor a változó élettartama kiterjesztésre kerül, meg fogy egyezni a referencia élettartamával.
+		A temporális változók jobb értékek, így csak konstans referenciával, vagy érték szerint tudjuk őket átvenni. Ha konstans referenciához kötjük, akkor a változó élettartama kiterjesztésre kerül, meg fog egyezni a referencia élettartamával. Bár ezt a referenciát tudjuk címképezni (azaz egy balérték lesz), ne feledjük, hogy ez a referencia csak hivatkozik egy jobbértékre, nem maga lesz az.
 	\end{note}
 	\subsection{Destrukorok}
 	Ahogy gondoskodtunk a listaelemek létrehozásáról, gondoskodhatnánk annak megfelelő megsemmisüléséről is.
 	\begin{lstlisting}
 struct List
 {
-	List(int data, List *next = 0) : data(data), next(next) {}
+	List(int _data, List *_next = 0) : data(_data), next(_next) {}
 	~List() // dtor
 	{
 		delete next;
@@ -516,7 +536,7 @@ int main()
 	Most úgy alakítottuk át a kódot, hogy amikor létrehozzuk a listát, akkor a fejelemet a stacken hozzuk létre, melynek értéke 8, és a pointer része nullpointer. Később az \texttt{add} függvénnyel létrehozunk a heapen egy olyan listaelemet, mely 7-et tárol, és pointer része nullpointer, és az eredeti lista fejét ráállítjuk erre.
 	\medskip
 	
-	Itt sikeresen elértük, hogy a lista első eleme a stack-en, de minden más eleme a heap-en legyen. Mivel olyan struktrát írtunk, mely gondoskodik arról, hogy minden dinamikusan lefoglalt területet felszabadítson, mindent csak egyszer töröl, jó sorrendben, egy  \textit{RAII} (\textit{Resource acquisition is initialization}) osztályt írtunk. Ez Bjarne-nek egy elég szerencsétlenül választott acronymje. A lényege, hogy az adott osztály a megfelelő erőforrásokat lefoglalja magának, majd a destruktor gondoskodik az erőforrások felszabadításáról. Minden erőforrást egy stack-en lévő objektumhoz kötünk, mivel azok garantáltan automatikusan fel fognak szabadulni, a destruktoruk le fog futni. Jelen esetben a lista fejeleme, ami a stack-en van, felelős azért, hogy a heap-re allokált listaelemek felszabaduljanak a program futásának a végeztével. Így a felhasználónak már a free hívásra sem kell figyelnie.
+	Sikeresen elértük, hogy a lista első eleme a stack-en, de minden más eleme a heap-en legyen. Mivel olyan struktrát írtunk, mely gondoskodik arról, hogy minden dinamikusan lefoglalt területet felszabadítson, mindent csak egyszer töröl, jó sorrendben, egy  \textit{RAII} (\textit{Resource acquisition is initialization}) osztályt írtunk. Ez Bjarne-nek egy elég szerencsétlenül választott acronymje. A lényege, hogy az adott osztály a megfelelő erőforrásokat lefoglalja magának, majd a destruktor gondoskodik az erőforrások felszabadításáról. Minden erőforrást egy stack-en lévő objektumhoz kötünk, mivel azok garantáltan automatikusan fel fognak szabadulni, a destruktoruk le fog futni. Jelen esetben a lista fejeleme, ami a stack-en van, felelős azért, hogy a heap-re allokált listaelemek felszabaduljanak a program futásának a végeztével. Így a felhasználónak már a free hívásra sem kell figyelnie.
 	
 	Bjarne híres mondása, hogy a C++ szemétgyüjtéssel rendelkező nyelv, mert nem generál szemetet. A jól megírt objektumok mindig eltakarítanak maguk után. 
 	\medskip
@@ -527,8 +547,7 @@ int main()
 	Csináljunk az \texttt{add} függvényből tagfüggvényt!
 	\begin{lstlisting}
 struct List
-{
-  // ...	
+{	
 	void add(int data) //eltűnt egy paraméter!
 	{
 		if (next == 0)
@@ -540,8 +559,7 @@ struct List
 			next->add(data);
 		}
 	}
-	int data;
-	List *next;
+	//...
 };
 
 int main()
@@ -564,7 +582,7 @@ int main()
 	head.add(7);
 	head.add(2);
 	{
-		List cHead = head;
+		List cHead = head; //másoló konstruktor hívása
 	} //itt lefut cHead destruktora
 }
 	\end{lstlisting}
@@ -609,8 +627,6 @@ int main()
 \begin{lstlisting}
 struct List
 {
-	//...
-	
 	List(const List &other) : data(other.data), next(0)
 	{
 		if (other.next != 0)
@@ -618,7 +634,6 @@ struct List
 			next = new List(*other.next);
 		}
 	}
-	
 	//...
 };
 

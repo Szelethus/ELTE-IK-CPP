@@ -184,6 +184,9 @@ T a = b;
 		Ekkor \texttt{a} ekvivalens \texttt{b}-vel, és ha \texttt{a}-t módosítjuk, akkor \texttt{b} nem változik, és viszont.
 		\item egyenlőségvizsgálat (\texttt{operator==}) (Ha nincs, akkor az adott típust félig regulárisnak nevezzük)
 	\end{enumerate}
+	\begin{note}
+		Azt a másoló konstruktorral vagy értékadó operátorral történő műveletet, amikor a pointer adattagoknak úgy adunk értékül, hogy ne ugyanarra a területre mutassanak, \textit{deep copy}-nak hívjuk. Amikor ez nem történik meg, azt \textit{shallow copy}-nak nevezzük.
+	\end{note}
 	\subsection{Adattagok védettsége}
 	Biztonságossá sikerült tenni a lista használatát? A felhasználó most már a megfelelő metódusok, valamint a másolás és értékadás használatával nem tud elkövetni memóriakezeléssel kapcsolatos hibát. Az adattagokhoz azonban továbbra is hozzá fér. Így, a következő módon továbbra is érhetik meglepetések:
 	\begin{lstlisting}
