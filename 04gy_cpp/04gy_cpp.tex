@@ -1,69 +1,16 @@
-\documentclass[a4paper,11.5pt,table]{article}
-\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
-\usepackage[normalem]{ulem}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
-\usepackage[magyar]{babel}
-\usepackage{amsmath, amsthm,amssymb, paralist, tikz, multirow, float}
-\usetikzlibrary{arrows, positioning}
-
-\usepackage{listings}
-\lstdefinestyle{customc}{
-	belowcaptionskip=1\baselineskip,
-	breaklines=true,
-	frame=L,
-	language=C++,
-	showstringspaces=false,
-	basicstyle=\ttfamily,
-	%identifierstyle=\color{blue},
-	keywordstyle=\bfseries\color{green!40!black},
-	stringstyle=\color{orange},
-	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}, 
-	emphstyle = \color{blue},
-	tabsize = 4
-}
-
-\lstdefinestyle{customasm}{
-	belowcaptionskip=1\baselineskip,
-	frame=L,
-	language=[x86masm]Assembler,
-	basicstyle=\ttfamily,
-	commentstyle=\itshape\color{purple!40!black},
-}
-
-\lstset{
-	escapechar=@,
-	style=customc,
-	literate =  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
-	{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
-	{ö}{{\"o}}1 {ü}{{\"u}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
-	{ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
-	{€}{{\euro}}1 {£}{{\pounds}}1	
-}
-
-\lstset{escapechar=@,style=customc}
-
-\usepackage{hyperref}
-
+% !TeX root = 04gy_cpp
+\documentclass[../cpp_book/cpp_book.tex]{subfiles}
 \begin{document}
-	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
-	\setlength\parindent{0pt}
-	\def\<{<\hspace{0mm}<}
-	
-	\theoremstyle{definition}
-	\newtheorem{note}{Megjegyzés}[subsection]
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	\begin{center}
-		{\LARGE\textbf{C++}}
-		
-		{\Large Gyakorlat jegyzet}
-		
-		4. óra.
-	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlatán. (\today)
-	
+	\onlyinsubfile{
+		\begin{center}
+			{\LARGE\textbf{C++}}
+			
+			{\Large Gyakorlat jegyzet}
+			
+			4. óra
+		\end{center}
+		A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlata alapján. (\today)
+	}
 	\section{Literálok}
 	\subsection{Karakterláncok}
 	Mi lesz a \texttt{"Hello"} karakterlánc literál típusa?

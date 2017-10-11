@@ -1,69 +1,16 @@
-\documentclass[a4paper,11.5pt,table]{article}
-\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
-\usepackage[normalem]{ulem}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
-\usepackage[magyar]{babel}
-\usepackage{amsmath, amsthm,amssymb, paralist, tikz, multirow}
-\usetikzlibrary{arrows, positioning}
-
-\usepackage{listings}
-\lstdefinestyle{customc}{
-	belowcaptionskip=1\baselineskip,
-	breaklines=true,
-	frame=L,
-	language=C++,
-	showstringspaces=false,
-	basicstyle=\ttfamily,
-	%identifierstyle=\color{blue},
-	keywordstyle=\bfseries\color{green!40!black},
-	stringstyle=\color{orange},
-	emph=std,
-	emphstyle = \color{blue},
-	tabsize = 4
-}
-
-\lstdefinestyle{customasm}{
-	belowcaptionskip=1\baselineskip,
-	frame=L,
-	language=[x86masm]Assembler,
-	basicstyle=\ttfamily,
-	commentstyle=\itshape\color{purple!40!black},
-}
-
-\lstset{
-	escapechar=@,
-	style=customc,
-	literate =  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
-	{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
-	{ö}{{\"o}}1 {ü}{{\"u}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
-	{ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
-	{€}{{\euro}}1 {£}{{\pounds}}1	
-}
-
-\usepackage{hyperref}
-
+% !TeX root = 12gy_cpp
+\documentclass[../cpp_book/cpp_book.tex]{subfiles}
 \begin{document}
-	%%%%%%%%%%%RÖVIDÍTÉSEK%%%%%%%%%%
-	\setlength\parindent{0pt}
-	\def\<{<\hspace{0mm}<}
-	
-	\theoremstyle{definition}
-	\newtheorem{note}{Megjegyzés}[subsection]
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	\begin{center}
-		{\LARGE\textbf{C++}}
-		
-		{\Large Gyakorlat jegyzet}
-		
-		12. óra.
-	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor  gyakorlatán. (\today)
-	\medskip
-	
-	%TODO magyarázatok
+	\onlyinsubfile{
+		\begin{center}
+			{\LARGE\textbf{C++}}
+			
+			{\Large Gyakorlat jegyzet}
+			
+			12. óra
+		\end{center}
+		A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlata alapján. (\today)
+	}
 	\section{Beugró kérdések}
 	A következő kérdések egy régebbi, kiszivárgott C++ beugróból lettek beemelve. Így értelemszerűen ezekkel a kérdésekkel az olvasó nem fog semmiképpen se találkozni. Alaposabb magyarázatot nem fűztem a megoldásokhoz, ugyanis azok a jegyzet alapos megértése után triviálisak.
 	\begin{enumerate}[1.)]
