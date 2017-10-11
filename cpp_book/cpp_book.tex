@@ -90,17 +90,17 @@
 		\vfill
 		
 		\begin{lstlisting}[frame=trbl, linewidth=12.6cm, xleftmargin=4.5cm, emph={CppStudent}]
-		#include <iostream>
-		#include "CppStudent.h"
-		
-		int main()
-		{
-		CppStudent *reader = new CppStudent();
-		reader->readBook();
-		while(reader->doesUnderstand() == false)
+#include <iostream>
+#include "CppStudent.h"
+
+int main()
+{
+	CppStudent *reader = new CppStudent();
+	reader->readBook();
+	while(reader->doesUnderstand() == false)
 		reader->readBook();	
-		delete reader;
-		}
+	delete reader;
+}
 		\end{lstlisting}
 		\vfill
 		
