@@ -66,15 +66,44 @@
 	\theoremstyle{definition}
 	\newtheorem{note}{Megjegyzés}[subsection]
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	\begin{center}
-		{\LARGE\textbf{C++}}
+	\begin{titlepage}
+		\vspace*{2cm}
+		\centering
+		\includegraphics[width=5cm]{elte_cimer}
 		
-		{\Large Gyakorlat jegyzet}
+		\vspace*{2cm}
+		{\Huge Programozási Nyelvek: C++ }
 		
-		1. óra
-	\end{center}
-	A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlata alapján. (\today)
+		\vspace{1cm}
+		{\huge Gyakorlat és előadásjegyzet}
+		
+		\vspace*{5mm}
+		{\large Horváth Gábor gyakorlata alapján}
+		\vspace*{1.5cm}
+		
+		{\large Umann Kristóf}
+		\vfill
+		
+		\begin{lstlisting}[frame=trbl, linewidth=12.6cm, xleftmargin=4.5cm, emph={CppStudent}]
+#include <iostream>
+#include "CppStudent.h"
+
+int main()
+{
+	CppStudent *reader = new CppStudent();
+	reader->readBook();
+	while(reader->doesUnderstand() == false)
+		reader->readBook();	
+	delete reader;
+}
+		\end{lstlisting}
+		\vfill
+		
+		\vspace*{1cm}
+		\today
+	\end{titlepage}
+	\tableofcontents
+	\pagebreak
 	\section{Előszó}
 	Ez a jegyzet az ELTE Informatikai Kar hallgatóinak készült a \emph{Programozási Nyelvek C++} című tárgyhoz. A jegyzet segítségével a gyakorlaton és előadáson elhangzott anyagok elsajátíthatóak, egy saját, néhány helyen hiányos jegyzetet jól kiegészít. Úgy gondoljuk, hogy aki a jegyzetben leírtakat mélyen megérti, az olvasás mellett a példakódokkal kísérletezik, az jó eséllyel a vizsgáról nem fog sikertelenül távozni. Fontos tehát kihangsúlyoznunk, hogy a cél az aktív tudás elsajátítása, amelyet egyetlen jegyzet sem képes megadni. Az aktív tudás megszerzéséhez fontos a gyakorlás, feladatok megoldása.
 	
