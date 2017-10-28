@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+	\tikzstyle{Heap} = [rectangle, minimum width=6cm, minimum height=2cm, text centered, draw=black, fill=white]
+	\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
+	\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{arrow} = [thick,->,>=stealth]
+	
+	\draw [thick, black] (-3, 0) -- (-1, 0);
+	\draw [thick, black] (-3, 0) -- (-3, 3);
+	\draw [thick, black] (-1, 0) -- (-1, 3);
+	\node[Heap] at (3,1.5){};
+	\node (7node) [ListNode] at (2,1) {7};
+	\node (2node) [ListNode] at (4,2) {2};
+	\node (headNode) [ListNode] at (-2,0.25) {8};
+	\draw [arrow] (7node) -- (2node);
+	\draw [arrow] (headNode) -- (7node);
+\end{tikzpicture}

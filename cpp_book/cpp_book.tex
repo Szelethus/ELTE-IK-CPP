@@ -7,8 +7,18 @@
 \usepackage{lipsum}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
-\usepackage{amsmath, amsthm,amssymb, paralist, tikz, multirow, float, array, tikz-uml}
-\usetikzlibrary{arrows, positioning}
+\usepackage{
+	amsmath, 
+	amsthm,
+	amssymb, 
+	paralist, 
+	tikz, 
+	multirow, 
+	float, 
+	array, 
+	tikz-uml
+}
+\usetikzlibrary{arrows, positioning, calc}
 
 \usepackage{listings}
 \lstdefinestyle{customc}{
@@ -51,7 +61,6 @@
 \expandafter\let\csname active@char\string?\endcsname\relax
 \expandafter\let\csname active@char\string!\endcsname\relax
 \expandafter\let\csname active@char\string:\endcsname\relax
-
 
 \initiate@active@char{?}
 \initiate@active@char{!}

@@ -1,0 +1,15 @@
+
+\begin{tikzpicture}
+	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{arrow} = [thick,->,>=stealth]
+	
+	\draw [thick, black] (0, 0) -- (2, 0);
+	\draw [thick, black] (0, 0) -- (0, 3.5);
+	\draw [thick, black] (2, 0) -- (2, 3.5);
+	\node (c2) [Node] at (1,0.25) {\texttt{i} (5)};
+	\node (d2) [Node] at (1,0.75) {\texttt{t[0]} (5)};
+	\node (d2) [Node] at (1,1.25) {\texttt{t[1]} (4)};
+	\node (d2) [Node] at (1,1.75) {\texttt{t[2]} (3)};
+	\node (d2) [Node] at (1,2.25) {\texttt{t[3]} (2)};
+	\node (d2) [Node] at (1,2.75) {\texttt{t[4]} (1)};
+\end{tikzpicture}

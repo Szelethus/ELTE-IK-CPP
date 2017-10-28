@@ -159,52 +159,17 @@ struct Hallgato
 	Miután átrendeztük a mezők sorrendjét, és újra kiírjuk a struktúra méretét, akkor a válasz 24. Ennek az oka az, hogy míg az első esetben így volt eltárolva a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
 	\begin{figure}[H]
 		\centering
-		\begin{tikzpicture}
-		\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 1.2pt]
-		\tikzstyle{Border} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, line width = 1.2pt]
-		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 0.2pt]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
-		
-		\node (1) [Node] {atlag};
-		\node (2) [HalfNode, right = 0mm of 1] {kor};
-		\node (3) [HalfNode, right = 0mm of 2] {mag};
-		\node (border) [Border, right = -0.2mm of 1] {};
-		
-		\end{tikzpicture}
+		\input{../img/struct_size_1.tikz}
 	\end{figure}
 	Azaz, \texttt{atlag}, illetve \texttt{kor} és \texttt{magassag} pont efértek 1-1 gépi szóban. Viszont, ha megcseréljük a sorrendet, ez már nem lesz igaz:
 	\begin{figure}[H]
 		\centering
-		\begin{tikzpicture}
-		\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{Border} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, line width = 1.2pt]
-		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 0.2pt]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
-		
-		\node (1) [HalfNode] {kor};
-		\node (2) [Node, right = 0mm of 1] {atlag};
-		\node (3) [HalfNode, right = 0mm of 2] {mag};
-		\node (border) [Border, right = -1.26cm of 1] {};
-		\node (border) [Border, left = -1.26cm of 3] {};
-		\end{tikzpicture}
+		\input{../img/struct_size_2.tikz}
 	\end{figure}
   Itt az \texttt{atlag} két fele két különböző gépi szóba kerülne. Ez a ma használt processzorok számára nem hatékony, hiszen az átlag értékének kiolvasásához vagy módosításához két gépi szót is olvasni vagy módosítani kéne (a legtöbb processzor csak szóhatárról tud hatékonyan olvasni).
 	\begin{figure}[H]
 		\centering
-		\begin{tikzpicture}
-		\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 1.2pt]
-		\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 0.2pt]
-		\tikzstyle{Border} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, line width = 1.2pt]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
-		
-		\node (1) [Node] {atlag};
-		\node (2) [HalfNode, left = 0mm of 1] {};
-		\node (3) [HalfNode, left = 0mm of 2] {kor};
-		\node (4) [HalfNode, right = 0mm of 1] {};
-		\node (5) [HalfNode, right = 0mm of 4] {mag};
-		\node (border) [Border, right = -0.2mm of 1] {};
-		\node (border) [Border, left = -0.2mm of 1] {};
-		\end{tikzpicture}
+		\input{../img/struct_size_3.tikz}
 	\end{figure}
 	A fenti elrendezés hatékonyabb, bár 3 gépi szót használ. Ebben az esetben a fordító \textit{padding}et illeszt be a mező után. Ennek hatására hatékonyan olvasható és módosítható minden mező. Cserébe több memóriát foglal a struktúra.
 	\smallskip

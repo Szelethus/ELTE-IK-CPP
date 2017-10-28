@@ -1,0 +1,45 @@
+\begin{tikzpicture}
+	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{arrow} = [thick,->,>=stealth]
+	
+	\draw [thick, black] (-3, 0) -- (-1, 0);
+	\draw [thick, black] (-3, 0) -- (-3, 3);
+	\draw [thick, black] (-1, 0) -- (-1, 3);
+	\node (c1) [Node] at (-2,0.25) {\texttt{c} (5)};
+	\node (d1) [Node] at (-2,0.75) {\texttt{d} (8)};
+	
+	\draw [thick, black] (0, 0) -- (2, 0);
+	\draw [thick, black] (0, 0) -- (0, 3);
+	\draw [thick, black] (2, 0) -- (2, 3);
+	\node (c2) [Node] at (1,0.25) {\texttt{c} (5)};
+	\node (d2) [Node] at (1,0.75) {\texttt{d} (8)};
+	\node (a2) [Node] at (1,1.25) {\texttt{a}};
+	\node (b2) [Node] at (1,1.75) {\texttt{b}};
+	\node (tmp2) [Node] at (1,2.25) {\texttt{tmp} (5)};
+	
+	\path[every node/.style={font=\sffamily\small}]
+		(a2) edge[bend left = 90, thick, ->] node [right] {} (c2);
+	\path[every node/.style={font=\sffamily\small}]
+		(b2) edge[bend right = 90, thick, ->] node [left] {} (d2);
+	
+	\draw [thick, black] (3, 0) -- (5, 0);
+	\draw [thick, black] (3, 0) -- (3, 3);
+	\draw [thick, black] (5, 0) -- (5, 3);
+	\node (c3) [Node] at (4,0.25) {\texttt{c} (8)};
+	\node (d3) [Node] at (4,0.75) {\texttt{d} (5)};
+	\node (a3) [Node] at (4,1.25) {\texttt{a}};
+	\node (b3) [Node] at (4,1.75) {\texttt{b}};
+	\node (tmp3) [Node] at (4,2.25) {\texttt{tmp} (5)};
+	
+	
+	\path[every node/.style={font=\sffamily\small}]
+	(a3) edge[bend left = 90, thick, ->] node [right] {} (c3);
+	\path[every node/.style={font=\sffamily\small}]
+	(b3) edge[bend right = 90, thick, ->] node [left] {} (d3);
+	
+	\draw [thick, black] (6, 0) -- (8, 0);
+	\draw [thick, black] (6, 0) -- (6, 3);
+	\draw [thick, black] (8, 0) -- (8, 3);
+	\node (a4) [Node] at (7,0.25) {\texttt{c} (8)};
+	\node (b4) [Node] at (7,0.75) {\texttt{d} (5)};
+\end{tikzpicture}

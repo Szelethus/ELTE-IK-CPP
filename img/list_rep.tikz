@@ -1,0 +1,34 @@
+\begin{tikzpicture}
+	\tikzstyle{Data} = [rectangle, minimum width=1.5cm, minimum height=6mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{Pointer} = [rectangle, minimum width=5mm, minimum height=6mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{arrow} = [thick,->,>=stealth]
+	
+	\node (data) [Data] {\texttt{data}};
+	\node [Pointer, right = 0mm of data] {\texttt{*next}};
+\end{tikzpicture}
+
+\medskip
+\begin{tikzpicture}
+	\tikzstyle{Node} = [
+		minimum width = 6 mm, 
+		minimum height = 6 mm, 
+		text centered, 
+		draw=black, 
+		fill= gray!20
+	]
+	
+	\node (11l) [Node] {9};
+	\node (11r) [Node,right = 0mm of 11l]                    {};
+	
+	\node (12l) [Node,right = 7 mm of 11r]           {16};
+	\node (12r) [Node,right = 0mm of 12l]                    {};
+	\draw[->, thick] ($(11r)$) -- (12l);
+	
+	\node (13l) [Node,right = 7 mm of 12r]           {4};
+	\node (13r) [Node,right = 0mm of 13l]                    {};
+	\draw[->, thick] ($(12r)$) -- (13l);
+	
+	\node (14l) [Node,right = 7 mm of 13r]           {1};
+	\node (14r) [Node,right = 0mm of 14l]                    {\texttt{/}};
+	\draw[->, thick] ($(13r)$) -- (14l);
+\end{tikzpicture}

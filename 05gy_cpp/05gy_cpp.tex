@@ -149,37 +149,12 @@ int main()
 	A következő pár gyakorlaton egy láncolt listát fogunk implementálni, mely jól demonstrálja majd a dinamikus memóriakezelés veszélyeit is.
 	
 	\smallskip
-	A láncolt lista egy olyan konténer, melynek minden eleme egy olyan listaelem, mely tartalmaz egy mutatót és (legalább egy) adatot tároló objektumot. A listaelem mutatója rámutat a lista következő elemére, és az utolsó elem pointere pedig egy nullpointer.
-	\begin{center}
-		\begin{tabular}{|c|c|}
-			\hline
-			\texttt{data}&\texttt{*next}\\
-			\hline
-		\end{tabular}
-		\smallskip
-		
-		Egy listaelem.
-		\medskip
-		
-		\begin{tabular}{|c|c|}
-			\hline
-			\texttt{8}&\texttt{}\\
-			\hline
-		\end{tabular}$\rightarrow$
-		\begin{tabular}{|c|c|}
-			\hline
-			\texttt{7}&\texttt{}\\
-			\hline
-		\end{tabular}$\rightarrow$
-		\begin{tabular}{|c|c|}
-			\hline
-			\texttt{2}&\texttt{$\emptyset$}\\
-			\hline
-		\end{tabular}
-		\smallskip
-		
-		3 elemű láncolt lista.
-	\end{center}
+	A láncolt lista nevéből eredendően nem tömbszerűen (egymás melletti memóriacímeken) tárolja az objektumokat, hanem egymástól független memóriacímeken. Ezt úgy oldja meg, hogy minden adathoz rendel egy pointert is, mellyel a következő listalemet el lehet érni. A lista utolsó elemében a pointer a rákövetkező elem memóriacíme helyett nulpointer értéket vesz fel.
+	\begin{figure}[H]
+		\centering
+		\input{../img/list_rep.tikz}
+		\caption{A fenti képen egy listaelem, a lentin egy adatként \texttt{int}-et tároló 4 elemű láncolt lista. Figyeljük meg, hogy az utolsó elem pointere nullpointer.}\label{list-example}
+	\end{figure}
 	\subsection{Struct-ok}
 	Egy láncolt lista elemét implementálhatjuk pl. így:
 	\begin{lstlisting}
@@ -208,33 +183,13 @@ int main()
 	delete head->next->next;
 }
 	\end{lstlisting}
-	Ezen a ponton készen vagyunk, hisz \texttt{List} használható láncolt listaként (bár valójában igen kényelmetlen).
+	Ezen a ponton mondhatnánk, hogy készen vagyunk, hisz \texttt{List} használható láncolt listaként (bár valójában igen kényelmetlen).
 	\medskip
 	
 	\begin{figure}[!h]
 		\centering
-		\begin{tikzpicture}
-		\tikzstyle{Heap} = [rectangle, minimum width=6cm, minimum height=2cm, text centered, draw=black, fill=white]
-		\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
-		\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
-		
-		%\foreach \x in {-2,-1,0,1,2,3,4}
-		%	\draw (\x cm,1pt) -- (\x cm,-1pt) node[anchor=north] {$\x$};
-		%\foreach \y in {-2,-1,0,1,2,3,4}
-		%	\draw (1pt,\y cm) -- (-1pt,\y cm) node[anchor=east] {$\y$};
-		%\draw[step=5mm,gray,very thin] (-2,-2) grid (6,6);
-		
-		\draw [thick, black] (-3, 0) -- (-1, 0);
-		\draw [thick, black] (-3, 0) -- (-3, 3);
-		\draw [thick, black] (-1, 0) -- (-1, 3);
-		\node[Heap] at (3,1.5){};
-		\node (7node) [ListNode] at (2,1) {7};
-		\node (2node) [ListNode] at (4,2) {2};
-		\node (headNode) [ListNode] at (-2,0.25) {8};
-		\draw [arrow] (7node) -- (2node);
-		\draw [arrow] (headNode) -- (7node);
-		\end{tikzpicture}
+		\input{../img/list_stack_heap_rep.tikz}
+		\caption{Láncolt lista. Az első elem stacken, a többi heapen van tárolva.}
 	\end{figure}
 	Sajnos a törlést rossz: először törljük a fejelemet (mely az első elemre mutat), viszont az első elem segítségével tudnánk a többi elemet elérni, így mikor a második listaelemet törölnénk, \texttt{head} már egy felszabadított memóriaterületre mutat. Ezt törlés utáni használatnak (\textit{use after delete}) szokás nevezni és nem definiált viselkedés.
 	
@@ -536,38 +491,12 @@ int main()
 	\end{lstlisting}
 	Fentebb létrehoztunk egy új listát \texttt{head} mintájára. A másolatnak a destruktora hamarabb lefut. Ha sanitizerrel fordítunk, futáskor hibaüzenetet kapunk: felszabadított memóriaterületet szeretnénk használni. Ennek az az oka, hogy a \texttt{cHead}-ben lévő pointer \textbf{ugyanarra} a listára fog mutatni (lévén a bitről bitre történő másolás történt a pointernél). A \texttt{cHead} megsemmisülése után a \texttt{head} destruktora megpróbál beleolvasni a már felszabadított memóriaterületbe.
 	
-	%\resizebox{\textwidth}{!}{%
 	\begin{figure}[!h]
 		\centering
-		\begin{tikzpicture}
-			\tikzstyle{Heap} = [rectangle, minimum width=6cm, minimum height=2cm, text centered, draw=black, fill=white]
-			\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
-			\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-			\tikzstyle{arrow} = [thick,->,>=stealth]
-			
-			%\foreach \x in {-2,-1,0,1,2,3,4}
-			%	\draw (\x cm,1pt) -- (\x cm,-1pt) node[anchor=north] {$\x$};
-			%\foreach \y in {-2,-1,0,1,2,3,4}
-			%	\draw (1pt,\y cm) -- (-1pt,\y cm) node[anchor=east] {$\y$};
-			%\draw[step=5mm,gray,very thin] (-2,-2) grid (6,6);
-			
-			\draw [thick, black] (-3, 0) -- (-1, 0);
-			\draw [thick, black] (-3, 0) -- (-3, 3);
-			\draw [thick, black] (-1, 0) -- (-1, 3);
-			\node[Heap] at (3,1.5){};
-			\node (7node) [ListNode] at (2,1) {7};
-			\node (2node) [ListNode] at (4,2) {2};
-			\node (cHeadNode) [ListNode] at (-2,0.9) {cHead (8)};
-			\node (headNode) [ListNode] at (-2,0.3) {head (8)};
-			\draw [arrow] (7node) -- (2node);
-			\draw [arrow] (headNode) -- (7node);
-			\draw [arrow] (cHeadNode) -- (7node);
-		\end{tikzpicture}
-		\smallskip
+		\input{../img/list_copy_ctor_wrong.tikz}
 		
-		Zárójelben a lista első elemének \texttt{data} adattagjának értéke.
+		\caption{A lista másolása default másoló konstruktorral. Zárójelben a lista első elemének \texttt{data} adattagjának értéke.}\label{list_copy_ctor_wrong}
 	\end{figure}
-	%}
 	
 	A megoldás egy saját másoló konstruktor bevezetése!
 	
@@ -598,33 +527,8 @@ int main()
 	Mint a korábbi függvényeink, ez is rekurzív: a \texttt{new List(*other.next)} újra meghívja a copy konstruktort, ha az other.next nem nullpointer.
 	\begin{figure}[!h]
 		\centering
-		\begin{tikzpicture}
-		\tikzstyle{Heap} = [rectangle, minimum width=6cm, minimum height=3cm, text centered, draw=black, fill=white]
-		\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
-		\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
-		
-		%\foreach \x in {-2,-1,0,1,2,3,4}
-		%	\draw (\x cm,1pt) -- (\x cm,-1pt) node[anchor=north] {$\x$};
-		%\foreach \y in {-2,-1,0,1,2,3,4}
-		%	\draw (1pt,\y cm) -- (-1pt,\y cm) node[anchor=east] {$\y$};
-		%\draw[step=5mm,gray,very thin] (-2,-2) grid (6,6);
-		
-		\draw [thick, black] (-3, 0) -- (-1, 0);
-		\draw [thick, black] (-3, 0) -- (-3, 3);
-		\draw [thick, black] (-1, 0) -- (-1, 3);
-		\node[Heap] at (3,1.5){};
-		\node (7node) [ListNode] at (2,1) {7};
-		\node (2node) [ListNode] at (4.5,1.5) {2};
-		\node (7node2) [ListNode] at (1.5,2) {7};
-		\node (2node2) [ListNode] at (4.5,2.5) {2};
-		\node (cHeadNode) [ListNode] at (-2,0.9) {cHead (8)};
-		\node (headNode) [ListNode] at (-2,0.3) {head (8)};
-		\draw [arrow] (7node) -- (2node);
-		\draw [arrow] (7node2) -- (2node2);
-		\draw [arrow] (headNode) -- (7node);
-		\draw [arrow] (cHeadNode) -- (7node2);
-		\end{tikzpicture}
+		\input{../img/list_copy_ctor_correct.tikz}
+		\caption{A lista másolása az általunk implementált másoló konstruktorral.}\label{list_copy_ctor_correct}
 	\end{figure}
 	
 	\medskip
