@@ -1,0 +1,60 @@
+\begin{tikzpicture}
+	\tikzstyle{Heap} = [rectangle, minimum width=4.2cm, minimum height=2cm, text centered, draw=black, fill=white]
+	\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
+	\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{arrow} = [thick,->,>=stealth]
+	
+	\draw [thick, black] (-3, 0) -- (-1, 0);
+	\draw [thick, black] (-3, 0) -- (-3, 3);
+	\draw [thick, black] (-1, 0) -- (-1, 3);
+	\node[Heap] at (2,1.5){};
+	\node (7node) [ListNode] at (1.5,1) {7};
+	\node (2node) [ListNode] at (2.8,2) {2};
+	\node (ptr) [ListNode] at (-2,0.85) {ptr};
+	\node (headNode) [ListNode] at (-2,0.3) {head (8)};
+	
+	\path[every node/.style={font=\sffamily\small}]
+	(ptr) edge[bend right = 90, thick, ->] node [right] {} (headNode);
+	\draw [arrow] (7node) -- (2node);
+	\draw [arrow] (headNode) -- (7node);
+\end{tikzpicture}
+
+\bigskip
+\hspace{1.5mm} \begin{tikzpicture}
+	\tikzstyle{Heap} = [rectangle, minimum width=4.2cm, minimum height=2cm, text centered, draw=black, fill=white]
+	\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
+	\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{arrow} = [thick,->,>=stealth]
+	
+	\draw [thick, black] (-3, 0) -- (-1, 0);
+	\draw [thick, black] (-3, 0) -- (-3, 3);
+	\draw [thick, black] (-1, 0) -- (-1, 3);
+	\node[Heap] at (2,1.5){};
+	\node (7node) [ListNode] at (1.5,1) {7};
+	\node (2node) [ListNode] at (2.8,2) {2};
+	\node (ptr) [ListNode] at (-2,0.85) {ptr};
+	\node (headNode) [ListNode] at (-2,0.3) {head (8)};
+	\draw [arrow] (7node) -- (2node);
+	\draw [arrow] (headNode) -- (7node);
+	\draw [arrow] (ptr) -- (7node);
+\end{tikzpicture}
+
+\bigskip
+\hspace{4mm}\begin{tikzpicture}
+	\tikzstyle{Heap} = [rectangle, minimum width=4.2cm, minimum height=2cm, text centered, draw=black, fill=white]
+	\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
+	\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{arrow} = [thick,->,>=stealth]
+	
+	\draw [thick, black] (-3, 0) -- (-1, 0);
+	\draw [thick, black] (-3, 0) -- (-3, 3);
+	\draw [thick, black] (-1, 0) -- (-1, 3);
+	\node[Heap] at (2,1.5){};
+	\node (7node) [ListNode] at (1.5,1) {7};
+	\node (2node) [ListNode] at (2.8,2) {2};
+	\node (ptr) [ListNode] at (-2,0.85) {ptr};
+	\node (headNode) [ListNode] at (-2,0.3) {head (8)};
+	\draw [arrow] (7node) -- (2node);
+	\draw [arrow] (headNode) -- (7node);
+	\draw [arrow] (ptr) -- (2node);
+\end{tikzpicture}

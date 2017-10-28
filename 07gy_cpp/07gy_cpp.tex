@@ -178,33 +178,9 @@ inline void f() {}
 	Az ábra jól demonstrálja a problémát.
 	\begin{figure}[h]
 		\centering
-		\begin{tikzpicture}
-		\tikzstyle{HeaderName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{CppName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{FunctionName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= white]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
+		\input{../img/inline_func.tikz}
 		
-		
-		\node (listHpp) [HeaderName] {\texttt{list.hpp}};
-		\node (listHppF) [FunctionName, below = 0 mm of listHpp] {\texttt{f() \{\}}};
-		
-		\node (mainCpp) [CppName, below left = of listHpp] {\texttt{main.cpp}};
-		\node (mainCppF) [FunctionName, below  = 0 mm of mainCpp] {\texttt{f() \{\}}};
-		
-		\node (listCpp) [CppName, below right = of listHpp] {\texttt{list.cpp}};
-		\node (listCppF) [FunctionName, below  = 0 mm of listCpp] {\texttt{f() \{\}}};
-		
-		\node (exe) [CppName, below = 2.7 cm of listHpp] {\texttt{exe file}};
-		\node (exeF) [FunctionName, below  = 0 mm of exe] {\texttt{f() ???}};
-		
-		\draw[arrow] (listHppF) -- (mainCpp);
-		\draw[arrow] (listHppF) -- (listCpp);
-		\draw[arrow] (mainCppF) -- (exe);
-		\draw[arrow] (listCppF) -- (exe);
-		\end{tikzpicture}
-		\smallskip
-		
-		A \texttt{main.cpp}-ben vagy a \texttt{list.cpp}-ben lévő definíciója szerepeljen \texttt{f}-nek a futtatható fájlban?
+		\caption{A \texttt{main.cpp}-ben vagy a \texttt{list.cpp}-ben lévő definíciója szerepeljen \texttt{f}-nek a futtatható fájlban?}
 	\end{figure}
 	\texttt{f()} egy un. \textit{strong reference}-el jön létre ha nem inline, így a linker hibát dob ha több fordítási egységben definiálva van. Ha azonban inline-ként adjuk meg, akkor  \textit{weak reference}-ként értelmezi, a meglevő definíciók közül tetszőlegesen kerül egy kiválasztásra. Ez nyilván azt is jelenti, hogy minden ilyen függvény definíciójának meg kell egyeznie, hisz kellemetlen meglepetés érhet minket, ha különböző definíciók közül olyat választ a fordító, melyre nem számítanánk (és ez egyben nem definiált viselkedés is).
 	\begin{note}

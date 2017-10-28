@@ -479,27 +479,9 @@ int main()
 	\end{note}
 	\begin{figure}[t]
 		\centering
-		\begin{tikzpicture}
-			[
-				level distance=1.5cm,
-				level 1/.style={sibling distance=3cm},
-				level 2/.style={sibling distance=1.5cm},
-				edge from parent/.style={draw,-latex}
-			]
-			\tikzstyle{Node} = [rectangle, minimum width=1cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-			\node [Node]{3}
-			child {node [Node]{1}
-				child {node [Node]{0}}
-				child {node [Node]{2}}
-			}
-			child {node [Node]{5}
-				child {node [Node]{4}}
-				child {node [Node]{6}}
-			};
-		\end{tikzpicture}
-		\smallskip
+		\input{../img/std_set.tikz}
 		
-		Az \texttt{std::set} egy lehetséges ábrázolása, bináris keresőfával. Erre az irányított gráfra igaz, hogy minden gyökér a bal oldali gyerekénél nagyobb, és a jobb oldali gyerekénél kisebb.
+		\caption{Az \texttt{std::set} egy lehetséges ábrázolása, bináris keresőfával. Erre az irányított gráfra igaz, hogy minden gyökér a bal oldali gyerekénél nagyobb, és a jobb oldali gyerekénél kisebb.}\label{std_set_fig}
 	\end{figure}
 	\subsection{list}
 	Az \texttt{std::list} konténer a \texttt{<list>} könyvtár része, és nagyon hasonló ahhoz, mint amit mi írtunk, viszont létezik fejelemmel, és kétirányú.
@@ -568,36 +550,9 @@ int main()
 	
 	\begin{figure}[t]
 		\centering
-		\begin{tikzpicture}
-			[
-				level distance=1.5cm,
-				level 1/.style={sibling distance=4cm},
-				level 2/.style={sibling distance=2cm},
-				edge from parent/.style={draw,-latex}
-			]
-			
-			\tikzstyle{Node} = [
-				rectangle, 
-				minimum width=1cm, 
-				minimum height=5mm, 
-				text centered, 
-				draw=black, 
-				fill= gray!20
-			]
-			
-			\node [Node]{\texttt{"d", 4}}
-			child {node [Node]{\texttt{"b", 3}}
-				child {node [Node]{\texttt{"a", 5}}}
-				child {node [Node]{\texttt{"c", 1}}}
-			}
-			child {node [Node]{\texttt{"f", 9}}
-				child {node [Node]{\texttt{"e", 8}}}
-				child {node [Node]{\texttt{"g", 7}}}
-			};
-		\end{tikzpicture}
-		\smallskip
+		\input{../img/std_map.tikz}
 		
-		Az \texttt{std::map} egy lehetséges ábrázolása, bináris keresőfával. Az ábrán egy \texttt{std::string, int} párosokat tároló \texttt{map} szerepel -- figyeljük meg, hogy a a konténer a kulcs szerint rendez, az értékek a rendezés szempontjából nem számítanak.
+		\caption{Az \texttt{std::map} egy lehetséges ábrázolása, bináris keresőfával. Az ábrán egy \texttt{std::string, int} párosokat tároló \texttt{map} szerepel -- figyeljük meg, hogy a a konténer a kulcs szerint rendez, az értékek a rendezés szempontjából nem számítanak.}\label{std_map}
 	\end{figure}
 	Van egy speciális beszúró függvénye is:
 \begin{lstlisting}
