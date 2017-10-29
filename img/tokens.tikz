@@ -1,0 +1,37 @@
+\begin{tikzpicture}
+	\tikzstyle{Node} = [rectangle, text width=5mm, minimum height=5mm]
+	\tikzstyle{Token} = [rectangle, minimum height=5mm]
+	\tikzstyle{arrow} = [->,>=stealth]
+	
+	\node (int) [Node, text = green] {\texttt{int}};
+	\node (main) [Node, right = 0mm of int, text = red] {\texttt{main}};
+	\node (parantheses) [Node, right = 0mm of main, text = blue] {\texttt{()}};
+	\node (leftBracket) [Node, below = 0mm of int, text = blue] {\texttt{\{}};
+	\node (std1) [Node,, text = red,text width=10mm, below right = 0mm and 0mm of leftBracket] {\texttt{std}};
+	\node (colon) [Node, right = -5mm of std1, text = yellow!60!black] {\texttt{::}};
+	\node (cout) [Node, right = 0mm of colon, text = red] {\texttt{cout}};
+	\node (rightShift) [Node, right = 2mm of cout, text = yellow!60!black] {\texttt{\<}};
+	\node (hello) [Node, text width=30mm,right = 0mm of rightShift] {\texttt{"Hello World!"}};
+	\node (semicolon1) [Node, right = -5mm of hello, text = blue] {\texttt{;}};
+	\node (return) [Node,text width=10mm, below = 0mm of std1, text = green] {\texttt{return}};
+	\node (0) [Node, right = 0mm of return] {\texttt{0}};
+	\node (semicolon2) [Node,text width=3mm, right = -5mm of 0, text = blue] {\texttt{;}};
+	\node (rightBracket) [Node, below = 10mm of leftBracket, text = blue] {\texttt{\}}};
+	
+	
+	\node (keyword) [Token, below left = 2mm and 10mm of int, text = green] {Kulcsszó};
+	\node (operator) [Token, above left = 5mm and -8mm of rightShift, text = yellow!60!black] {Operátor};
+	\node (literal) [Token, below = 5mm of hello] {Literál};
+	\node (punctuator) [Token, below = 5mm of semicolon2, text = blue] {Szeparátor};
+	\node (identifier) [Token, below = 10mm of keyword, text = red] {Azonosító};
+	
+	\draw[arrow] (keyword) -- (int);
+	\draw[arrow] (keyword) -- (return);
+	\draw[arrow] (operator) -- (rightShift);
+	\draw[arrow] (operator) -- (colon);
+	\draw[arrow] (literal) -- (hello);
+	\draw[arrow] (punctuator) -- (rightBracket);
+	\draw[arrow] (punctuator) -- (semicolon2);
+	\draw[arrow] (identifier) -- (std1);
+	\draw[arrow] (identifier) -- (main);
+\end{tikzpicture}
