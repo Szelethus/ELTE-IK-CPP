@@ -1,43 +1,61 @@
 \documentclass[a4paper,11.5pt, table]{article}
-\usepackage[textwidth=170mm, textheight=230mm, inner=20mm, top=20mm, bottom=30mm]{geometry}
+
+%%%%%% Basic packages begin %%%%%%
+\usepackage[
+	textwidth  = 160mm, 
+	textheight = 230mm, 
+	top        = 25mm, 
+	bottom     = 30mm
+]{geometry}
 \usepackage[normalem]{ulem}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[dvipsnames, table]{xcolor}
-\usepackage{lipsum}
 \PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
 \usepackage[magyar]{babel}
+%%%%%%% Basic packages end %%%%%%%
+
+%%%%%% Packages required for this document begin %%%%%%
 \usepackage{
-	amsmath, 
-	amsthm,
-	amssymb, 
-	paralist, 
-	tikz, 
-	multirow, 
-	float, 
-	array, 
-	tikz-uml
+	amsmath,   % Math mode
+	amsthm,    % "note" environment
+	amsfonts,  % "\mathbb{}" command
+	paralist,  % "compactitem" and "compactenum" environment
+	multirow,  % "\multirow{}{}" command
+	float,     % "H" float specifier
+	tikz,      % Basepackage for nearly all figures
+	tikz-uml,  % Used for UML diagrams. Package needs to be in the same directory!
+	listings,  % Used for code snippets
+	subfiles
 }
-\usetikzlibrary{arrows, positioning, calc}
+\usepackage[unicode]{hyperref} % Clickable links
+%%%%%%% Packages required for this document end %%%%%%%
 
-\usepackage{listings}
-\lstdefinestyle{customc}{
-	belowcaptionskip=1\baselineskip,
-	breaklines=true,
-	frame=L,
-	language=C++,
-	showstringspaces=false,
-	basicstyle=\ttfamily,
-	%identifierstyle=\color{blue},
-	keywordstyle=\bfseries\color{green!40!black},
-	stringstyle=\color{orange},
-	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}, 
-	emphstyle = \color{blue},
-	tabsize = 4,
-	columns=fullflexible
+%%%%%% TikZ options start %%%%%%
+\usetikzlibrary{
+	positioning, % Contains positioning utilities, such as "below = of" 
+	calc         % Adding coordinates
+}
+%%%%%%% TikZ options end %%%%%%%
+
+%%%%%% lstlistings envvironment options start %%%%%%
+
+\lstdefinestyle{customc}{ % C/C++ code snippet style
+	belowcaptionskip = 1\baselineskip,
+	breaklines       = true,
+	frame            = L, % Double line on the left
+	language         = C++,
+	showstringspaces = false,
+	basicstyle       = \ttfamily,
+	keywordstyle     = \bfseries\color{green!40!black},
+	stringstyle      = \color{orange},
+	emphstyle        = \color{blue}, % Defined below
+	tabsize          = 4,
+	columns          = fullflexible,
+	%NOTE The environment "lstlsiting" obviously can't know all types, especially custom defined ones. Because of this, non-primitive types names have to be added below for proper syntax highlighting.
+	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}
 }
 
-\lstdefinestyle{customasm}{
+\lstdefinestyle{customasm}{ % Assembly code snippet style
 	belowcaptionskip=1\baselineskip,
 	frame=L,
 	language=[x86masm]Assembler,
@@ -46,17 +64,18 @@
 }
 
 \lstset{
-	escapechar=@,
-	style=customc,
-	literate =  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
-	{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
-	{ö}{{\"o}}1 {ü}{{\"u}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+	escapechar = @,
+	style      = customc, % Default code snippet style
+	%NOTE In order to use special characters in code snippets, one has to manually define them.
+	literate   = {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1	{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1	{ö}{{\"o}}1 {ü}{{\"u}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
 	{ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
 	{€}{{\euro}}1 {£}{{\pounds}}1 {~}{$\sim$}{1}	
 }
-\usepackage[unicode]{hyperref}
 
-%IMPORTANT https://tex.stackexchange.com/questions/376763/incomplete-iffalse-all-text-was-ignored-after-line-x-with-lstlisting
+%%%%%%% lstlistings envvironment options end %%%%%%%
+
+%%%%%%%% Compilation error fix begin %%%%%%%%
+%NOTE https://tex.stackexchange.com/questions/376763/incomplete-iffalse-all-text-was-ignored-after-line-x-with-lstlisting
 \makeatletter
 \expandafter\let\csname active@char\string?\endcsname\relax
 \expandafter\let\csname active@char\string!\endcsname\relax
@@ -66,19 +85,24 @@
 \initiate@active@char{!}
 \initiate@active@char{:}
 \makeatletter
+%%%%%%%%% Compilation error fix end %%%%%%%%%
 
+% "note" environment definition
 \theoremstyle{definition}
 \newtheorem{note}{Megjegyzés}[subsection]
-\newcommand{\<}{<\hspace{0mm}<}
 
-\usepackage{subfiles}
-\newcommand{\onlyinsubfile}[1]{#1}
-\newcommand{\notinsubfile}[1]{}
+%%%%%%%% Custom command and environment definitions start %%%%%%%%
+\newcommand{\<}{<\hspace{0mm}<} % Better looking left shift operator
+
+% Commands for subfiles
+\newcommand{\onlyinsubfile}[1]{#1} % Its argument appears only when the file is compiled on its own
+\newcommand{\notinsubfile}[1]{} % Its argument appears only when the main file (or root file) is compiled
+%%%%%%%%% Custom command and environment definitions end %%%%%%%%%
 
 \begin{document}
+	% Little bit of hacking to make subfiles commands work
 	\renewcommand{\onlyinsubfile}[1]{}
 	\renewcommand{\notinsubfile}[1]{#1}
-	%% my document content
 	
 	\begin{titlepage}
 		\vspace*{2cm}
@@ -98,7 +122,7 @@
 		{\large Umann Kristóf}
 		\vfill
 		
-		\begin{lstlisting}[frame=trbl, linewidth=12.6cm, xleftmargin=4.5cm, emph={CppStudent}]
+		\begin{lstlisting}[frame=trbl, linewidth=12cm, xleftmargin=3.9cm, emph={CppStudent}]
 #include "CppStudent.h"
 
 int main()
@@ -116,6 +140,7 @@ int main()
 		\today
 	\end{titlepage}
 	\tableofcontents
+	\pagebreak
 	\subfile{../01gy_cpp/01gy_cpp.tex}
 	\subfile{../02gy_cpp/02gy_cpp.tex}
 	\subfile{../03gy_cpp/03gy_cpp.tex}
