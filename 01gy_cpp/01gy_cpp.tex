@@ -136,7 +136,7 @@ int main() // deklaráció és definíció
 	\begin{figure}[!h]
 		\centering
 		\input{../img/tokens.tikz}
-		\caption{A Hello World programban található tokenek.}\label{tokens-fig}
+		\caption{A Hello World programban található tokenek.}\label{fig_tokens}
 	\end{figure}
 	\subsection{Fordítás konzolból}
 	Windowson nyomjuk le a windows gombot és az R-t egyszerre. Ennek hatására felugrik egy ablak, melyből lehet futtatni programokat. Írjuk be hogy \texttt{cmd}, és nyomjunk entert. 
@@ -241,7 +241,7 @@ int main()
 		\input{../img/steps_of_compilation.tikz}
 		
 		\smallskip
-		\caption{Szürkében az adott fordítási lépés neve, alatta az így létrehozott fájl kiterjesztése (leggyakrabban).}\label{steps_of_compilation}
+		\caption{Szürkében az adott fordítási lépés neve, alatta az így létrehozott fájl kiterjesztése (leggyakrabban).}\label{fig_steps_of_compilation}
 	\end{figure}
 	A fordítás a preprocesszor parancsok végrehajtásával kezdődik (például a \textbf{header fájl}ok beillesztése a \textbf{cpp fájl}okba), az így kapott fájlot hívjuk \textbf{fordítási egység}nek (\textit{translation unit}). A fordítási egységek külön-külön fordulnak \textbf{tárgykód}dá (\textit{object file}). Ahhoz hogy a tárgykódokból \textbf{futtatható állomány}t (\textit{executable file}) lehessen készíteni, össze kell linkelni őket. A saját forráskódunkból létrejövő tárgykódok mellett a linker a felhasznált könyvtárak tárgykódjait is bele fogja szerkeszteni a végleges futtatható állományba. (ld.: \ref{steps_of_compilation}. ábra)
 	\medskip

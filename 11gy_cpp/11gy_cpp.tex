@@ -51,23 +51,9 @@ public:
 	\end{lstlisting}
 	\begin{figure}[!h]
 		\centering
-		\begin{tikzpicture} 
-		\umlclass{Sikidom}{ 
-			-- x : int \\ 
-			-- y : int 
-		}{ 
-			+terulet() : double
-		}  
-		\umlclass[x = 5]{Kor} { 
-			-- r : int
-		}{ 
-			+terulet() : double
-		} 
-		\umlinherit{Kor}{Sikidom} 
-		\end{tikzpicture}
+		\input{../img/uml_inheritance_example.tikz}
 		
-		\smallskip
-		A \texttt{Sikidom} és a \texttt{Kor} osztály kapcsolata, melyet a fent látható nyíllal fejezünk ki: a nyíl a leszármazott osztályból az ősosztályba mutat.
+		\caption{A \texttt{Sikidom} és a \texttt{Kor} osztály kapcsolata, melyet a fent látható nyíllal fejezünk ki: a nyíl a leszármazott osztályból az ősosztályba mutat.}\label{fig_uml_inheritance_example}
 	\end{figure}
 	Egy adott \texttt{struct}-ból illetve \texttt{class}-ból a fent látható módon tudunk örökölni: az új osztály neve után kettőspontot írunk, opcionálisan megadjuk a hozzáférés típusát, mely ebben az esetben public (erről nemsokára bővebben lesz szó), és az osztály nevét, melyből örökölni szeretnénk.
 
@@ -162,26 +148,9 @@ Sikidom &sr = k; //a referencia ugyanúgy működik, mint a pointer
 	A fenti példában \texttt{sp} \textit{statikus típusa} \texttt{Sikidom*}, a dinamikus típusa pedig \texttt{Kor}. Ez azt jelenti, hogy a fordító biztosan tudja már fordítási időben hogy \texttt{sp}-nek milyen típusa lesz, azonban azt nem tudhatja, hogy éppen milyen típusú objektumra mutat a \texttt{Sikidom}-hoz tartozó öröklődési fában, ez csak futási időben derülhet ki.
 	\begin{figure}[!h]
 		\centering
-		\begin{tikzpicture}
-		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{Sikidom} = [rectangle, minimum width=2cm, minimum height=10mm, text centered, draw=black, line width = 2pt]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
+		\input{../img/slicing.tikz}
 		
-		\draw [thick, black] (0, 0) -- (2, 0);
-		\draw [thick, black] (0, 0) -- (0, 2.5);
-		\draw [thick, black] (2, 0) -- (2, 2.5);
-		\node (sp) [Node] at (1,0.25) {\texttt{sp}};
-		\node (x) [Node] at (1,0.75) {\texttt{k.x}};
-		\node (y) [Node] at (1,1.25) {\texttt{k.y}};
-		\node (r) [Node] at (1,1.75) {\texttt{k.r}};
-		\node (sikidom) [Sikidom] at (1,1) {};
-		
-		\path[every node/.style={font=\sffamily\small}]
-		(sp) edge[bend left = 90, thick, ->] node [right] {} (sikidom);
-		\end{tikzpicture}
-		\smallskip
-		
-		\texttt{sp} pointer csak a \texttt{k} objektum \texttt{Sikidom} részére tud hivatkozni.
+		\caption{\texttt{sp} pointer csak a \texttt{k} objektum \texttt{Sikidom} részére tud hivatkozni.}\label{fig_slicing}
 	\end{figure}
 
 	Ez meg is felel az eredeti célunknak -- amennyiben csak egy \texttt{Sikidom} objektummal szeretnénk dolgozni, addig mindegy is, hogy van-e a azon túl extra adat. Ha például egy olyan barát függvényt írunk, mely \texttt{Sikidom}-ok koordinátáit íratja ki, fölösleges információ ahhoz a sugár, vagy bármilyen egyéb tulajdonság.
@@ -577,32 +546,9 @@ public:
 	\end{lstlisting}
 	\begin{figure}
 		\centering
-		\begin{tikzpicture} 
-		\umlclass[type=abstract]{Negyszog}{ 
-			\# h : int 
-		}{ 
-			\umlvirt{+terulet() : double}
-		}  
-		\umlclass[type=abstract, x = 3, y = -2.5]{Rombusz} { 
-		}{ 
-			\umlvirt{+terulet() : double}
-		} 
-		\umlclass[type=abstract, x = -3, y = -2.5]{Deltoid} { 
-		}{ 
-			\umlvirt{+terulet() : double}
-		} 
-		\umlclass[y = -5]{Negyzet} { 
-		}{ 
-			+terulet() : double
-		} 
-		\umlinherit{Rombusz}{Negyszog} 
-		\umlinherit{Deltoid}{Negyszog} 
-		\umlinherit{Negyzet}{Deltoid} 
-		\umlinherit{Negyzet}{Rombusz} 
-		\end{tikzpicture}
+		\input{../img/uml_diamond_inheritance.tikz}
 		
-		\smallskip
-		Egy példa a gyémántöröklésre.
+		\caption{Egy példa a gyémántöröklésre.}\label{fig_uml_diamond_inheritance}
 	\end{figure}
 	A legutóbbi osztály természetesnek tűnhet, hisz egy négyzet deltoid is, meg rombusz is, így szeretnénk, ha minden függvény, ami \texttt{Deltoid}-ot vagy \texttt{Rombusz}-t vár, \texttt{Negyzet}-et is elfogadjon. Azonban a fenti kód nem fordul le, hisz mind \texttt{Rombusz}-ban, mind \texttt{Deltoid}-ban van egy teljes \texttt{Negyszog} is. Így \texttt{Negyzet} kétszer fogja tartalmazni annak összes adattagját, így \texttt{h}-t is, és a fordító nem tudja kitalálni, mi épp melyikre gondolunk. 2 kézenfekvő megoldás lehet:
 	\begin{lstlisting}
@@ -649,73 +595,6 @@ public:
 	Ezzel garantáltuk is ezt, de milyen áron? A virtuális öröklődésnek, csak úgy mint a virtuális metódusoknak futási idejű költsége van, így ha egy mód van rá, kerüljük. Az öröklődési gráfot is nehéz átlátni és értelmezni, ha tartalmaz gyémánt öröklést.
 	
 	Annak ellenére, hogy a gyémánt öröklődés erősen ellenjavallott dolog, van kivétel még a standard könyvtáron belül is: az \texttt{iostream}. A beolvasó és kiírató stream-ek közös tulajdonságait tartalmazza \texttt{iosbase}, melyből örököl \texttt{istream} és \texttt{ostream} is, és mindkettőből az \texttt{iostream}.
-	%NOTE this is a mess...
-%	\subsection{Túlterhelés és felüldefiniálás}
-%	Próbáljunk megírni egy sítábor programot, melyben azt oldjuk meg, hogy a kétszobás ágyakban vagy 2 fiú, vagy 2 lány aludjon!
-%\begin{lstlisting}
-%#include <iostream>
-%
-%class Sielo
-%{
-%public:
-%	virtual void szobatars(Sielo*)
-%	{
-%		std::cout << "sielo";
-%	}
-%};
-%
-%class Lany : public Sielo
-%{
-%public:
-%	void szobatars(Sielo*)
-%	{
-%		std::cout << "valamilyen sielo";
-%	}
-%	void szobatars(Lany*)
-%	{
-%		std::cout << "lany sielo";
-%	}
-%};
-%
-%class Fiu : public Sielo
-%{
-%public:
-%	void szobatars(Sielo*)
-%	{
-%		std::cout << "valamilyen sielo";
-%	}
-%	void szobatars(Fiu*)
-%	{
-%		std::cout << "fiu sielo";
-%	}
-%};
-%
-%int main()
-%{
-%	Lany *lany = new Lany;
-%	Fiu *fiu = new Fiu;
-%	Sielo *sielo = lany;
-%	
-%	sielo->szobatars(fiu); //valamilyen sielo
-%	lany->szobatars(fiu); //valamilyen sielo
-%	lany->szobatars(lany); //lany sielo
-%	sielo->szobatars(lany); //valamilyen sielo
-%	
-%	delete lany; delete fiu;
-%}
-%\end{lstlisting}
-%	Figyeljük meg, hogy bár megöröklik mind \texttt{Fiu}, mind \texttt{Lany} a \texttt{szobatars(Sielo*)} függvényt, de azt még felül is írják (\textit{override}), ezen kívül még a függvényt túl is terhelik (\textit{overload}) rendre \texttt{szobatars(Fiu*)} és \texttt{szobatars(Lany*)} függvénnyel. 
-%	
-%	Feltűnhet, hogy sajnos ezzel a kóddal nem sikerül elérnünk, hogy a lányok és fiúk szeparálva maradjanak. Ennek oka az, hogy a harmadik eset kivételével felüldefiniálás következik be, és csupán a harmadik esetben lesz függvénytúlterhelés. Az, hogy ott miért nem felüldefiniálás következik be, a korábbi szekció magyarázza: a paraméter úgy változott, hogy az öröklődési ág szerint speciálisabb típusra váltottunk, mi meg megállapítottuk fent, hogy csak általánosabb típusra váltás eredményezhet továbbra is jól forduló kódot.
-%	
-%	A másik három esetben \texttt{fiu} is és \texttt{lany} is a \texttt{szobatars(Sielo*)} függvénybe fog menni.
-%	
-%	\medskip
-%	Ha kitörölnénk rendre mindkét leszármazott osztályból a \texttt{szobatars(Sielo*)} metódust, még mindig bajban lennénk, hisz egy \texttt{Sielo} típusú pointer dinamikus típusa lehet \texttt{Lany}, és minden probléma nélkül meg tudnánk adni neki paraméterül egy \texttt{Fiu} típusú objektumot, hisz minden \texttt{Fiu} \textit{az egy} \texttt{Sielo}.  Ez az eset annyival lenne jobb, hogy \texttt{lany} pointeren keresztül a \texttt{szobatars} függvénynek nem adhatjuk meg \texttt{fiu}-t paraméterül.
-%	
-%	\medskip
-%	Forrás: \url{http://bruntib.web.elte.hu/read.php?3,52} (\textsc{Brunner} Tibor honlapja)
-%	
 	\subsection{Privát és védett öröklődés}
 	%NOTE https://stackoverflow.com/questions/656224/when-should-i-use-c-private-inheritance/675451#675451
 	Lévén az esetek \textbf{erősen} túlnyomó többségében publikusan öröklünk, és igény is nagyon kevés van ettől eltérni, így ez a szekció nem részleteiben fogja tárgyalni e két öröklődési módot.
@@ -803,49 +682,9 @@ void f(Sikidom *sp)
 	Fontos megállapítás, hogy ez a cast egy adott pointer/referencia dinamikus típusát változtatja/változtathatja meg, így értelemszerűen az a típus amelyre konvertálunk mindenképpen referencia vagy pointer kell hogy legyen.
 	\begin{figure}[!h]
 		\centering
-		\begin{tikzpicture}
-		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{Sikidom} = [rectangle, minimum width=2cm, minimum height=10mm, text centered, draw=black, line width = 2pt]
-		\tikzstyle{Kor} = [rectangle, minimum width=2cm, minimum height=15mm, text centered, draw=red, line width = 3pt]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
+		\input{../img/dynamic_cast.tikz}
 		
-		\draw [thick, black] (0, 0) -- (2, 0);
-		\draw [thick, black] (0, 0) -- (0, 2.75);
-		\draw [thick, black] (2, 0) -- (2, 2.75);
-		\node (s) [Node] at (1,0.25) {\texttt{sp}};
-		\node (x) [Node] at (1,0.75) {\texttt{k.x}};
-		\node (y) [Node] at (1,1.25) {\texttt{k.y}};
-		\node (r) [Node] at (1,1.75) {\texttt{k.r}};
-		\node (sikidom) [Sikidom] at (1,1) {};
-		\path[every node/.style={font=\sffamily\small}]
-		(s) edge[bend left = 90, thick, ->] node [right] {} (sikidom);
-		\end{tikzpicture}
-		\hspace{1cm}
-		\begin{tikzpicture}
-		\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-		\tikzstyle{Sikidom} = [rectangle, minimum width=2cm, minimum height=10mm, text centered, draw=black, line width = 2pt]
-		\tikzstyle{Kor} = [rectangle, minimum width=2cm, minimum height=15mm, text centered, draw=red, line width = 3pt]
-		\tikzstyle{arrow} = [thick,->,>=stealth]
-		
-		\draw [thick, black] (3, 0) -- (5, 0);
-		\draw [thick, black] (3, 0) -- (3, 2.75);
-		\draw [thick, black] (5, 0) -- (5, 2.75);
-		\node (s2) [Node] at (4,0.25) {\texttt{sp}};
-		\node (x2) [Node] at (4,0.75) {\texttt{k.x}};
-		\node (y2) [Node] at (4,1.25) {\texttt{k.y}};
-		\node (r2) [Node] at (4,1.75) {\texttt{k.r}};
-		\node (kp) [Node] at (4,2.25) {\texttt{kp}};
-		\node (sikidom2) [Sikidom] at (4,1) {};
-		\node (kor) [Kor] at (4,1.25) {};
-		
-		\path[every node/.style={font=\sffamily\small}]
-		(s2) edge[bend left = 90, thick, ->] node [right] {} (sikidom2);
-		\path[every node/.style={font=\sffamily\small}]
-		(kp) edge[bend left = 90, thick, red, ->] node [right] {} (kor);
-		\end{tikzpicture}
-		\smallskip
-		
-		A \texttt{dynamic\_cast} működése.
+		\caption{A \texttt{dynamic\_cast} működése.}\label{fig_dynamic_cast}
 	\end{figure}
 	Ez leginkább 3 dologra jó, leszármazott típusról bázis típusra konvertálásra (\textit{upcast}), bázisról leszármazottra (\textit{downcast}), valamint többszörös öröklődésnél bázisok közötti váltásra (\textit{sidecast}).
 	

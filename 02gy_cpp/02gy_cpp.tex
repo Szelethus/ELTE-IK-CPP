@@ -90,7 +90,7 @@ int main()
 		\input{../img/stack_example.tikz}
 		
 		\smallskip
-		\caption{}\label{stack_example}
+		\caption{}\label{fig_stack_example}
 	\end{figure}
 	Az ábrán egy stack-et látunk. Amikor a vezérlés az \texttt{f} függvényhez ér, és ott létrehozza az \texttt{x} változót, azt behelyezi a stack-be. A \texttt{return} kulcsszó hatására készít \texttt{x}-ről egy temporális példányt, ami a függvény visszatérési értéke lesz. Amikor a vezérlés visszatér a \texttt{main} függvényhez, {x}-re nem tudunk tovább hivatkozni, így azt megsemmisíti, és ez ismétlődik, ameddig a ciklus véget nem ér.
 	\smallskip
@@ -120,7 +120,7 @@ p = &d;
 		\input{../img/stack_pointer_intro.tikz}
 		
 		\smallskip
-		\caption{Az objektum neve mellett zárójelben található az értéke.}\label{stack_pointer_intro}
+		\caption{Az objektum neve mellett zárójelben található az értéke.}\label{fig_stack_pointer_intro}
 	\end{figure}
 	Rendre: pointer inicializálása, pointer által mutatott érték módosítása, pointer átállítása másik memóriacímre, és a mutatott érték módosítása.
 	
@@ -219,7 +219,7 @@ std::cout << sizeof(t) << std::endl;
 		\centering
 		\input{../img/stack_array.tikz}
 		
-		\caption{A \texttt{main} függvény változói.}\label{stack_array}
+		\caption{A \texttt{main} függvény változói.}\label{fig_stack_array}
 	\end{figure}
 	\subsection{Biztonsági rések nem definiált viselkedés kihasználásával}
 	Irassuk ki a a tömb elemeit! A példa kedvéért rontsuk el a kódot.
@@ -331,7 +331,7 @@ int main()
 		\centering
 		\input{../img/stack_swap_wrong.tikz}
 		
-		\caption{A \texttt{swapWrong} függvény szemléltetése a stack-en.}\label{stack_swap_wrong}
+		\caption{A \texttt{swapWrong} függvény szemléltetése a stack-en.}\label{fig_stack_swap_wrong}
 	\end{figure}
 	\subsection{Mutatók érték szerinti átadása}
   	Nézzük meg, hogy hogyan tudunk megcserélni két értéket ezúttal helyesen, mutatók segítségével.
@@ -362,7 +362,7 @@ int main()
 		\centering
 		\input{../img/stack_swap_p.tikz}
 		
-		\caption{A \texttt{swapP} függvény szemléltetése.}\label{stack_swap_p}
+		\caption{A \texttt{swapP} függvény szemléltetése.}\label{fig_stack_swap_p}
 	\end{figure}
 	
 	\begin{lstlisting}
@@ -379,7 +379,7 @@ void swapWrong2(int *a, int *b)
 		\centering
 		\input{../img/stack_swap_wrong_2.tikz}
 		
-		\caption{A \texttt{swapWrong2} függvén szemléltetése.}\label{stack_swap_wrong_2}
+		\caption{A \texttt{swapWrong2} függvén szemléltetése.}\label{fig_stack_swap_wrong_2}
 	\end{figure}
 	\subsection{Referencia szerinti paraméter átadás}
 	Megállapíthatjuk, hogy az előző megoldásnál nem változtattuk meg, hogy mire mutassanak a pointerek, így azokat konstansként is definiálhatnánk. A konstans pointerek módosíthatják a mutatott értéket, de nem lehet őket átállítani egy másik memória címre. Úgy tudunk egy ilyen pointert létrehozni, hogy a csillag után írjuk a \texttt{const} kulcsszót.

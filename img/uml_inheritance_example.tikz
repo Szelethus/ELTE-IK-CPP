@@ -1,0 +1,14 @@
+\begin{tikzpicture} 
+	\umlclass{Sikidom}{ 
+		-- x : int \\ 
+		-- y : int 
+	}{ 
+		+terulet() : double
+	}  
+	\umlclass[x = 5]{Kor} { 
+		-- r : int
+	}{ 
+		+terulet() : double
+	} 
+	\umlinherit{Kor}{Sikidom} 
+\end{tikzpicture}

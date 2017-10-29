@@ -1,0 +1,23 @@
+\begin{tikzpicture} 
+	\umlclass[type=abstract]{Negyszog}{ 
+		\# h : int 
+	}{ 
+		\umlvirt{+terulet() : double}
+	}  
+	\umlclass[type=abstract, x = 3, y = -2.5]{Rombusz} { 
+	}{ 
+		\umlvirt{+terulet() : double}
+	} 
+	\umlclass[type=abstract, x = -3, y = -2.5]{Deltoid} { 
+	}{ 
+		\umlvirt{+terulet() : double}
+	} 
+	\umlclass[y = -5]{Negyzet} { 
+	}{ 
+		+terulet() : double
+	} 
+	\umlinherit{Rombusz}{Negyszog} 
+	\umlinherit{Deltoid}{Negyszog} 
+	\umlinherit{Negyzet}{Deltoid} 
+	\umlinherit{Negyzet}{Rombusz} 
+\end{tikzpicture}

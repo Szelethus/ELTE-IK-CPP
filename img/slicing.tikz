@@ -1,0 +1,17 @@
+\begin{tikzpicture}
+	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
+	\tikzstyle{Sikidom} = [rectangle, minimum width=2cm, minimum height=10mm, text centered, draw=black, line width = 2pt]
+	\tikzstyle{arrow} = [thick,->,>=stealth]
+	
+	\draw [thick, black] (0, 0) -- (2, 0);
+	\draw [thick, black] (0, 0) -- (0, 2.5);
+	\draw [thick, black] (2, 0) -- (2, 2.5);
+	\node (sp) [Node] at (1,0.25) {\texttt{sp}};
+	\node (x) [Node] at (1,0.75) {\texttt{k.x}};
+	\node (y) [Node] at (1,1.25) {\texttt{k.y}};
+	\node (r) [Node] at (1,1.75) {\texttt{k.r}};
+	\node (sikidom) [Sikidom] at (1,1) {};
+	
+	\path[every node/.style={font=\sffamily\small}]
+	(sp) edge[bend left = 90, thick, ->] node [right] {} (sikidom);
+\end{tikzpicture}
