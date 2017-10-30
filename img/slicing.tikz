@@ -1,12 +1,10 @@
 \begin{tikzpicture}
-	\draw [thick, black] (0, 0) -- (2, 0);
-	\draw [thick, black] (0, 0) -- (0, 2.5);
-	\draw [thick, black] (2, 0) -- (2, 2.5);
+	\drawStackFrame{0}{0}{2.5}
 	\node (sp) [StackObject] at (1,0.25) {\texttt{sp}};
 	\node (x) [StackObject] at (1,0.75) {\texttt{k.x}};
 	\node (y) [StackObject] at (1,1.25) {\texttt{k.y}};
 	\node (r) [StackObject] at (1,1.75) {\texttt{k.r}};
-	\node (sikidom) [Sikidom] at (1,1) {};
+	\node (sikidom) [SikidomFrame] at (1,1) {};
 	
 	\path[every node/.style={font=\sffamily\small}]
 	(sp) edge[bend left = 90, thick, ->] node [right] {} (sikidom);

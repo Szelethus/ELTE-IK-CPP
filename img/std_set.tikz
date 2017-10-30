@@ -1,17 +1,20 @@
 \begin{tikzpicture}[
-		level distance=1.5cm,
-		level 1/.style={sibling distance=3cm},
-		level 2/.style={sibling distance=1.5cm},
-		edge from parent/.style={draw,-latex}
+		level distance = 1.5cm,
+		level 1/.style = {sibling distance=3cm},
+		level 2/.style = {sibling distance=1.5cm},
+		edge from parent/.style = {
+			draw,
+			-latex
+		}
 	]
-	\tikzstyle{Node} = [rectangle, minimum width=1cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\node [Node]{3}
-	child {node [Node]{1}
-		child {node [Node]{0}}
-		child {node [Node]{2}}
+	
+	\node [BinTreeNode]{3}
+	child {node [BinTreeNode]{1}
+		child {node [BinTreeNode]{0}}
+		child {node [BinTreeNode]{2}}
 	}
-	child {node [Node]{5}
-		child {node [Node]{4}}
-		child {node [Node]{6}}
+	child {node [BinTreeNode]{5}
+		child {node [BinTreeNode]{4}}
+		child {node [BinTreeNode]{6}}
 	};
 \end{tikzpicture}

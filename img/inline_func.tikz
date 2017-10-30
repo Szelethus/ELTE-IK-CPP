@@ -1,21 +1,29 @@
 \begin{tikzpicture}
-	\tikzstyle{HeaderName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{CppName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{FunctionName} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= white]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
+
+	\tikzstyle{GrayNode} = [
+		NodeBase,
+		minimum width  = 2cm, 
+		minimum height = 5mm, 
+		fill           = DefaultObjectColor
+	]
+	\tikzstyle{WhiteNode} = [
+		NodeBase,
+		minimum width  = 2cm, 
+		minimum height = 5mm, 
+		fill           = white
+	]
 	
+	\node (listHpp) [GrayNode] {\texttt{list.hpp}};
+	\node (listHppF) [WhiteNode, below = 0 mm of listHpp] {\texttt{f() \{\}}};
 	
-	\node (listHpp) [HeaderName] {\texttt{list.hpp}};
-	\node (listHppF) [FunctionName, below = 0 mm of listHpp] {\texttt{f() \{\}}};
+	\node (mainCpp) [GrayNode, below left = of listHpp] {\texttt{main.cpp}};
+	\node (mainCppF) [WhiteNode, below  = 0 mm of mainCpp] {\texttt{f() \{\}}};
 	
-	\node (mainCpp) [CppName, below left = of listHpp] {\texttt{main.cpp}};
-	\node (mainCppF) [FunctionName, below  = 0 mm of mainCpp] {\texttt{f() \{\}}};
+	\node (listCpp) [GrayNode, below right = of listHpp] {\texttt{list.cpp}};
+	\node (listCppF) [WhiteNode, below  = 0 mm of listCpp] {\texttt{f() \{\}}};
 	
-	\node (listCpp) [CppName, below right = of listHpp] {\texttt{list.cpp}};
-	\node (listCppF) [FunctionName, below  = 0 mm of listCpp] {\texttt{f() \{\}}};
-	
-	\node (exe) [CppName, below = 2.7 cm of listHpp] {\texttt{exe file}};
-	\node (exeF) [FunctionName, below  = 0 mm of exe] {\texttt{f() ???}};
+	\node (exe) [GrayNode, below = 2.7 cm of listHpp] {\texttt{exe file}};
+	\node (exeF) [WhiteNode, below  = 0 mm of exe] {\texttt{f() ???}};
 	
 	\draw[arrow] (listHppF) -- (mainCpp);
 	\draw[arrow] (listHppF) -- (listCpp);

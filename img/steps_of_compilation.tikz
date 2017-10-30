@@ -1,38 +1,45 @@
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=4cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{FileName} = [rectangle, minimum width=4cm, minimum height=5mm, text centered, draw=black, fill= white]
-	\tikzstyle{NodeExe} = [rectangle, minimum width=5cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{FileNameExe} = [rectangle, minimum width=5cm, minimum height=5mm, text centered, draw=black, fill= white]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
+	\tikzstyle{GrayNode} = [
+		NodeBase,
+		minimum width  = 4cm, 
+		minimum height = 5mm, 
+		fill           = DefaultObjectColor
+	]
+	\tikzstyle{WhiteNode} = [
+		NodeBase,
+		minimum width  = 4cm, 
+		minimum height = 5mm, 
+		fill           = white
+	]
 	
 	
-	\node (header) [Node] {Header állomány};
-	\node (headerFileName) [FileName, below = 0mm of header] {\texttt{.h} / \texttt{.hpp}};
+	\node (header) [GrayNode] {Header állomány};
+	\node (headerFileName) [WhiteNode, below = 0mm of header] {\texttt{.h} / \texttt{.hpp}};
 	
-	\node (cpp1) [Node, below left = of header] {Cpp fájl};
-	\node (cpp1FileName) [FileName, below = 0mm of cpp1] {\texttt{.c} / \texttt{.cpp}};
+	\node (cpp1) [GrayNode, below left = of header] {Cpp fájl};
+	\node (cpp1FileName) [WhiteNode, below = 0mm of cpp1] {\texttt{.c} / \texttt{.cpp}};
 	
-	\node (cpp2) [Node, below right = of header] {Cpp fájl};
-	\node (cpp2FileName) [FileName, below = 0mm of cpp2] {\texttt{.c} / \texttt{.cpp}};
+	\node (cpp2) [GrayNode, below right = of header] {Cpp fájl};
+	\node (cpp2FileName) [WhiteNode, below = 0mm of cpp2] {\texttt{.c} / \texttt{.cpp}};
 	
-	\node (translationUnit1) [Node, below = of cpp1] {Fordítási egység};
-	\node (translationUnit1FileName) [FileName, below = 0mm of translationUnit1] {\texttt{.c} / \texttt{.cpp}};
+	\node (translationUnit1) [GrayNode, below = of cpp1] {Fordítási egység};
+	\node (translationUnit1FileName) [WhiteNode, below = 0mm of translationUnit1] {\texttt{.c} / \texttt{.cpp}};
 	
-	\node (translationUnit2) [Node, below = of cpp2] {Fordítási egység};
-	\node (translationUnit2FileName) [FileName, below = 0mm of translationUnit2] {\texttt{.c} / \texttt{.cpp}};
+	\node (translationUnit2) [GrayNode, below = of cpp2] {Fordítási egység};
+	\node (translationUnit2FileName) [WhiteNode, below = 0mm of translationUnit2] {\texttt{.c} / \texttt{.cpp}};
 	
-	\node (objectFile1) [Node, below = of translationUnit1] {Tárgykód};
-	\node (objectFile1FileName) [FileName, below = 0mm of objectFile1] {\texttt{.o}};
+	\node (objectFile1) [GrayNode, below = of translationUnit1] {Tárgykód};
+	\node (objectFile1FileName) [WhiteNode, below = 0mm of objectFile1] {\texttt{.o}};
 	
-	\node (objectFile2) [Node, below = of translationUnit2] {Tárgykód};
-	\node (objectFile2FileName) [FileName, below = 0mm of objectFile2] {\texttt{.o}};
+	\node (objectFile2) [GrayNode, below = of translationUnit2] {Tárgykód};
+	\node (objectFile2FileName) [WhiteNode, below = 0mm of objectFile2] {\texttt{.o}};
 	
 	
-	\node (libFile1) [Node, below = 4.1 cm of header] {Könyvtár};
-	\node (libFile1FileName) [FileName, below = 0mm of libFile1] {\texttt{.a} / \texttt{.lib} / \texttt{.so} / \texttt{.dll}};
+	\node (libFile1) [GrayNode, below = 4.1 cm of header] {Könyvtár};
+	\node (libFile1FileName) [WhiteNode, below = 0mm of libFile1] {\texttt{.a} / \texttt{.lib} / \texttt{.so} / \texttt{.dll}};
 	
-	\node (exe) [NodeExe, below = 6.2 cm of header] {Végrehajtható állomány};
-	\node (exeFileName) [FileNameExe, below = 0mm of exe] {\texttt{.exe} / \texttt{.out}};
+	\node (exe) [GrayNode, minimum width  = 5cm, below = 6.2 cm of header] {Végrehajtható állomány};
+	\node (exeFileName) [WhiteNode, minimum width  = 5cm, below = 0mm of exe] {\texttt{.exe} / \texttt{.out}};
 	
 	
 	\draw[arrow] (headerFileName) -- (cpp1);

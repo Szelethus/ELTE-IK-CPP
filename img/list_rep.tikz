@@ -1,17 +1,27 @@
 \begin{tikzpicture}
 	
-	\node (data) [Data] {\texttt{data}};
-	\node [Pointer, right = 0mm of data] {\texttt{*next}};
+	\node (data) [
+		NodeBase,
+		minimum width  = 1.5cm, 
+		minimum height = 6mm, 
+		fill           = DefaultObjectColor
+	] {\texttt{data}};
+	\node [
+		NodeBase,
+		minimum width  = 5mm, 
+		minimum height = 6mm, 
+		fill           = DefaultObjectColor,
+		right          = 0 mm of data
+	] {\texttt{*next}};
 \end{tikzpicture}
 
 \medskip
 \begin{tikzpicture}
 	\tikzstyle{Node} = [
-		minimum width = 6 mm, 
+		NodeBase,
+		minimum width  = 6 mm, 
 		minimum height = 6 mm, 
-		text centered, 
-		draw=black, 
-		fill= gray!20
+		fill= DefaultObjectColor
 	]
 	
 	\node (11l) [Node] {9};

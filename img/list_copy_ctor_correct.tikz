@@ -1,10 +1,10 @@
 \begin{tikzpicture}
 	\drawStackFrame{-3}{0}{3};
 	\node[Heap] at (3,1.5){};
-	\node (7node) [StackObject] at (2,1) {7};
-	\node (2node) [StackObject] at (4.5,1.5) {2};
-	\node (7node2) [StackObject] at (1.5,2) {7};
-	\node (2node2) [StackObject] at (4.5,2.5) {2};
+	\node (7node) [StackObject] at (2,0.75) {7};
+	\node (2node) [StackObject] at (4.5,1.25) {2};
+	\node (7node2) [StackObject] at (1.5,1.75) {7};
+	\node (2node2) [StackObject] at (4.5,2.25) {2};
 	\node (cHeadNode) [StackObject] at (-2,0.9) {cHead (8)};
 	\node (headNode) [StackObject] at (-2,0.3) {head (8)};
 	\draw [arrow] (7node) -- (2node);

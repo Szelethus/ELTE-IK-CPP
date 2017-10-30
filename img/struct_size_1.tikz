@@ -1,8 +1,24 @@
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{Border} = [rectangle, minimum width=2.5cm, minimum height=7mm, text centered, draw=black, line width = 1.2pt]
-	\tikzstyle{HalfNode} = [rectangle, minimum width=1.25cm, minimum height=7mm, text centered, draw=black, fill= gray!20, line width = 0.2pt]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
+	\tikzstyle{Node} = [
+		NodeBase,
+		minimum width  = 2.5cm, 
+		minimum height = 7mm, 
+		fill           = DefaultObjectColor, 
+		line width     = 1.2pt
+	]
+	\tikzstyle{HalfNode} = [
+		NodeBase,
+		minimum width  = 1.25cm, 
+		minimum height = 7mm,
+		fill           = DefaultObjectColor, 
+		line width     = 0.2pt
+	]
+	\tikzstyle{Border} = [
+		NodeBase,
+		minimum width=2.5cm, 
+		minimum height=7mm,
+		line width = 1.2pt
+	]
 	
 	\node (1) [HalfNode] {kor};
 	\node (2) [Node, right = 0mm of 1] {atlag};

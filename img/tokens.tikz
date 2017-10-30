@@ -1,7 +1,13 @@
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, text width=5mm, minimum height=5mm]
-	\tikzstyle{Token} = [rectangle, minimum height=5mm]
-	\tikzstyle{arrow} = [->,>=stealth]
+	\tikzstyle{Node} = [
+		rectangle, 
+		text width=5mm, 
+		minimum height=5mm
+	]
+	\tikzstyle{Token} = [
+		rectangle, 
+		minimum height=5mm
+	]
 	
 	\node (int) [Node, text = green] {\texttt{int}};
 	\node (main) [Node, right = 0mm of int, text = red] {\texttt{main}};
@@ -32,6 +38,6 @@
 	\draw[arrow] (literal) -- (hello);
 	\draw[arrow] (punctuator) -- (rightBracket);
 	\draw[arrow] (punctuator) -- (semicolon2);
-	\draw[arrow] (identifier) -- (std1);
+	\draw[arrow] (identifier) -- (std1.west);
 	\draw[arrow] (identifier) -- (main);
 \end{tikzpicture}

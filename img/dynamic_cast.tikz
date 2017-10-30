@@ -4,25 +4,32 @@
 	\node (x) [StackObject] at (1,0.75) {\texttt{k.x}};
 	\node (y) [StackObject] at (1,1.25) {\texttt{k.y}};
 	\node (r) [StackObject] at (1,1.75) {\texttt{k.r}};
-	\node (sikidom) [Sikidom] at (1,1) {};
+	\node (sikidom) [SikidomFrame] at (1,1) {};
+	
 	\path[every node/.style={font=\sffamily\small}]
 	(s) edge[bend left = 90, thick, ->] node [right] {} (sikidom);
 \end{tikzpicture}
 \hspace{1cm}
 \begin{tikzpicture}
-	\draw [thick, black] (3, 0) -- (5, 0);
-	\draw [thick, black] (3, 0) -- (3, 2.75);
-	\draw [thick, black] (5, 0) -- (5, 2.75);
+	\drawStackFrame{3}{0}{2.75};
 	\node (s2) [StackObject] at (4,0.25) {\texttt{sp}};
 	\node (x2) [StackObject] at (4,0.75) {\texttt{k.x}};
 	\node (y2) [StackObject] at (4,1.25) {\texttt{k.y}};
 	\node (r2) [StackObject] at (4,1.75) {\texttt{k.r}};
 	\node (kp) [StackObject] at (4,2.25) {\texttt{kp}};
-	\node (sikidom2) [Sikidom] at (4,1) {};
-	\node (kor) [Kor] at (4,1.25) {};
+	
+	\node (sikidom) [SikidomFrame] at (4,1) {};
+	
+	\node (kor) [
+		rectangle, 
+		minimum width=2cm, 
+		minimum height=15mm, 
+		draw=red, 
+		line width = 3pt
+	] at (4,1.25) {};
 	
 	\path[every node/.style={font=\sffamily\small}]
-	(s2) edge[bend left = 90, thick, ->] node [right] {} (sikidom2);
+	(s2) edge[bend left = 90, thick, ->] node [right] {} (sikidom);
 	\path[every node/.style={font=\sffamily\small}]
 	(kp) edge[bend left = 90, thick, red, ->] node [right] {} (kor);
 \end{tikzpicture}

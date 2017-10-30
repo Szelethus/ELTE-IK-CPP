@@ -45,14 +45,37 @@
 \tikzstyle{NodeBase} = [
 	rectangle,
 	text centered,
-	draw=black
+	draw = black
+]
+
+\definecolor{DefaultObjectColor}{gray}{0.9} % This is the default color of object in the TikZ pictures
+
+\tikzstyle{StackObject} = [
+	NodeBase,
+	minimum width  = \stackNodeWidth mm, 
+	minimum height = \stackNodeHeight mm,
+	fill           = DefaultObjectColor
+]
+
+\tikzstyle{BinTreeNode} = [
+	NodeBase,
+	minimum width  = 1cm, 
+	minimum height = 5mm, 
+	fill           = DefaultObjectColor
 ]
 
 \tikzstyle{Heap} = [
 	NodeBase,
-	minimum width=6cm, 
-	minimum height=2cm,
+	minimum width  = 5.5cm, 
+	minimum height = 2.5cm,
 	fill=white
+]
+
+\tikzstyle{SikidomFrame} = [
+	NodeBase, 
+	minimum width  = 2cm, 
+	minimum height = 10mm, 
+	line width     = 2pt
 ]
 
 % Creates a stack frame in a TikZ environment
@@ -66,30 +89,11 @@
 	\draw [thick, black] (#1 + \stackNodeWidth/10, #2) -- (#1 + \stackNodeWidth/10, #3);
 }
 
-\tikzstyle{StackObject} = [
-	NodeBase,
-	minimum width  = \stackNodeWidth mm, 
-	minimum height = \stackNodeHeight mm,
-	fill=gray!20
-]
-	
-\tikzstyle{Data} = [
-	NodeBase,
-	minimum width=1.5cm, 
-	minimum height=6mm, 
-	fill= gray!20
-]
-
 \tikzstyle{arrow} = [
 	thick,
 	->,
 	>=stealth
 ]
-
-\tikzstyle{Pointer} = [rectangle, minimum width=5mm, minimum height=6mm, text centered, draw=black, fill= gray!20]
-
-\tikzstyle{Sikidom} = [rectangle, minimum width=2cm, minimum height=10mm, text centered, draw=black, line width = 2pt]
-\tikzstyle{Kor} = [rectangle, minimum width=2cm, minimum height=15mm, text centered, draw=red, line width = 3pt]
 %%%%%%% TikZ options end %%%%%%%
 
 %%%%%% lstlistings envvironment options start %%%%%%
@@ -111,11 +115,11 @@
 }
 
 \lstdefinestyle{customasm}{ % Assembly code snippet style
-	belowcaptionskip=1\baselineskip,
-	frame=L,
-	language=[x86masm]Assembler,
-	basicstyle=\ttfamily,
-	commentstyle=\itshape\color{yellow!40!black},
+	belowcaptionskip = 1\baselineskip,
+	frame            = L, 
+	language         = [x86masm]Assembler,
+	basicstyle       = \ttfamily,
+	commentstyle     = \itshape\color{yellow!40!black},
 }
 
 \lstset{
