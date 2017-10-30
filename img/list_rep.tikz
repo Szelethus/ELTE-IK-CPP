@@ -1,7 +1,4 @@
 \begin{tikzpicture}
-	\tikzstyle{Data} = [rectangle, minimum width=1.5cm, minimum height=6mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{Pointer} = [rectangle, minimum width=5mm, minimum height=6mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
 	
 	\node (data) [Data] {\texttt{data}};
 	\node [Pointer, right = 0mm of data] {\texttt{*next}};

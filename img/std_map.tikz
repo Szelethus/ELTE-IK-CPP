@@ -1,5 +1,4 @@
-\begin{tikzpicture}
-	[
+\begin{tikzpicture}[
 		level distance=1.5cm,
 		level 1/.style={sibling distance=4cm},
 		level 2/.style={sibling distance=2cm},

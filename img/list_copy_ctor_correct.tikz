@@ -1,19 +1,12 @@
 \begin{tikzpicture}
-	\tikzstyle{Heap} = [rectangle, minimum width=6cm, minimum height=3cm, text centered, draw=black, fill=white]
-	\tikzstyle{Stack} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
-	\tikzstyle{ListNode} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
-	
-	\draw [thick, black] (-3, 0) -- (-1, 0);
-	\draw [thick, black] (-3, 0) -- (-3, 3);
-	\draw [thick, black] (-1, 0) -- (-1, 3);
+	\drawStackFrame{-3}{0}{3};
 	\node[Heap] at (3,1.5){};
-	\node (7node) [ListNode] at (2,1) {7};
-	\node (2node) [ListNode] at (4.5,1.5) {2};
-	\node (7node2) [ListNode] at (1.5,2) {7};
-	\node (2node2) [ListNode] at (4.5,2.5) {2};
-	\node (cHeadNode) [ListNode] at (-2,0.9) {cHead (8)};
-	\node (headNode) [ListNode] at (-2,0.3) {head (8)};
+	\node (7node) [StackObject] at (2,1) {7};
+	\node (2node) [StackObject] at (4.5,1.5) {2};
+	\node (7node2) [StackObject] at (1.5,2) {7};
+	\node (2node2) [StackObject] at (4.5,2.5) {2};
+	\node (cHeadNode) [StackObject] at (-2,0.9) {cHead (8)};
+	\node (headNode) [StackObject] at (-2,0.3) {head (8)};
 	\draw [arrow] (7node) -- (2node);
 	\draw [arrow] (7node2) -- (2node2);
 	\draw [arrow] (headNode) -- (7node);

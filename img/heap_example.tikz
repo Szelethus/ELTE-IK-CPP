@@ -1,0 +1,11 @@
+\begin{tikzpicture}
+	\drawStackFrame{-3}{0}{3};
+	
+	\draw [thick, black] (-3, 0) -- (-1, 0);
+	\draw [thick, black] (-3, 0) -- (-3, 2);
+	\draw [thick, black] (-1, 0) -- (-1, 2);
+	\node[Heap] at (3,1){};
+	\node (2) [StackObject] at (3.2,1.25) {2};
+	\node (p) [StackObject] at (-2,0.25) {p};
+	\draw[arrow] (p) -- (2);
+\end{tikzpicture}

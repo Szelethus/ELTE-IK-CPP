@@ -25,7 +25,7 @@
 	tikz,      % Basepackage for nearly all figures
 	tikz-uml,  % Used for UML diagrams. Package needs to be in the same directory!
 	listings,  % Used for code snippets
-	subfiles
+	subfiles   % Used for including subfiles into this document
 }
 \usepackage[unicode]{hyperref} % Clickable links
 %%%%%%% Packages required for this document end %%%%%%%
@@ -33,8 +33,56 @@
 %%%%%% TikZ options start %%%%%%
 \usetikzlibrary{
 	positioning, % Contains positioning utilities, such as "below = of" 
-	calc         % Adding coordinates
+	calc,        % Adding coordinates
+	math         % Needed for global variables
 }
+
+\tikzmath{
+	\stackNodeWidth  = 20;
+	\stackNodeHeight = 5;
+}
+
+\tikzstyle{NodeBase} = [
+	rectangle,
+	text centered,
+	draw=black
+]
+
+\tikzstyle{Heap} = [
+	NodeBase,
+	minimum width=6cm, 
+	minimum height=2cm,
+	fill=white
+]
+
+% Creates a stack frame in a TikZ environment
+%
+% param #1 x coordinate position
+% param #2 y coordinate position
+% param #3 height
+\newcommand{\drawStackFrame}[3]{
+	\draw [thick, black] (#1, #2) -- (#1 + \stackNodeWidth/10, #2);
+	\draw [thick, black] (#1, #2) -- (#1, #3);
+	\draw [thick, black] (#1 + \stackNodeWidth/10, #2) -- (#1 + \stackNodeWidth/10, #3);
+}
+
+\tikzstyle{StackObject} = [
+	NodeBase,
+	minimum width  = \stackNodeWidth mm, 
+	minimum height = \stackNodeHeight mm,
+	fill=gray!20
+]
+	
+\tikzstyle{Data} = [
+	NodeBase,
+	minimum width=1.5cm, 
+	minimum height=6mm, 
+	fill= gray!20
+]
+
+\tikzstyle{Pointer} = [rectangle, minimum width=5mm, minimum height=6mm, text centered, draw=black, fill= gray!20]
+
+\tikzstyle{arrow} = [thick,->,>=stealth]
 %%%%%%% TikZ options end %%%%%%%
 
 %%%%%% lstlistings envvironment options start %%%%%%
