@@ -1,23 +1,11 @@
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
+	\drawStackFrame{-3}{0}{2}
 	
+	\drawStackFrame{0}{0}{2}
+	\node (x) [StackObject] at (1,0.25) {x};
 	
-	\draw [thick, black] (-3, 0) -- (-1, 0);
-	\draw [thick, black] (-3, 0) -- (-3, 2);
-	\draw [thick, black] (-1, 0) -- (-1, 2);
+	\drawStackFrame{3}{0}{2}
 	
-	\draw [thick, black] (0, 0) -- (2, 0);
-	\draw [thick, black] (0, 0) -- (0, 2);
-	\draw [thick, black] (2, 0) -- (2, 2);
-	\node (x) [Node] at (1,0.25) {x};
-	
-	\draw [thick, black] (3, 0) -- (5, 0);
-	\draw [thick, black] (3, 0) -- (3, 2);
-	\draw [thick, black] (5, 0) -- (5, 2);
-	
-	\draw [thick, black] (6, 0) -- (8, 0);
-	\draw [thick, black] (6, 0) -- (6, 2);
-	\draw [thick, black] (8, 0) -- (8, 2);
-	\node (x) [Node] at (7,0.25) {x};
+	\drawStackFrame{6}{0}{2}
+	\node (x) [StackObject] at (7,0.25) {x};
 \end{tikzpicture}

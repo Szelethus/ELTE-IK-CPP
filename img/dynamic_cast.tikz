@@ -1,35 +1,23 @@
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{Sikidom} = [rectangle, minimum width=2cm, minimum height=10mm, text centered, draw=black, line width = 2pt]
-	\tikzstyle{Kor} = [rectangle, minimum width=2cm, minimum height=15mm, text centered, draw=red, line width = 3pt]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
-	
-	\draw [thick, black] (0, 0) -- (2, 0);
-	\draw [thick, black] (0, 0) -- (0, 2.75);
-	\draw [thick, black] (2, 0) -- (2, 2.75);
-	\node (s) [Node] at (1,0.25) {\texttt{sp}};
-	\node (x) [Node] at (1,0.75) {\texttt{k.x}};
-	\node (y) [Node] at (1,1.25) {\texttt{k.y}};
-	\node (r) [Node] at (1,1.75) {\texttt{k.r}};
+	\drawStackFrame{0}{0}{3};
+	\node (s) [StackObject] at (1,0.25) {\texttt{sp}};
+	\node (x) [StackObject] at (1,0.75) {\texttt{k.x}};
+	\node (y) [StackObject] at (1,1.25) {\texttt{k.y}};
+	\node (r) [StackObject] at (1,1.75) {\texttt{k.r}};
 	\node (sikidom) [Sikidom] at (1,1) {};
 	\path[every node/.style={font=\sffamily\small}]
 	(s) edge[bend left = 90, thick, ->] node [right] {} (sikidom);
 \end{tikzpicture}
 \hspace{1cm}
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{Sikidom} = [rectangle, minimum width=2cm, minimum height=10mm, text centered, draw=black, line width = 2pt]
-	\tikzstyle{Kor} = [rectangle, minimum width=2cm, minimum height=15mm, text centered, draw=red, line width = 3pt]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
-	
 	\draw [thick, black] (3, 0) -- (5, 0);
 	\draw [thick, black] (3, 0) -- (3, 2.75);
 	\draw [thick, black] (5, 0) -- (5, 2.75);
-	\node (s2) [Node] at (4,0.25) {\texttt{sp}};
-	\node (x2) [Node] at (4,0.75) {\texttt{k.x}};
-	\node (y2) [Node] at (4,1.25) {\texttt{k.y}};
-	\node (r2) [Node] at (4,1.75) {\texttt{k.r}};
-	\node (kp) [Node] at (4,2.25) {\texttt{kp}};
+	\node (s2) [StackObject] at (4,0.25) {\texttt{sp}};
+	\node (x2) [StackObject] at (4,0.75) {\texttt{k.x}};
+	\node (y2) [StackObject] at (4,1.25) {\texttt{k.y}};
+	\node (r2) [StackObject] at (4,1.75) {\texttt{k.r}};
+	\node (kp) [StackObject] at (4,2.25) {\texttt{kp}};
 	\node (sikidom2) [Sikidom] at (4,1) {};
 	\node (kor) [Kor] at (4,1.25) {};
 	

@@ -1,55 +1,35 @@
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
-	
-	\draw [thick, black] (0, 0) -- (2, 0);
-	\draw [thick, black] (0, 0) -- (0, 3);
-	\draw [thick, black] (2, 0) -- (2, 3);
-	\node (c) [Node] at (1,0.25) {\texttt{c} (5)};
-	\node (d) [Node] at (1,0.75) {\texttt{d} (8)};
-	\node (p) [Node] at (1,1.25) {\texttt{p}};
+	\drawStackFrame{0}{0}{3};
+	\node (c) [StackObject] at (1,0.25) {\texttt{c} (5)};
+	\node (d) [StackObject] at (1,0.75) {\texttt{d} (8)};
+	\node (p) [StackObject] at (1,1.25) {\texttt{p}};
 	
 	\path[every node/.style={font=\sffamily\small}]
 	(p) edge[bend left = 90, thick, ->] node [right] {} (c);
 \end{tikzpicture}\quad 
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
-	
-	\draw [thick, black] (0, 0) -- (2, 0);
-	\draw [thick, black] (0, 0) -- (0, 3);
-	\draw [thick, black] (2, 0) -- (2, 3);
-	\node (c) [Node] at (1,0.25) {\texttt{c} (4)};
-	\node (d) [Node] at (1,0.75) {\texttt{d} (8)};
-	\node (p) [Node] at (1,1.25) {\texttt{p}};
+	\drawStackFrame{0}{0}{3};
+	\node (c) [StackObject] at (1,0.25) {\texttt{c} (4)};
+	\node (d) [StackObject] at (1,0.75) {\texttt{d} (8)};
+	\node (p) [StackObject] at (1,1.25) {\texttt{p}};
 	
 	\path[every node/.style={font=\sffamily\small}]
 	(p) edge[bend left = 90, thick, ->] node [right] {} (c);
 \end{tikzpicture}\quad 
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
-	
-	\draw [thick, black] (0, 0) -- (2, 0);
-	\draw [thick, black] (0, 0) -- (0, 3);
-	\draw [thick, black] (2, 0) -- (2, 3);
-	\node (c) [Node] at (1,0.25) {\texttt{c} (4)};
-	\node (d) [Node] at (1,0.75) {\texttt{d} (8)};
-	\node (p) [Node] at (1,1.25) {\texttt{p}};
+	\drawStackFrame{0}{0}{3};
+	\node (c) [StackObject] at (1,0.25) {\texttt{c} (4)};
+	\node (d) [StackObject] at (1,0.75) {\texttt{d} (8)};
+	\node (p) [StackObject] at (1,1.25) {\texttt{p}};
 	
 	\path[every node/.style={font=\sffamily\small}]
 	(p) edge[bend left = 90, thick, ->] node [right] {} (d);
 \end{tikzpicture}\quad 
 \begin{tikzpicture}
-	\tikzstyle{Node} = [rectangle, minimum width=2cm, minimum height=5mm, text centered, draw=black, fill= gray!20]
-	\tikzstyle{arrow} = [thick,->,>=stealth]
-	
-	\draw [thick, black] (0, 0) -- (2, 0);
-	\draw [thick, black] (0, 0) -- (0, 3);
-	\draw [thick, black] (2, 0) -- (2, 3);
-	\node (c) [Node] at (1,0.25) {\texttt{c} (4)};
-	\node (d) [Node] at (1,0.75) {\texttt{d} (7)};
-	\node (p) [Node] at (1,1.25) {\texttt{p}};
+	\drawStackFrame{0}{0}{3};
+	\node (c) [StackObject] at (1,0.25) {\texttt{c} (4)};
+	\node (d) [StackObject] at (1,0.75) {\texttt{d} (7)};
+	\node (p) [StackObject] at (1,1.25) {\texttt{p}};
 	
 	\path[every node/.style={font=\sffamily\small}]
 	(p) edge[bend left = 90, thick, ->] node [right] {} (d);

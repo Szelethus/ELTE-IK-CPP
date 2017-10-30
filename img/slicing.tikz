@@ -1,6 +1,4 @@
 \begin{tikzpicture}
-	\tikzstyle{Sikidom} = [rectangle, minimum width=2cm, minimum height=10mm, text centered, draw=black, line width = 2pt]
-	
 	\draw [thick, black] (0, 0) -- (2, 0);
 	\draw [thick, black] (0, 0) -- (0, 2.5);
 	\draw [thick, black] (2, 0) -- (2, 2.5);
