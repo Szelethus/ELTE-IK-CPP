@@ -1,4 +1,4 @@
-﻿# C++ gyakorlat- és előadásjegyzet
+﻿# C++ gyakorlat- és előadásjegyzet forráskód
 
 ## Pótlandó dolgok
 

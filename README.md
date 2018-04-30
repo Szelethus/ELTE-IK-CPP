@@ -19,3 +19,17 @@ A hallgatóság az alábbi linkeken fér hozzá a jegyzetekhez:
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/11gy_cpp/11gy_cpp.pdf
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/12gy_cpp/12gy_cpp.pdf
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/cpp_book/cpp_book.pdf
+
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/exercise_book/exercise_book.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/01exercise_cpp/01exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/02exercise_cpp/02exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/03exercise_cpp/03exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/04exercise_cpp/04exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/05exercise_cpp/05exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/06exercise_cpp/06exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/07exercise_cpp/07exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/08exercise_cpp/08exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/09exercise_cpp/09exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/10exercise_cpp/10exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/11exercise_cpp/11exercise_cpp.pdf
+* http://people.inf.elte.hu/szelethus/LaTeX/cpp/12exercise_cpp/12exercise_cpp.pdf

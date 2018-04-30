@@ -1,0 +1,159 @@
+%%%%%% Basic packages begin %%%%%%
+\usepackage[
+	textwidth  = 160mm, 
+	textheight = 230mm, 
+	top        = 25mm, 
+	bottom     = 30mm
+]{geometry}
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\PassOptionsToPackage{defaults=hu-min}{magyar.ldf}
+\usepackage[magyar]{babel}
+%%%%%%% Basic packages end %%%%%%%
+
+%%%%%% Packages required for this document begin %%%%%%
+\usepackage{
+	amsmath,   % Math mode
+	amsthm,    % "note" environment
+	amsfonts,  % "\mathbb{}" command
+	paralist,  % "compactitem" and "compactenum" environment
+	multirow,  % "\multirow{}{}" command
+	float,     % "H" float specifier
+	tikz,      % Basepackage for nearly all figures
+	tikz-uml,  % Used for UML diagrams. Package needs to be in the same directory!
+	listings,  % Used for code snippets
+	subfiles,  % Used for including subfiles into this document
+	array      % "\setlength{\extrarowheight}{2pt}"
+}
+\usepackage[unicode]{hyperref} % Clickable links
+%%%%%%% Packages required for this document end %%%%%%%
+
+%%%%%% TikZ options start %%%%%%
+\usetikzlibrary{
+	positioning, % Contains positioning utilities, such as "below = of" 
+	calc,        % Adding coordinates
+	math         % Needed for global variables
+}
+
+\tikzmath{
+	\stackNodeWidth  = 20;
+	\stackNodeHeight = 5;
+}
+
+\tikzstyle{NodeBase} = [
+	rectangle,
+	text centered,
+	draw = black
+]
+
+\definecolor{DefaultObjectColor}{gray}{0.9} % This is the default color of object in the TikZ pictures
+
+\tikzstyle{StackObject} = [
+	NodeBase,
+	minimum width  = \stackNodeWidth mm, 
+	minimum height = \stackNodeHeight mm,
+	fill           = DefaultObjectColor
+]
+
+\tikzstyle{BinTreeNode} = [
+	NodeBase,
+	minimum width  = 1cm, 
+	minimum height = 5mm, 
+	fill           = DefaultObjectColor
+]
+
+\tikzstyle{Heap} = [
+	NodeBase,
+	minimum width  = 5.5cm, 
+	minimum height = 2.5cm,
+	fill=white
+]
+
+\tikzstyle{SikidomFrame} = [
+	NodeBase, 
+	minimum width  = 2cm, 
+	minimum height = 10mm, 
+	line width     = 2pt
+]
+
+% Creates a stack frame in a TikZ environment
+%
+% param #1 x coordinate position
+% param #2 y coordinate position
+% param #3 height
+\newcommand{\drawStackFrame}[3]{
+	\draw [thick, black] (#1, #2) -- (#1 + \stackNodeWidth/10, #2);
+	\draw [thick, black] (#1, #2) -- (#1, #3);
+	\draw [thick, black] (#1 + \stackNodeWidth/10, #2) -- (#1 + \stackNodeWidth/10, #3);
+}
+
+\tikzstyle{arrow} = [
+	thick,
+	->,
+	>=stealth
+]
+%%%%%%% TikZ options end %%%%%%%
+
+%%%%%% lstlistings envvironment options start %%%%%%
+
+\lstdefinestyle{customc}{ % C/C++ code snippet style
+	belowcaptionskip = 1\baselineskip,
+	breaklines       = true,
+	frame            = L, % Double line on the left
+	language         = C++,
+	showstringspaces = false,
+	basicstyle       = \ttfamily,
+	keywordstyle     = \bfseries\color{green!40!black},
+	stringstyle      = \color{orange},
+	emphstyle        = \color{blue}, % Defined below
+	tabsize          = 4,
+	columns          = fullflexible,
+	%NOTE The environment "lstlsiting" obviously can't know all types, especially custom defined ones. Because of this, non-primitive types names have to be added below for proper syntax highlighting.
+	emph = {std, A, B, BDIT, Base, BaseOne, BaseTwo, C, CharT, Circle, Compr, ConstIterator, Cont, D, Deltoid, Derived, Derived2, DerivedLast, DerivedOne, DerivedTwo, Fact, Fiu, Foo, Greater, Hallgato, IT, InputIt, Iterator, Kor, Lany, Less, LessByX, LinAlgVector, List, Matrix, Negyszog, Negyzet, RAIT, Rombusz, S, Sielo, Sikidom, StringLength, T, T1, T2, Templ, U, Val, X, Y, Z, bad_cast, bidirectional_iterator_tag, const_iterator, deque, forward_iterator_tag, input_iterator_tag, iostream, istream, iterator, iterator_category, line_editor, list, map, multimap, multiset, ostream, pair, random_access_iterator_tag, set, string, strlen, strlenWrong, value_type, vector}
+}
+
+\lstdefinestyle{customasm}{ % Assembly code snippet style
+	belowcaptionskip = 1\baselineskip,
+	frame            = L, 
+	language         = [x86masm]Assembler,
+	basicstyle       = \ttfamily,
+	commentstyle     = \itshape\color{yellow!40!black},
+}
+
+\lstset{
+	escapechar = @,
+	style      = customc, % Default code snippet style
+	%NOTE In order to use special characters in code snippets, one has to manually define them.
+	literate   = {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1	{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1	{ö}{{\"o}}1 {ü}{{\"u}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+	{ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+	{€}{{\euro}}1 {£}{{\pounds}}1 {~}{$\sim$}{1}	
+}
+
+%%%%%%% lstlistings envvironment options end %%%%%%%
+
+%%%%%%%% Compilation error fix begin %%%%%%%%
+%NOTE https://tex.stackexchange.com/questions/376763/incomplete-iffalse-all-text-was-ignored-after-line-x-with-lstlisting
+\makeatletter
+\expandafter\let\csname active@char\string?\endcsname\relax
+\expandafter\let\csname active@char\string!\endcsname\relax
+\expandafter\let\csname active@char\string:\endcsname\relax
+
+\initiate@active@char{?}
+\initiate@active@char{!}
+\initiate@active@char{:}
+\makeatletter
+%%%%%%%%% Compilation error fix end %%%%%%%%%
+
+%%%%%%%% Custom command and environment definitions start %%%%%%%%
+% Better looking left shift operator
+\newcommand{\<}{<\hspace{0mm}<} 
+
+% "note" environment definition
+\theoremstyle{definition}
+\newtheorem{note}{Megjegyzés}[subsection]
+
+% Commands for subfiles
+\newcommand{\onlyinsubfile}[1]{#1} % Its argument appears only when the file is compiled on its own
+\newcommand{\notinsubfile}[1]{} % Its argument appears only when the main file (or root file) is compiled
+%%%%%%%%% Custom command and environment definitions end %%%%%%%%%

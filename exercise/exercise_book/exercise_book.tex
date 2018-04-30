@@ -12,7 +12,6 @@
 	% Little bit of hacking to make subfiles commands work
 	\renewcommand{\onlyinsubfile}[1]{}
 	\renewcommand{\notinsubfile}[1]{#1}
-	
 	\begin{titlepage}
 		\vspace*{2cm}
 		\centering
@@ -22,10 +21,8 @@
 		{\Huge Programozási Nyelvek: C++ }
 		
 		\vspace{1cm}
-		{\huge Gyakorlat és előadásjegyzet}
+		{\huge Gyakorló feladatkönyv}
 		
-		\vspace*{5mm}
-		{\large Horváth Gábor gyakorlata alapján}
 		\vspace*{1.5cm}
 		
 		{\large Umann Kristóf}
@@ -39,7 +36,10 @@ int main()
 	CppStudent *reader = new CppStudent();
 	reader->readBook();
 	while(!reader->doesUnderstand())
+	{
+		reader->exercise();
 		reader->readBook();	
+	}
 	delete reader;
 }
 		\end{lstlisting}
@@ -50,16 +50,5 @@ int main()
 	\end{titlepage}
 	\tableofcontents
 	\pagebreak
-	\subfile{../01gy_cpp/01gy_cpp.tex}
-	\subfile{../02gy_cpp/02gy_cpp.tex}
-	\subfile{../03gy_cpp/03gy_cpp.tex}
-	\subfile{../04gy_cpp/04gy_cpp.tex}
-	\subfile{../05gy_cpp/05gy_cpp.tex}
-	\subfile{../06gy_cpp/06gy_cpp.tex}
-	\subfile{../07gy_cpp/07gy_cpp.tex}
-	\subfile{../08gy_cpp/08gy_cpp.tex}
-	\subfile{../09gy_cpp/09gy_cpp.tex}
-	\subfile{../10gy_cpp/10gy_cpp.tex}
-	\subfile{../11gy_cpp/11gy_cpp.tex}
-	\subfile{../12gy_cpp/12gy_cpp.tex}
+	\subfile{../01exercise_cpp/01exercise_cpp.tex}
 \end{document}
