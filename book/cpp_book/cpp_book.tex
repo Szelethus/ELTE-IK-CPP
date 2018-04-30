@@ -147,17 +147,24 @@
 \makeatletter
 %%%%%%%%% Compilation error fix end %%%%%%%%%
 
+%%%%%%%% Custom command and environment definitions start %%%%%%%%
+% Better looking left shift operator
+\newcommand{\<}{<\hspace{0mm}<} 
+
 % "note" environment definition
 \theoremstyle{definition}
 \newtheorem{note}{Megjegyzés}[subsection]
-
-%%%%%%%% Custom command and environment definitions start %%%%%%%%
-\newcommand{\<}{<\hspace{0mm}<} % Better looking left shift operator
 
 % Commands for subfiles
 \newcommand{\onlyinsubfile}[1]{#1} % Its argument appears only when the file is compiled on its own
 \newcommand{\notinsubfile}[1]{} % Its argument appears only when the main file (or root file) is compiled
 %%%%%%%%% Custom command and environment definitions end %%%%%%%%%
+
+% Defining a default image folder.
+\graphicspath{{../../img/}}
+\makeatletter
+\def\input@path{{../../img/}}
+\makeatother
 
 \begin{document}
 	% Little bit of hacking to make subfiles commands work
@@ -167,7 +174,7 @@
 	\begin{titlepage}
 		\vspace*{2cm}
 		\centering
-		\includegraphics[width=5cm]{../img/elte_cimer}
+		\includegraphics[width=5cm]{elte_cimer}
 		
 		\vspace*{2cm}
 		{\Huge Programozási Nyelvek: C++ }

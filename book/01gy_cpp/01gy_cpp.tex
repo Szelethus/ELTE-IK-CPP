@@ -1,0 +1,583 @@
+% !TeX root = 01gy_cpp
+\documentclass[../cpp_book/cpp_book.tex]{subfiles}
+\begin{document}
+	\onlyinsubfile{
+		\begin{center}
+			{\LARGE\textbf{C++}}
+			
+			{\Large Gyakorlat jegyzet}
+			
+			1. óra
+		\end{center}
+		A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlata alapján. (\today)
+	}
+	\section{Előszó}
+	Ez a jegyzet az ELTE Informatikai Kar hallgatóinak készült a \emph{Programozási Nyelvek C++} című tárgyhoz. A jegyzet segítségével a gyakorlaton és előadáson elhangzott anyagok elsajátíthatóak, egy saját, néhány helyen hiányos jegyzetet jól kiegészít. Úgy gondoljuk, hogy aki a jegyzetben leírtakat mélyen megérti, az olvasás mellett a példakódokkal kísérletezik, az jó eséllyel a vizsgáról nem fog sikertelenül távozni. Fontos tehát kihangsúlyoznunk, hogy a cél az aktív tudás elsajátítása, amelyet egyetlen jegyzet sem képes megadni. Az aktív tudás megszerzéséhez fontos a gyakorlás, feladatok megoldása.
+	
+	A jegyzet \textbf{nem fedi le teljes mértékben az előadás és gyakorlat anyagát.} Ez azt jelenti, hogy a tárgy jó eredménnyel történő teljesítéséhez az előadáson és gyakorlaton megszerzett tudásra is szükség lesz. Például a programozási konvenciók, a programozási nyelvek történelme, és még megannyi anyagrész nem szerepel a jegyzetben, azonban ezeknek az ismerete fontos és elvárható egy programtervező informatikustól.
+	
+	\smallskip
+	Hangsúlyozzuk, hogy a jegyzet elsősorban a vizsgára történő felkészülést hivatott segíteni. A vizsga közben a jegyzet használata szükséges gyakorlat nélkül nem elég.
+	
+	\smallskip
+	A jegyzet első számú forrása \textsc{Horváth} Gábor 2015/2016/2 és 2016/2017/1 félévében tartott gyakorlatai, \textsc{Pataki} Norbert 2015/2016/1 előadásai, valamint a gyakorlaton megjelent helyettesítő tanárok órái: \textsc{Porkoláb} Zoltán, \textsc{Brunner} Tibor.
+	
+	Külön köszönet jár \textsc{Horváth} Gábornak, aki a jegyzet javításában segített és aktívan segít, és mindenki másnak, aki az esetleges hibák észrevétele után szóltak.
+	
+	(Felhívnánk rá a figyelmet, hogy a szerkesztés jelen pillanatában a jegyzet nem teljes terjedelmében lektorált.)
+
+	\subsection{Szükséges háttértudás}
+	Ez a jegyzet feltételezi, hogy az Olvasó elvégezte a \emph{Programozási Alapismeretek} című tárgyat, és a \emph{Programozás} tárgyat ezzel párhuzamosan végzi, vagy már teljesítette. Támaszkodunk arra, hogy az Olvasó tisztában van a primitív típusokkal (\texttt{int}, \texttt{float}, \texttt{double}, stb.), a szabványos bemeneten keresztül történő kiíratással és beolvasással, a konstanssággal, definiálni tud függvényeket, képes egy helyes C++ kódot lefordítani és lefuttatni (akár fejlesztői környezettel), valamint alapvető algoritmusokat ismer (pl. maximum keresés, rendezés).
+
+	\section{Bevezető}
+	A C++ többek között a hatákonyságáról is híres. Andrei Alexandrescu azt nyilatkozta, hogy amikor a Facebooknál a backend kódján 1\%ot sikerült optimalizálni, több mint 10 évnyi fizetését spórolta meg a cégnek havonta csak az áramköltségen. Ez is mutatja, hogy hiába fejlődtek a hardverek, továbbra is vannak olyan felhasználási területek, ahol a hatékonyság nem mellékes szempont. Az általános hatékonyság mellett a C++ alkalmas valós idejű szoftverek írására is. Mivel nem használ szemét gyűjtést, nincs nem várt szünet a program végrehajtásában a menedzselt nyelvekkel szemben. Miért előny ez? Például az önvezető autók esetében kellemetlen élményben lehetne az utasoknak része, ha az autó azért nem képes időben fékezni, mert éppen a szemétgyüjtésre vár a program. Ezen felül, a jegyzetben megmutatjuk, hogy idiomatikus C++ kód írása esetén nincs szükség szemétgyüjtésre. Sőt, az is ki fog derülni, hogy a C++ megoldása általánosabb a szemétgyüjtésnél, mivel nem csak a memória esetében működik.
+
+	A C++-szal kapcsolatban az egyik gyakori tévhit, hogy egy alacsony szintű (hardver közeli) nyelv. Bár a nyelv lehetőséget biztosít arra, hogy alacsony szinten programozzunk, számos absztrakciós lehetőséget tartalmaz. Ezeknek a használatával magas szintű kód írására is kíválóan alkalmas. A legtöbb nyelvhez képest a C++ abban emelkedik ki, hogy az itt megvalósított absztrakcióknak ritkán van futási idejű költsége.
+	
+	A C++ filozófiájának fontos eleme, hogy ha nem használunk egy adott nyelvi eszközt, akkor annak ne legyen negatív hatása a program teljesítményére.
+	
+	Fontos, hogy a C++ alapvetően nem egy objektum orientált nyelv. Bár számos nyelvi eszköz támogatja az objektum orientált stílusú programozást, de kíválóan alkalmas más paradigmák használatára is. A funkcionális programozástól a generatív programozáson át a deklaratív stílusig sok paradigmát támogat. A nyelv nem próbál ráerőltetni egy megközelítést a programozóra, ellenben próbál minél gazdagabb eszköztárat biztosítani, hogy a megfelelő problémát a megfelelő megközelítéssel lehessen megoldani. Még akkor is, ha ez a különböző paradigmák keverését vonja maga után. Ezért ezt a nyelvet gyakran multiparadigmás programozási nyelvnek szokták besorolni. 
+
+	\medskip
+	Cél: a tárgy során kialakítani a nyelvvel kapcsolatban egy intuíciót, amely segítségével a jegyzetben nem érintett nyelvi eszközök is könnyen megérthetőek. Emellett az idiomatikus C++ stílus elsajátítása, amely alkalmazásával könnyebben lehet hatékony és helyes kódot írni a gyakori hibalehetőségek elkerülésével. Az előzménytárgyakban az egyszerűség kedvéért gyakran féligazságok vagy kevésbé precíz definíciók hangzottak el. Bár ezek rövid távon didaktikailag megállták a helyüket, ennek a tárgynak a kapcsán rendbe rakjuk ezeket a fogalmakat.
+
+	\subsection{Mi az a C++?}
+	Alapvetően a nyelv két összetevőből áll. Az aktuális szabványból és annak implementációiból (fordítók + szabványkönyvtárak). A szabvány az, ami meghatározza a nyelv nyelvtanját, valamint a szemantikát: mit jelentenek a leforduló programok (nem definiál minden részletet). A szabvány emellett definiál egy szabványkönyvtárat is, amit minden szabványos C++ fordító mellé szállítani kell. Az első C++ szabvány a {C++98} volt. További szabványai: {C++03}, {C++11}, {C++14}, {C++17}. A szabvány nevében a számok a szabvány elfogadásának évét jelentik. 
+	
+	\medskip
+	Számos fordító (implementáció) létezik a C++ kódok fordítására, amelyek különböző mértékben támogatják az aktuális C++ szabványt: MSVC, GCC, Clang.
+	Létezik számos fejlesztői környezet is, mint például: CLion, QtCreator, CodeBlocks, VIM. De ezek nem fordítók! Példaképp alapértelmezetten a CodeBlocks GCC-vel, a Visual Studio MSVC-vel fordít.
+
+
+	\section{Alapok}
+
+	\subsection{A Hello World program}
+	Bizonyára az alábbi program nem ismeretlen:
+	
+	\fbox{\textbf{main.cpp}}
+	\medskip
+	
+	\begin{lstlisting}
+#include <iostream>
+
+using namespace std;
+	
+int main()
+{
+	cout << "Hello World!" << endl;
+}
+	\end{lstlisting}
+	A \texttt{main.cpp} fájl meghatároz egy \textbf{fordítási egység}et (\textit{compilation unit}). Fordításkor folyamata során fordítási egységeket fordítunk gépi kódra. Egy fordítási egységben az a kód található, amelyhez a fordító a fordítás során hozzáfér. A C++ fájlon túl ez a fájlban felhaszált headerek tranzitív lezártját is jelenti.
+	
+	\medskip
+	A kód legelső sorában található az ismerős \texttt{\#include <iostream>}. Az \texttt{iostream} egy un. \textbf{header fájl}, mely tartalmaz valamennyi beolvasással és kiíratással kapcsolatos szabványos osztályt, függvényt és változót. Maga az \texttt{iostream} header ugyanúgy C++ kódot tartalmaz, melyet mi magunk is írunk, a \texttt{\#include} direktíva hatására pedig a teljes tartalma a mi fordítási egységünkbe kerül. A fordító számára a mi fordítási egységünk a fordító számára úgy néz ki, egy fájlban szerepelne az egész \texttt{iostream}-ben található (és tranzitív módan az oda include-olt) kód, melynek a végén szerepel a Hello World programunk.
+	
+	A header fájlokról később bővebben beszélünk, egyenlőre elég annyit tudni róluk, hogy C++ fájlokba szoktuk őket includeolni, önmagukban nem szokás őket fordítani.
+	
+	\medskip
+	Ez alatt található a \texttt{using namespace std;} sor. Ennek hatására az \texttt{std} névtérben található típusok, függvények, változók oly módon is elérhetővé válnak, mintha a globális névtérben lettek volna deklarálva. 
+	
+	A standard könyvtárban található implementációk az \texttt{std} névtéren belül találhatóak. Ennek az az oka, hogy a standard könyvtár gazdag eszközkészletet biztosít, amelynek során számos gyakran használt nevet is felhasznál, mint például \texttt{find}, \texttt{max}, stb. Ha nem az \texttt{std} névtérben lennének ezek a nevek, akkor bizonyos kontextusban nem használhatnánk fel ezeket a neveket a saját programunkban. Éppen ezért gyakran kihagyjuk ezt a sort a progamunkból, eztán pedig a standard könyvtárbeli elemekre minősített nevek segítségével hivatkozunk:
+	\begin{lstlisting}
+int main()
+{
+	std::cout << "Hello World!" << std::endl;
+}
+	\end{lstlisting}
+	\begin{note}
+		A fenti kódban nem írtuk ki az \texttt{\#include <iostream>} sort. Ilyen rövidítésekkel gyakran fogunk élni a továbbiakban is. 
+	\end{note}
+
+	Fontos, hogy \texttt{using namespace ...;} soha nem kerülhet header állományba! Ezzel ugyanis a header állomány összes felhasználójánál potenciálisan névütközéseket okozunk.
+
+	Fentebb explicit módon jeleztük a fordítónak, hogy az \texttt{std} névtérben keresse a \texttt{cout} és \texttt{endl} változókat.
+	
+	\medskip
+	A \textbf{right shift operátor} (\texttt{\<}) alternatív szintaxissal is meghívható:
+	\begin{lstlisting}
+operator<<(std::cout, "Hello World");
+	\end{lstlisting}
+	Ebből is látható, hogy az operátorok is tulajdonképpen függvények, tehát a szintaxisuktól (és néhány esetben a kiértékelési sorrendtől és rövidzártól) eltekintve ugyanazon nyelvi szabályok fognak vonatkozni rájuk, mint a többi függvényre.
+	
+	\medskip
+	\textbf{Függvény deklaráció}nak nevezzük, amikor függvény használatáról adunk információt. Ennek része a paraméterek típúsa, visszatérési érték típusa és a függvény neve.
+	
+	\medskip
+	\textbf{Függvény definíció}nak nevezzük azt, amikor leírjuk a függvény törzsét is, ezzel meghatározva, hogy mit csináljon. Ez egyben deklaráció is, hiszen a paraméterekről és visszatérési értékekről is tartalmazza a szükséges információkat.
+	
+	\medskip
+	Fentebb a \texttt{main} függvényt definiáltuk. Egy függvényhez több deklaráció is tartozhat, ha azok nem mondanak egymásnak ellent:
+	\begin{lstlisting}
+int main(); // csak deklaráció	
+
+int main() // deklaráció és definíció
+{
+	std::cout << "Hello World!" << std::endl;
+}
+	\end{lstlisting}
+	\subsection{A C++ nyelvi elemei}
+	Minden C++ kód tokenekből áll. A token a legkisebb nyelvi egység, ami még értelmes a fordító számára. %https://msdn.microsoft.com/en-us/library/3yx2xe3h.aspx
+	
+	Tokeneknek az alábbiakat tekintjük:
+	\begin{compactitem}
+		\item Kulcsszavak (\textit{keywords}), pl. \texttt{int}, \texttt{return}. Ezek a szavak a C++ nyelvhez tartoznak, így mi újakat létrehozni nem tudunk.
+		\item Azonosítók (\textit{identifiers}), pl. \texttt{alma}. Lényegében ezek azok a nevek, melyket mi hozunk létre: függvénynév, osztálynév, változónév, stb. Ez csak betűkből és számokból állhat, nem kezdődhet számmal és nem lehet kulcsszó. Fontos megjegyezni, hogy a C++ nyelv különbséget tesz a kis- és nagybetűk között (\textit{case sensitive}).
+ 		\item Literálok:
+		\begin{compactitem}
+			\item Egész számliterálok (pl. \texttt{0xa23}, \texttt{123})
+			\item Karakterliterálok (pl. \texttt{'a'}, \texttt{'\textbackslash n'})
+			\item Lebegőpontos számliterálok (pl. \texttt{0.12}, \texttt{3e10})
+			\item Konstans szövegliterálok (pl. \texttt{"Hello"})
+		\end{compactitem}
+		A literálokkal később egy teljes fejezet fog foglalkozni.
+		\item Operátorok, pl. \texttt{\<}, \texttt{::}, \texttt{+}, \texttt{-}
+		\item Szeparátorok (\textit{punctuators}), pl. \texttt{;}, \texttt{\{}, \texttt{\}}
+	\end{compactitem}
+	\begin{figure}[!h]
+		\centering
+		\input{tokens.tikz}
+		\caption{A Hello World programban található tokenek.}\label{fig_tokens}
+	\end{figure}
+	\subsection{Fordítás konzolból}
+	Windowson nyomjuk le a windows gombot és az R-t egyszerre. Ennek hatására felugrik egy ablak, melyből lehet futtatni programokat. Írjuk be hogy \texttt{cmd}, és nyomjunk entert. 
+	
+	Hozzunk létre egy tetszőleges mappában (pl. \texttt{C:\textbackslash test\textbackslash}) egy Hello World programot \texttt{main.cpp} néven. Üssük be a parancssorba következőket:
+	\begin{lstlisting}
+>cd C:\test
+>g++ main.cpp
+	\end{lstlisting}
+	Amennyiben azt a hibaüzenetet kaptuk, hogy 
+	
+	{\centering\texttt{"g++" is not recognized as an internal or external command.}\par}
+	
+	az azt jelenti, hogy ha telepítve is van a GCC, a Windows nem találja. Amennyiben van CodeBlocks telepítve a gépen mely sikeresen le tud fordítani egy helyes C++ kódot, akkor közel biztosan rendelkezünk a GCCvel, mely nagy valószínűséggel itt található: \texttt{c:\textbackslash Program Files (x86)\textbackslash CodeBlocks\textbackslash MinGW\textbackslash bin\textbackslash }.
+	 
+	Amennyiben nem rendelkezünk CodeBlocks-al, töltsük le a fordítót, és telepítsük (ennek megoldását az Olvasóra bízzuk). Másoljuk ki a \texttt{bin} mappa abszolút elérési útvonalát.
+	 
+	Ezek után hozzá kell adnunk ezt a mappát a PATH változóhoz. Ezáltal a parancssor újraindítása utána Windows már a megfelelő mappában meg fogja találni a GCC fordítót.
+	\begin{note}
+	 	A PATH változóhoz való eljutás minden Windows verziónál más lehet, különösképpen, ha pl. magyar nyelvű operációs rendszerünk van. Ez okból kifolyólag ennek megoldását ismét az Olvasóra bízzuk.
+	\end{note}
+	Amennyiben a fordítás sikeres volt, létrejött egy \texttt{a.exe} nevű fájl, melyet tudunk futtatni. Ha módosítjuk a kódot, akkor fordítani és futtatni 1 sorban így tudunk:
+	\begin{lstlisting}
+>g++ main.cpp && a.exe
+	\end{lstlisting}
+	Linuxon általában előre telepítve van a GCC. Ennek használata szintén hasonló, azonban a létrejött fájl kiterjesztése \texttt{.out} lesz.
+	\begin{lstlisting}
+~$ g++ main.cpp && ./a.out
+	\end{lstlisting}
+	A jegyzetben később számos extra kapcsolót megismerünk a fordításhoz.
+
+	\section{Különböző viselkedések kategorizálása}
+	Egy reménytelen megközelítés lenne a szabványban minden szintaktikusan (nyelvtanilag) helyes kódhoz pontos szemantikát (működést) társítani. Ennek  elméleti és gyakorlati oka is van. Ezért a C++ szabvány néhány esetben nem vagy csak részben definiálja egy adott program működését. A következőkben erre fogunk példákat látni.
+
+	\subsection{Nem definiált viselkedések}
+	\begin{lstlisting}
+int main()
+{
+	int i = 0;
+	std::cout << i++ << i++ << std::endl;
+}
+	\end{lstlisting}
+	Lehetséges kimenet: \texttt{01} (GCC 6.1 fordítóval 64 bites x86 Linux platformon)
+	
+	Lehetséges kimenet: \texttt{10} (Clang 3.9 fordítóval 64 bites x86 Linux platformon)
+	\medskip
+	
+	Fordítás és futtatás után különböző fordítókkal különböző eredményeket kaphatunk. Az, hogy mikor értékelődik ki a két \texttt{i++} a kifejezésen belül, \textbf{nem specifikált.} Amikor a szabvány nem terjed ki arra, hogy pontosan milyen viselkedésű kódot generáljon a fordító, akkor a fordító bármit választhat. 
+	\medskip
+	
+	Gyakran eldönthetetlen előre, hogy mi a leghatékonyabb megoldás, ez az egyik oka, hogy nem definiál mindent a szabvány.
+	Ez többek között lehetőséget ad a fordítónak arra, hogy \textbf{optimalizáljon.} 
+	\medskip
+	
+	A C++ban van úgy nevezett szekvenciapontok. A szabvány annyit mond ki, hogy a szekvenciapont előtti kód hamarabb kerüljön végrehajtásra mint az utána levő. Mivel itt az \textit{i} értékadása után és csak az \texttt{std::endl} után van szekvenciapont, így az, hogy milyen sorrendben történjen a kettő közötti kifejezés részkifejezéseinek a kiértékelése, a fordítóra van bízva.
+	\medskip
+	
+	A C++ban nem meghatározott, hogy két szekvenciapont között mi a kifejezések és részkifejezések kiértékelésének a sorrendje. Az adatfüggőségek azonban definiálnak egy sorrendet.
+
+	\begin{lstlisting}
+int main()
+{
+	std::cout << f();
+}
+	\end{lstlisting}
+
+	Bár a fenti kódban csak az \texttt{f} meghívása után található szekvenciapont, a függvény eredményének a kiírása előtt ki kell számolni az eredményt, különben nem tudnánk, hogy mit írjunk ki. Tehát a fenti kódban garantált, hogy a \texttt{f} az eredmény kiírása előtt fog lefutni.
+
+	\medskip
+	Az, hogy két részkifejezés szekvenciaponttal történő elválasztás nélkül ugyanazt a memóriaterületet módosítja, \textbf{nem definiált} viselkedést eredményez. Nem definiált viselkedés esetén a fordító vagy a futó program bármit csinálhat. A szabvány semmiféle megkötést nem tesz. Az is elképzelhető, hogy a program pont úgy viselkedik, amire számítunk, azonban a későbbiekben ez változhat. Az ilyen viselkedés tehát egy időzített bombaként viselkedhet, amiről nem tudjuk előre, hogy mikor fog problémát okozni.
+	\begin{note}
+		Az a program, amely nem definiált viselkedéseket tartalmaz, hibás.
+	\end{note}
+	\subsection{Nem specifikált viselkedések}
+	Amennyiben a szabvány definiál néhány lehetséges opciót, de a fordítóra bízza, hogy az melyiket választja, akkor \textbf{nem specifikált} viselkedésről beszélünk.
+	
+  A nem specifikált viselkedés csak akkor probléma, ha a program végeredményét (megfigyelhető működését) befolyásolhatja a fordító választása. Például a fenti kódot módosíthatjuk a következő képpen:
+
+	\begin{lstlisting}
+int main()
+{
+	int i = 0;
+	int j = 0;
+	std::cout << ++i << ++j << std::endl; // 11
+}
+	\end{lstlisting}
+	Bár azt továbbra se tudjuk, hogy \texttt{++i} vagy \texttt{++j} értékelődik ki hamarabb, (\textit{nem specifikált}), azt biztosan tudjuk, hogy 11-et fog kiírni (a program végeredménye \textit{jól definiált}).
+
+	\subsection{Implementáció által definiált viselkedés}
+	A szabvány nem köti meg, hogy egy \texttt{int} egy adott platformon mennyi byte-ból álljon. Ez állandó, egy adott platformon egy adott fordító mindig ugyanakkorát hoz létre, de platform/fordítóváltás esetén ez változhat. Ennek az az oka, hogy különböző platformokon különböző választás eredményez hatékony programokat. Ennek köszönhetően hatékony kódot tud generálni a fordító, viszont a fejlesztő dolga, hogy megbizonyosodjon róla, hogy az adott platformon a primitív típúsok méretei megfelelnek a program által elvárt követelményeknek.
+	
+	\section{A fordító működése}
+	A fordítás 3 fő lépésből áll:
+	\begin{compactenum}
+		\item Preprocesszálás
+		\item Fordítás (A tárgykód létrehozása)
+		\item Linkelés (Szerkesztés)
+	\end{compactenum}
+	
+	\begin{figure}[!h]
+		\centering
+		\input{steps_of_compilation.tikz}
+		
+		\smallskip
+		\caption{Szürkében az adott fordítási lépés neve, alatta az így létrehozott fájl kiterjesztése (leggyakrabban).}\label{fig_steps_of_compilation}
+	\end{figure}
+	A fordítás a preprocesszor parancsok végrehajtásával kezdődik (például a \textbf{header fájl}ok beillesztése a \textbf{cpp fájl}okba), az így kapott fájlot hívjuk \textbf{fordítási egység}nek (\textit{translation unit}). A fordítási egységek külön-külön fordulnak \textbf{tárgykód}dá (\textit{object file}). Ahhoz hogy a tárgykódokból \textbf{futtatható állomány}t (\textit{executable file}) lehessen készíteni, össze kell linkelni őket. A saját forráskódunkból létrejövő tárgykódok mellett a linker a felhasznált könyvtárak tárgykódjait is bele fogja szerkeszteni a végleges futtatható állományba. (ld.: \ref{fig_steps_of_compilation}. ábra)
+	\medskip
+	
+	A következő pár szekcióban megismerjük a fenti 3 lépést alaposabban.
+	
+	\subsection{Preprocesszálás}
+	A preprocesszor (vagy előfeldolgozó) használata a legtöbb esetben kerülendő. Ez alól kivétel a header állományok include-olása. A preprocesszor primitív szabályok alapján dolgozik és \textbf{nyelvfüggetlen.} Mivel semmit nem tud a C++-ról, ezért sokszor a fejlesztő számára meglepő viselkedést okozhat a használata. Emiatt nem egyszerű diagnosztizálni a preprocesszor használatából származó hibákat. További probléma, hogy az automatikus refaktoráló eszközök használatát is megnehezíti a preprocesszor túlhasználata.
+	
+	A következőkben néhány preprocesszor direktívával fogunk megismerkedni. Minden direktíva \texttt{\#} jellel kezdődik. Ezeket a sorokat a fordító a figyelmen kívül hagyja.
+  \bigskip
+	
+	\fbox{\textbf{alma.h}}
+	\begin{lstlisting}
+#define ALMA 5
+
+ALMA ALMA ALMA
+	\end{lstlisting}
+	A \texttt{\#define ALMA 5}  parancs azt jelenti, hogy minden \texttt{ALMA} szót ki kell cserélni a fájlban \texttt{5}-re.
+	
+	Az előfeldolgozott szöveget a \texttt{cpp alma.h} parancs kiadása segítségével tekinthetjük meg. A cpp jelen esetben azt rövidíti, hogy c preprocessor, semmi köze nincs a C++-hoz.
+	
+	Az így kapott fájlból kiolvasható előfeldolgozás eredménye: \texttt{5 5 5}.
+	\bigskip
+	
+	\fbox{\textbf{alma.h}}
+	\begin{lstlisting}
+#define KORTE
+
+#ifdef KORTE
+	MEGVAN
+#else
+	KORTE
+#endif
+	\end{lstlisting}
+	A fent leírtakon kívül a \texttt{\#define} hatására a preprocesszor az első argumentumot definiáltnak fogja tekinteni. A fenti kódban rákérdezünk, hogy ez a \texttt{KORTE} makró definiálva van-e (az \texttt{\#ifdef} paranccsal), és mivel ezt fent megtettük, \texttt{\#else}-ig minden beillesztésre kerül, kimenetben csak annyi fog szerepelni, hogy \texttt{MEGVAN}.
+	\bigskip
+	
+	\fbox{\textbf{alma.h}}
+	\begin{lstlisting}
+#define KORTE
+#undef KORTE
+
+#ifdef KORTE
+	MEGVAN
+#else
+	KORTE
+#endif
+	\end{lstlisting}
+	Az \texttt{\#undef} paranccsal a paraméterként megadott makrót a preprocesszor nem tekinti továbbá makrónak, így a kimenetben \texttt{KORTE} lesz.
+	
+	Látható, hogy a preprocesszort kódrészletek kivágására is lehet használni. 
+  Felmerülhet a kérdés, ha az eredeti forrásszövegből a preprocesszor kivág illetve beilleszt részeket, akkor a fordító honnan tudja, hogy a hiba jelentésekor melyik sorra jelezze a hibát? Hiszen az preprocesszálás előtti és utáni sorszámok egymáshoz képest eltérnek. Ennek a problémának a megoldására az preprocesszor beszúr a fordító számára plusz sorokat, amik hordozzák azt az információt, hogy a feldolgozás előtt az adott sor melyik fájl hányadik sorában volt megtalálható. 
+	\begin{note}
+		 A fordítás közbeni ideiglenes fájlokat a \texttt{g++ -save-temps hello.cpp} paranccsal lehet lementeni.
+	\end{note}
+	A már bizonyára ismerős \texttt{\#include} egy paraméterént megadott fáj tartalmát illeszti be egy az egyben az adott fájlba, és így jelentősen meg tudják növelni a kód méretét, ami a fordítást lassítja. Ezért körültekintően kell vele bánni. A későbbiekben látni fogjuk, hogy bizonyos include-ok forward deklarációk segítségével kiválthatóak.
+	\bigskip
+	
+	\fbox{\textbf{pp.h}}
+	\begin{lstlisting}
+#include "pp.h"
+	\end{lstlisting}
+		
+	Rekurzív include-nál, mint a fenti példában, az preprocesszor egy bizonyos mélységi limit után leállítja az előfeldolgozást.
+	
+	Sok és hosszú include láncok esetén azonban nehéz megakadályozni, hogy kör kerüljön az include gráfba, így akaratlanul is a rekurzív include-ok aldozatai lehetünk.
+	\bigskip
+	
+	\fbox{\textbf{pp.h}}
+	\begin{lstlisting}
+#ifndef _PP_H_
+#define _PP_H_
+
+	FECSKE
+
+#endif
+	\end{lstlisting}
+	
+	\fbox{\textbf{alma.h}}
+	\begin{lstlisting}
+#include "pp.h"
+#include "pp.h"
+#include "pp.h"
+#include "pp.h"
+#include "pp.h"
+	\end{lstlisting}
+	
+	Egy trükk segítségével megakadályozhatjuk azt, hogy többször beillessze \texttt{FECSKE} szöveget a preprocessor. Először megnézzük, hogy \texttt{\_PP\_H\_} szimbólum definiálva van-e. Ha nincs, definiáljuk. Mikor legközelebb erre kerül a sor (a második \texttt{\#include "pp.h"} sornál), nem illesztjük be a \texttt{FECSKE}-t, mert \texttt{\#ifndef \_PP\_H\_} kivágja azt a szövegrészt.
+	
+	Ez az úgy nevezett \textbf{header guard} vagy \textbf{include guard.}
+	
+	\medskip
+	A preprocesszor az itt bemutatottaknál sokkal többet tud, de általában érdemes korlátozni a használatát a fent említett okok miatt.
+	
+	\subsection{Linkelés}
+	Tekintsük az alábbi fordítási egységeket:
+	
+	\smallskip
+	\fbox{\textbf{fecske.cpp}}
+	\begin{lstlisting}
+void fecske() {}
+	\end{lstlisting}
+	
+	\smallskip
+	\fbox{\textbf{main.cpp}}
+	\begin{lstlisting}
+int main()
+{
+	fecske();
+}
+	\end{lstlisting}
+	Fordítsuk le őket az alábbi parancsok kiadásával:
+	
+	{\centering\texttt{g++ main.cpp}\par}
+	
+	{\centering\texttt{g++ fecske.cpp}\par}
+	
+	Ez nem fog lefordulni, mert vagy csak a main.cpp-ből létrejövő fordítási egységet, vagy a fecske.cpp-ből létrejövő fordítási egységet látja a fordító, egyszerre a kettőt nem. Megoldás az ha \textbf{forward deklarál}unk, \texttt{void fecske();}-t beillesztjük a main függvény fölé, mely jelzi a fordítónak, hogy a \texttt{fecske} az egy függvény, \texttt{void} a visszatérési értékének a típuse (azaz nem ad vissza értéket) és nincs paramétere. 
+	
+	\smallskip
+	\fbox{\textbf{main.cpp}}
+	\begin{lstlisting}
+void fecske();
+
+int main()
+{
+	fecske();
+}
+	\end{lstlisting}
+	Ekkor \texttt{g++ main.cpp} paranccsal történő fordítás során a linkelési fázisánál kapunk hibát, mert nem találja a \texttt{fecske} függvény definícióját. Ezt ahogy korábban láttuk, úgy tudjuk megoldani, ha \texttt{main.cpp}-ből és \texttt{fecske.cpp}-ből is tárgykódot készítünk, majd összelinkeljük őket. \texttt{main.cpp}-ben lesz egy hivatkozás egy olyan \texttt{fecske} függvényre, és \texttt{fecske.cpp} fogja tartalmazni e függvény definícióját. 
+		
+    {\centering\texttt{g++ -c main.cpp}\par}
+
+	{\centering\texttt{g++ -c fecske.cpp}\par}
+
+	A fenti paranccsal lehet tárgykódot előállítani.
+	
+	{\centering\texttt{g++ main.o fecske.o}\par}
+	
+	Ezzel a paranccsal pedig az eredményül kapott tárgykódokat lehet linkelni. Rövidebb, ha egyből a cpp fájlokat adjuk meg a fordítónak, így ezt a folyamatot egy sorral letudhatjuk.
+
+	{\centering\texttt{g++ main.cpp fecske.cpp} \par}
+	
+	Ha a \texttt{fecske.cpp}-ben sok függvény van, akkor nem célszerű egyesével forward deklarálni őket minden egyes fájlban, ahol használni szeretnénk ezeket a függvényeket. Ennél egyszerűbb egy header fájl megírása, amiben deklaráljuk a \texttt{fecske.cpp} függvényeit.
+	\bigskip
+	
+	\fbox{\textbf{fecske.h}}
+	\begin{lstlisting}
+#ifndef _FECSKE_H_
+#define _FECSKE_H_
+	void fecske();
+#endif
+	\end{lstlisting}
+	Ilyenkor elég a \texttt{fecske.h}-t includeolni.
+	
+	Szokás a fecske.h-t a fecske.cpp-be is includeolni, mert ha véletlenül ellent mondana egymásnak a definíció a cpp fájlban és a deklaráció a header fájlban akkor a fordító hibát fog jelezni. (Például ha eltérő visszatérési érték típust adtunk meg a definíciónak a C++ fájlban és a deklarációnak a header fájlban.)
+	
+	Egy adott függvényt (vagy objektumot, osztályt) akárhányszor deklarálhatunk, azonban ha a deklarációk ellentmondanak egymásnak, akkor fordítási hibát kapunk. Definiálni viszont a legtöbb esetben pontosan egyszer szabad. Több definíció vagy a definíció hiánya problémát okozhat. Ezt az elvet szokás \textbf{One Definition Rule}-nak, vagy röviden \textbf{(ODR)}-nek hívni.
+	\bigskip
+	
+	\fbox{\textbf{fecske.h}}
+	\begin{lstlisting}
+#ifndef _FECSKE_H_
+#define _FECSKE_H_
+	void fecske();
+	int macska() {}
+#endif
+	\end{lstlisting}
+		
+	Ha több fordítási egységből álló programot fordítunk, melyek tartalmazzák a \texttt{fecske.h} headert, akkor a preprocesszor több macska függvény definíciót csinál, és linkeléskor a linker azt látja, hogy egy függvény többször van definiálva, és ez linkelési hibát eredményez.
+	\begin{note}
+		A header fájlokba általában nem szabad definíciókat rakni (kivéve, pl. template-ek, inline függvények, melyekről később lesz szó).
+	\end{note}
+	
+	\subsection{Figyelmeztetések}
+
+  A fordító gyanús vagy hibás kódrészlet esetén tud figyelmeztetéseket generálni. A legtöbb fordító alapértelmezetten elég kevés hibalehetőségre figyelmeztet. További figyelmeztetések bekapcsolásával hamarabb, már fordítási időben megtalálhatunk bizonyos hibákat vagy nem definiált viselkedéseket. Ezért ajánlott a \texttt{-Wall}, \texttt{-Wextra} kapcsolókat használni.
+
+	{\centering \texttt{g++ -Wall -Wextra hello.cpp} \par}
+
+	\subsection{Optimalizálás}
+	A fordításnál bekapcsolhatunk optimalizációkat, a GCC-nél pl. így:
+	
+	{\centering \texttt{g++ hello.cpp -O2} \par}
+	
+	Az \texttt{-O2} paraméter a kettes szintű optimalizációk kapcsolja be. Alapértelmezetten nincs optimalizáció (\texttt{-O0}), és egészen \texttt{-O3}-ig lehet fokozni azt.
+	\bigskip
+	
+	\fbox{\textbf{hello.cpp}}
+	\begin{lstlisting}
+int factorial(int n)
+{
+	if (n <= 0) return 1;
+	else return n*factorial(n-1);
+}
+
+int main()
+{
+	std::cout << factorial(5) << std::endl;
+}
+	\end{lstlisting}
+	
+	A \texttt{g++ -save-temps hello.cpp} paranccsal fordítva a temporális fájlokat is meg tudjuk nézni -- hello.s lesz az assembly fájl neve, mely a fordító a kódunk alapján generált. Kiolvasható benne ez a két sor:
+	\begin{lstlisting}[style = customasm]
+movl 	$5, (%esp)
+call	__Z9factoriali
+	\end{lstlisting}
+	\begin{note}
+		Az, hogy a fordító milyen assembly kódot alkot az input fájlból, implementációfüggő, ebben az esetben ezt az eredményt kaptuk.
+	\end{note}
+	Látható, hogy a \texttt{factorial} függvény 5 paraméterrel meg lett hívva (az hogy pontosan itt mi történik, az lényegtelen).
+	
+	\medskip
+	Amennyiben azonban \texttt{g++ -save-temps hello.cpp -O2} paranccsal fordítunk, az optimalizált assembly kódból kiolvasható, hogy a kód (kellően friss gcc-vel) a faktoriális kiszámolása helyett a végeredményt (120at) tartalmazza. 
+	\begin{lstlisting}[style = customasm]
+movl	$120, (%esp)
+	\end{lstlisting}
+	Így, mivel az eredmény már fordítási időben kiszámolásra került, futási időben nem kell ezzel plusz időt tölteni.
+	
+	A fordító sok ehhez hasonló \textbf{optimalizációt} végez. Ennek hatására a szabványos és csak definiált viselkedést tartalmazó kód jelentése nem változhat, viszont sokkal hatékonyabbá válhat.
+	\begin{note}
+		\texttt{-O3} Olyan optimalizálásokat is tartalmazhat, amik agresszívabban kihasználják, ha egy kód nem definiált viselkedéseket tartalmaz, míg az\texttt{-O2} kevésbé aggresszív, sokszor a nem szabványos kódot se rontja el. Mivel nem definiált viselkedésekre rosszul tud reagálni az \texttt{-O3}, így néha kockázatos használni.
+	\end{note}
+
+	\section{Globális változók}
+	\subsection{Féligazságok előzménytárgyakból}
+	Előzménytárgyakból azt tanultuk, hogy a program futása a main függvény végrehajtásával kezdődik. Biztosan igaz ez?
+	\begin{lstlisting}
+std::ostream& os = std::cout << "Hello";
+int main()
+{
+	std::cout << "valami";
+}
+	\end{lstlisting}
+	Kimenet: \texttt{Hellovalami}.
+	\medskip
+	
+	Tehát ez nem volt igaz. A program végrehajtásánál az első lépés az un. \textbf{globális változók} inicializálása. 
+	
+	Ennek az oka az, hogy a globális változók olyan objektumok, melyekre a program bármely pontján hivatkozni lehet, így ha \texttt{os}-t akarnám használni a \texttt{main} függvény első sorában, akkor ezt meg lehessen tenni. Inicializálatlan változó használata pedig nem definiált viselkedés, ezért fontos már a \texttt{main} végrehajtása előtt inicializálni a globálisokat.
+	\begin{lstlisting}
+int f()
+{
+	return 5;
+}
+
+int x = f();
+
+int main()
+{
+	std::cout << "valami";
+}
+	\end{lstlisting}
+	Itt szintén az \texttt{f()} kiértékelése a \texttt{main} függvény meghívása előtt történik, hogy a globális változót létre lehessen hozni.
+	\subsection{Globális változók definíciója és deklarációja}
+	Globális változókat úgy tudunk létrehozni, hogy közvetlen egy névteren belül (erről később) definiáljuk őket.
+	\medskip
+	
+	\fbox{\textbf{main.cpp}}
+	\begin{lstlisting}
+int x;
+
+int main() {}
+	\end{lstlisting}
+	\texttt{x} egy globális változó. Azonban mit tudunk tenni, ha nem csak a \texttt{main.cpp}-ben, hanem egy másik fordítási egységben is szeretnénk rá hivatkozni?
+	\medskip
+	
+	\fbox{\textbf{other.cpp}}
+	\begin{lstlisting}
+int x;
+
+void f() 
+{
+	x = 0;
+}
+	\end{lstlisting}
+  Sajnos ha \texttt{main.cpp}-t és \texttt{other.cpp}-t együtt fordítjuk, fordítási hibát kapunk, ugyanis megsértettük az ODR-t, hiszen \texttt{x} kétszer van definiálva. Ezt úgy tudjuk megoldani, ha \texttt{x}-et forward deklaráljuk az \texttt{extern} kulcsszóval!
+	\medskip
+	
+	\fbox{\textbf{other.cpp}}
+	\begin{lstlisting}
+extern int x;
+
+void f() 
+{
+	x = 0;
+}
+	\end{lstlisting}
+	Egy globális változó deklarációja hasonlít a függvényekéhez, információval látja el a fordítót arról hogy az adott szimbólum egy globális változó, és milyen a típusa. Csupán annyi a fontos, hogy \texttt{x}-et valamikor definiálni is kell (mely jelenleg a \texttt{main.cpp}-bentalálható).
+	\begin{note}
+		A globális változók deklarációit érdemes külön header fájlba kigyűjteni.
+	\end{note}
+	\subsection{Globális változók inicializációja}
+	Amennyiben egy lokális \texttt{int}-et hozunk létre és nem adunk neki kezdőértéket, annak értéke nem definiált lesz (memóriaszemét).
+	\begin{lstlisting}
+int i;
+
+int main() 
+{
+	std::cout << i << std::endl; // 0
+}
+	\end{lstlisting}   
+	Azonban mégis mindig 0-t fog ez a program kiírni. Ennek oka az, hogy a globális változók mindig 0-ra inicializálódnak (legalábbis az \texttt{int}-ek). A globális változókat csak egyszer hozzuk létre a program futásakot, így érdemes jól definiált kezdőértéket adni neki.
+	
+	Azonban a stacken (mellyel hamarosan megismerkedünk) rengetegszer létre kell hozni változókat, nem csak egyszer, így ott nem éri meg minden alkalommal egy jól definiált kezdőértékkel inicializálni. Sokkal nagyobb lenne a hatása a futási időre.
+	
+	Annak, hogy miért épp 0-ra inicializálódnak a globális változók, az az oka, hogy ezt a modern processzorok gyorsan tudják kivitelezni a legtöbb platformon. 
+	\subsection{Problémák a globális változókkal}
+	
+	A linkelés vajon befolyásolhatja a program megfigyelhető viselkedését?
+	\bigskip
+	
+	\fbox{\textbf{main.cpp}}
+	\begin{lstlisting}
+std::ostream& o = std::cout << "Hello";
+int main() {}
+	\end{lstlisting}
+	\bigskip
+	
+	\fbox{\textbf{fecske.cpp}}
+	\begin{lstlisting}
+std::ostream& o2 = std::cout << " World";
+	\end{lstlisting}
+	(Nem fontos itt feltétlen értenünk a lenti inicializációt, más problémát demonstrál a kód.)
+	
+	Itt nem specifikált a két globális változók inicializációs sorrendje, és ha más sorredben linkeljük a fordítási egységekből keletkező tárgykódot, mást ír ki.
+	
+	{\centering \texttt{g++ main.cpp fecske.cpp \quad $\not=$\quad\, g++ fecske.cpp main.cpp} \par}
+	
+	\begin{note}
+		Ez utolsó példa nem számít jó kódnak, mert nem specifikált viselkedést használ ki. A program kimenete nem definiált. Ez is egy jó elrettentő példa, miért nem érdemes globális változókat használni.
+	\end{note}
+	
+	Ezen kívül számos egyéb problémát is felvetnek a globális változók: túlzott használatuk a sok paraméterrel rendelkező függvények elkerülése végett fordulhat elő, azonban gyakran így sokkal átláthatatlanabb kódot kapunk. Mivel bárhol hozzá lehet férni egy globális változóhoz, nagyon nehéz tudni, mikor hol módosul.
+	\begin{note}
+    Párhuzamos programozásnál a globális változók túl az átláthatatlanságon még sokkal több fejtörést okoznak: mi van akkor, ha két párhuzamosan futó függvény ugyanazt a változót akarja módosítani? Ennek megelőzése globális változóknál ezt rendkívül körülményes lehet. A naív megoldás (kölcsönös kizárás) pedig rosszul skálázódó programot eredményez.
+	\end{note}
+\end{document}

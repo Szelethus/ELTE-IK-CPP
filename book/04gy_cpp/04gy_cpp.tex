@@ -1,0 +1,194 @@
+% !TeX root = 04gy_cpp
+\documentclass[../cpp_book/cpp_book.tex]{subfiles}
+\begin{document}
+	\onlyinsubfile{
+		\begin{center}
+			{\LARGE\textbf{C++}}
+			
+			{\Large Gyakorlat jegyzet}
+			
+			4. óra
+		\end{center}
+		A jegyzetet \textsc{Umann} Kristóf készítette \textsc{Horváth} Gábor gyakorlata alapján. (\today)
+	}
+	\section{Literálok}
+	\subsection{Karakterláncok}
+	Mi lesz a \texttt{"Hello"} karakterlánc literál típusa?
+	\smallskip
+	
+	Egy konstans karakterekből álló 6 méretű tömb (\texttt{const char[6]}). Azért 6 elemű, mert a karakterlánc literál végén el van tárolva a végét jelző \texttt{\textbackslash 0} karaktert.
+	
+	\begin{center}
+		\setlength{\extrarowheight}{2pt}
+		\begin{tabular}{|c|c|c|c|c|c|}
+			\hline
+			H&E&L&L&O&$\backslash$0\\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	\vspace{-4mm}
+	\begin{lstlisting}
+int main()
+{
+	char* hello= "Hello";
+	hello[1] = 'o';
+}
+	\end{lstlisting}
+	A fenti kódban megsértettük a konstans korrektséget, hisz egy nem konstansra mutató pointerrel mutatuk egy konstans karakterlánc literál első elemére. Ennek ellenére, a fenti kód lefordul. Ennek az az oka, hogy az eredeti C-ben nem volt const kulcsszó, a kompatibilitás végett ezért C++ban lehet konstans karakterlánc literál elemire nem konstansra mutató pointerrel mutatni.
+	\begin{note}
+		Ezt a fajta kompatibilitás miatt meghagyott viselkedést kerülni kell. Lefordul, de kapunk rá warningot.
+	\end{note}
+	Ha módosítani próbáljuk a karakterlánc literál értékét, az nem definiált viselkedéshez vezet. 
+	
+	Futtatáskor linuxon futási idejű hibát kapunk, méghozzá szegmentálási hibát. Ennek az az oka, hogy a konstansok értékei readonly memóriában vannak tárolva, aminek a módosítását nem engedi az operációs rendszer.
+  \medskip
+	
+	Ez jól rámutat arra, hogy miért is nem jó az, ha a fenti konverziót megengedjük.
+	\subsection{Szám literálok}
+	Függően attól, hogy egy szám literált hogyan írunk C++ban, mást jelenthet:
+	\begin{center}
+		\setlength{\extrarowheight}{2pt}
+		\begin{tabular}{|c|l|}
+			\hline
+			\texttt{5}						&\texttt{int}\\
+			\hline
+			\texttt{5.}						&\texttt{double}\\
+			\hline
+			\texttt{5.f}					&\texttt{float}\\
+			\hline
+			\texttt{5e-4}					&\texttt{double}, értéke 0.0005\\
+			\hline
+			\texttt{5e-4f}					&\texttt{float}\\
+			\hline
+			\multirow{2}{*}{\texttt{0xFF}}	&{16-os számrendszerben}\\
+											& ábrázolt \texttt{int}\\
+			\hline
+			\multirow{2}{*}{\texttt{012}}	&{8-as számrendszerben}\\
+											&ábrázolt \texttt{int}\\
+			\hline
+			\texttt{5l}						&\texttt{long int}\\
+			\hline
+			\texttt{5u}						&\texttt{unsigned int}\\
+			\hline
+			\texttt{5ul}					&\texttt{unsigned long int}\\
+			\hline
+		\end{tabular}
+	\end{center}
+	Létezik C++ban \texttt{signed} kulcsszó, mely a char miatt lett bevezetve. A char is egész számokat tartalmaz, de az implementáció függő, hogy a \texttt{char} singed vagy unsigned értéket tartalmaz-e. 
+	
+	Természetesen leggyakrabban egész számoknál szoktuk használni. Alapértelmezetten minden \texttt{int} egy \texttt{signed int}, amennyiben egy előjel nélküli egész számra van szükségünk, \texttt{unsigned int}-et vagy röviden \texttt{unsigned}-t kell írnunk. Megállapítható, hogy az \texttt{unsigned} típusok ugyanannyi számjegyet tudnak tárolni, ám értékben kétszer akkorát. 
+	
+	Míg a túlcsordulás \texttt{signed} típusoknál nem definiált, addig \texttt{unsigned} típusoknál az, a maximális érték (mely implementációfüggő) utáni inkrementális 0-ra állítja a változót. Értelemszerűen, ez a determinisztikus viselkedés futási idejű költséggel jár.
+	%NOTE https://www.youtube.com/watch?v=yG1OZ69H_-o - CppCon 2016: Chandler Carruth “Garbage In, Garbage Out: Arguing about Undefined Behavior..."
+	
+	\medskip
+	Mint tudjuk, a nem egész számoknál a törtrészt magyarban vesszővel, C++ban ponttal választjuk el. Azonban mégis, az alábbi kód helyesen lefordul:
+	\begin{lstlisting}
+int pi = 3,14;
+	\end{lstlisting}
+	Ennek oka az, hogy a vessző operátor egy szekvenciapont is, így a fordító az egyenlőség bal oldalát amikor kiértékeli, először rendre kiértékeli a 3 számliterált, eldobja, utána kiértékeli a 14-et, és értékül adja \texttt{pi}-nek. Ez azt jelenti, hogy az ilyen jellegű hibát nem olyan könnyű megfogni, mint elsőre gondolnánk.
+	
+	\smallskip
+	A lebegőpontos számok másik veszélye, az összehasonlítás. Jusson eszünkbe, ami Numerikus Módszereken hangzik el: minden lebegőpontos szám tartalmazhat egy kis pontatlanságot.
+	\begin{lstlisting}
+for (double d = 0; d != 1; d += 0.1)
+{
+	std::cout << d << ' ';
+}
+	\end{lstlisting}
+	Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ... 1.0} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
+	\begin{note}
+		Viszonylag kevés esetben éri meg \texttt{float}-ot használni \texttt{double} helyett. Modern CPU-k ugyanolyan hatékonyan dolgoznak mind a kettővel, így érdemesebb a pontosabbat választani. (Ha magát a GPU-t programozzuk, az lehet egy kivétel.)
+	\end{note}
+	\begin{note}
+		Érdemes mindig \texttt{int}et használnunk, ha nincs jó okunk arra, hogy mást használjunk. Az \texttt{int}-el általában a leghatékonyabb a processzor.
+	\end{note}
+	\section{Struktúrák mérete}
+	\subsection{Primitív típusok mérete}
+	A \texttt{sizeof(char)} mindig 1-et ad vissza. A karakter mérete mindig az egység. Minden más típusra a \texttt{sizeof} függvény azt adja vissza, hogy paraméterül megadott objektum vagy típus mérete hányszorosa a \texttt{char}nak. 
+	
+	Attól, hogy \texttt{sizeof(char) == 1}, a \texttt{char} mérete byteokban még implementáció függő.
+	
+	A lebegőpontos számok mindig rendelkeznek előjellel. 
+	
+	\medskip
+	A \texttt{char} méretén túl minden másnak a mérete implementációfüggő, bár a szabvány kimond pár relációt:
+	\begin{center}
+		\texttt{sizeof(X) == sizeof(signed X) == sizeof(unsigned X)}
+		\smallskip
+		
+		\texttt{sizeof(float) $\leq$ sizeof(double) $\leq$ sizeof(long double)}
+		\smallskip
+		
+		\texttt{sizeof(short) $\leq$ sizeof(int) $\leq$ sizeof(long)}
+		\smallskip
+		
+		\texttt{sizeof(char) $\leq$ sizeof(bool)}
+		\smallskip
+	\end{center}
+	\subsection{Nem primitív típusok mérete}
+	Egy áltlaunk megalkotott típus mérete több szabálytól is függhet.
+	\begin{lstlisting}
+#include <iostream>
+
+struct Hallgato
+{
+	double atlag;
+	int kor;
+	int magassag;
+}
+
+int main()
+{
+	std::cout << sizeof(double) << std::endl;
+	std::cout << sizeof(int) << std::endl;
+	std::cout << sizeof(Hallgato) << std::endl;
+}
+	\end{lstlisting}
+	A gyakorlaton használt gépen a \texttt{double} mérete 8, az \texttt{int} mérete 4, \texttt{Hallgato}-é 16. Ezen azt látjuk, hogy a \texttt{Hallgato} tiszta adat.
+	\begin{lstlisting}
+struct Hallgato
+{
+	int kor;
+	double atlag;
+	int magassag;
+}
+	\end{lstlisting} 
+	Miután átrendeztük a mezők sorrendjét, és újra kiírjuk a struktúra méretét, akkor a válasz 24. Ennek az oka az, hogy míg az első esetben így volt eltárolva a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
+	\begin{figure}[H]
+		\centering
+		\input{struct_size_1.tikz}
+	\end{figure}
+	Azaz, \texttt{atlag}, illetve \texttt{kor} és \texttt{magassag} pont efértek 1-1 gépi szóban. Viszont, ha megcseréljük a sorrendet, ez már nem lesz igaz:
+	\begin{figure}[H]
+		\centering
+		\input{struct_size_2.tikz}
+	\end{figure}
+  Itt az \texttt{atlag} két fele két különböző gépi szóba kerülne. Ez a ma használt processzorok számára nem hatékony, hiszen az átlag értékének kiolvasásához vagy módosításához két gépi szót is olvasni vagy módosítani kéne (a legtöbb processzor csak szóhatárról tud hatékonyan olvasni).
+	\begin{figure}[H]
+		\centering
+		\input{struct_size_3.tikz}
+	\end{figure}
+	A fenti elrendezés hatékonyabb, bár 3 gépi szót használ. Ebben az esetben a fordító \textit{padding}et illeszt be a mező után. Ennek hatására hatékonyan olvasható és módosítható minden mező. Cserébe több memóriát foglal a struktúra.
+	\smallskip
+	
+	A szabvány kimondja, hogy egy \texttt{struct} mérete az adottagok méreteinek összegénél nagyobb vagy egyenlő.
+	\smallskip
+	
+	Az, hogy egy gépi szó mekkora, implementációfüggő.
+	\bigskip
+	
+	Egy \texttt{struct} egyes adattagjaira a pont operátor segítségével hivatkozhatunk:
+	\begin{lstlisting}
+int main()
+{
+	//...
+	Hallgato a;
+	std::cout << a.kor << std::endl;
+	Hallgato b = a;
+	b.magassag = 3;
+}
+	\end{lstlisting}      
+	
+\end{document}

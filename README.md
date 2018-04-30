@@ -1,10 +1,7 @@
-﻿# C++ gyakorlati jegyzetek
+﻿# Tananyag a Programozási Nyelvek C++ tárgyhoz
 
-## Pótlandó dolgok
-
-* Kivételkezelés
-* Kiértékelési sorrend
-* istream/ostream iterator
+Ebben a repositoryban az ELTE IK Programozási Nyelvek C++ c. tárgyhoz készült előadás és gyakorlati jegyzetek forráskódjai találhatóak, valamint az `exercise` mappa tartalmaz pár, a megértést segítő gyakorlati feladatot.
+Ez a projekt open source, ha valami hibát találsz, bátran vegyél fel egy issue-t, valamint ha te is írnál valamit a projekthez, minden kontribúciót szívesen veszünk!
 
 ## Linkek
 
