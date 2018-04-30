@@ -19,7 +19,6 @@ A hallgatóság az alábbi linkeken fér hozzá a jegyzetekhez:
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/11gy_cpp/11gy_cpp.pdf
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/12gy_cpp/12gy_cpp.pdf
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/cpp_book/cpp_book.pdf
-
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/exercise_book/exercise_book.pdf
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/01exercise_cpp/01exercise_cpp.pdf
 * http://people.inf.elte.hu/szelethus/LaTeX/cpp/02exercise_cpp/02exercise_cpp.pdf
