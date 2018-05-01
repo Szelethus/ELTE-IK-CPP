@@ -20,21 +20,16 @@
 	\smallskip
 	Egy egyszerű példa:
 	\begin{lstlisting}
-struct S
-{
-	int x;
-	int operator()(int y)
-	{
-		return x + y;
-	}
+struct S {
+  int x;
+  int operator()(int y) { return x + y; }
 };
-int main()
-{
-	S s1, s2;
-	s1.x = 5;
-	s2.x = 8;
-	std::cout << s1(2) << std::endl; //7
-	std::cout << s2(2) << std::endl; //10
+int main() {
+  S s1, s2;
+  s1.x = 5;
+  s2.x = 8;
+  std::cout << s1(2) << std::endl; // 7
+  std::cout << s2(2) << std::endl; // 10
 }
 	\end{lstlisting}
 	Bár \texttt{x} egy objektum, függvényként is funkcionál. A funktorok segítségével nagyon könnyedén tudunk objektumokat rendezni. Tekintsünk is erre egy példát!
@@ -42,23 +37,17 @@ int main()
 	Írjunk egy funktort, mely egész számok számokat tud összehasonlítani érték szerint.
 	\begin{lstlisting}
 template <class Compr>
-bool f(int a, int b, Compr c)
-{
-	return c(a, b);
+bool f(int a, int b, Compr c) {
+  return c(a, b);
 }
 
-struct Less
-{
-	bool operator()(int a, int b) const
-	{
-		return a < b;
-	}
+struct Less {
+  bool operator()(int a, int b) const { return a < b; }
 };
 
-int main()
-{
-	if( f(2,3, Less()) )
-		std::cout << "2 kisebb mint 3! ";
+int main() {
+  if (f(2, 3, Less()))
+    std::cout << "2 kisebb mint 3! ";
 }
 	\end{lstlisting}
 %	int a = 2, b = 2;
@@ -75,11 +64,10 @@ int main()
 	Amennyiben egy \texttt{Less} típusú objektum gömbölyű zárójel operátorát 2 \texttt{int}-el meghívjuk, és a visszatérési érték \texttt{true}, akkor az első szám a kisebb, ellenkező esetben a második. Ez alapján az egyenlőség is levezethető: ha egy $a$ szám nem nagyobb $b$-nél, és $b$ sem nagyobb $a$-nál, akkor egyenlőek. 
 	\[a = b \quad \Leftrightarrow \quad \neg(a<b)\, \wedge\, \neg(b<a)\]
 	\begin{lstlisting}
-int main()
-{
-	int a = 2, b = 2;
-	if( f(a, b, Less()) == false && f(b, a, Less()) == false )
-		std::cout << "2 és 2 egyenlő!";
+int main() {
+  int a = 2, b = 2;
+  if (f(a, b, Less()) == false && f(b, a, Less()) == false)
+    std::cout << "2 és 2 egyenlő!";
 }
 	\end{lstlisting}
 	Kimenet: \texttt{2 és 2 egyenlő!}
@@ -89,28 +77,22 @@ int main()
 	\[ a\ \ \text{és}\ \ b\ \ \text{ekvivalens}\quad \Leftrightarrow\quad \neg \,Compr(a, b)\, \wedge\, \neg \,Compr(b, a). \]
 	Azokat a funktorokat, melyeknek az \texttt{()} operátora csak \textbf{egy} adott típusú objektumot várnak és \texttt{bool} a visszatérési értékük, \textit{unary predicate}-nek hívjuk. Írassunk ki egy tömb páros elemeit!
 	\begin{lstlisting}
-template <class T, class Pred> //pred mint predicate
-void printIf(T *start, int size, Pred pred)
-{
-	for (int i = 0; i<size; i++)
-	{
-		if( pred(start[i]) )
-			std::cout << start[i] << std::endl;
-	}
+template <class T, class Pred> // pred mint predicate
+void printIf(T *start, int size, Pred pred) {
+  for (int i = 0; i < size; i++) {
+    if (pred(start[i]))
+      std::cout << start[i] << std::endl;
+  }
 }
 
-struct IsEven //unary predicate
+struct IsEven // unary predicate
 {
-	bool operator()(const int &a) const
-	{
-		return a % 2 == 0;
-	}
+  bool operator()(const int &a) const { return a % 2 == 0; }
 };
 
-int main()
-{
-	int t[] = {1,2,3,4,5,6};
-	printIf(t, sizeof(t)/sizeof(t[0]), IsEven()); //2 4 6
+int main() {
+  int t[] = {1, 2, 3, 4, 5, 6};
+  printIf(t, sizeof(t) / sizeof(t[0]), IsEven()); // 2 4 6
 }
 	\end{lstlisting}
 	%TODO kéne futtatni, hogy valóban nem hibás.
@@ -165,26 +147,25 @@ int main()
 	Tekintsünk az \texttt{std::vector} pár alkalmazását.
 	\begin{lstlisting}
 #include <vector>
-#inclide <iostream>
+#inclide < iostream >
 
-int main()
-{
-	std::vector<int> v;
-	
-	//elem beszúrása
-	for (int i = 0; i<11; i++)
-		v.push_back(i);
-		
-	//utolsó elem törlése
-	v.pop_back();
-	
-	//végigiterálás a konténeren a már jól ismert módon
-	for (int i = 0; i<v.size; i++)
-		std::cout << v[i] << std::endl; // 0 1 2 3 4 5 6 7 8 9
-		
-	//iterátorok használata
-	for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
-		std::cout << *it << std::endl; // 0 1 2 3 4 5 6 7 8 9
+int main() {
+  std::vector<int> v;
+
+  // elem beszúrása
+  for (int i = 0; i < 11; i++)
+    v.push_back(i);
+
+  // utolsó elem törlése
+  v.pop_back();
+
+  // végigiterálás a konténeren a már jól ismert módon
+  for (int i = 0; i < v.size; i++)
+    std::cout << v[i] << std::endl; // 0 1 2 3 4 5 6 7 8 9
+
+  // iterátorok használata
+  for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
+    std::cout << *it << std::endl; // 0 1 2 3 4 5 6 7 8 9
 }
 	\end{lstlisting}
 	A \texttt{vector} leggyakrabban dinamikusan lefoglalt tömbben tárolja az adatainkat, viszont -- ahogy az korábban is említve volt -- egy tömb mérete nem növelhető. Ezt az \texttt{std::vector} a következőféleképpen oldja meg: ha több elemet szeretnénk beszúrni, mint amennyi az adott \texttt{vector} kapacitása, akkor lefoglal egy nagyobb memóriaterületet (leggyakrabban kétszer akkorát), és minden elemet átmásol erre az új memóriaterületre. 
@@ -200,24 +181,23 @@ int main()
 	\medskip
 	Az \texttt{std::vector} tagfüggvényei, mint a nemsoká következő STL algoritmusok, többnyire iterátorokat várnak paraméterül. A következő példában töröljük ki a 4. elemet, majd szúrjuk is vissza!
 	\begin{lstlisting}
-int main()
-{
-	std::vector<int> v;
-	for (int i = 0; i<10; i++)
-		v.push_back(i);
-		
-	for (int i = 0; i<v.size(); i++)
-		std::cout << v[i] << ' '; // 0 1 2 3 4 5 6 7 8 9
-		
-	std::vector<int>::iterator it = v.begin() + 3;
-	v.erase(it);
-	for (int i = 0; i<v.size(); i++)
-		std::cout << v[i] << ' '; // 0 1 2 4 5 6 7 8 9
-	
-	it = v.begin() + 3;
-	v.insert(it, 3);
-	for (int i = 0; i<v.size(); i++)
-		std::cout << v[i] << ' '; // 0 1 2 3 4 5 6 7 8 9
+int main() {
+  std::vector<int> v;
+  for (int i = 0; i < 10; i++)
+    v.push_back(i);
+
+  for (int i = 0; i < v.size(); i++)
+    std::cout << v[i] << ' '; // 0 1 2 3 4 5 6 7 8 9
+
+  std::vector<int>::iterator it = v.begin() + 3;
+  v.erase(it);
+  for (int i = 0; i < v.size(); i++)
+    std::cout << v[i] << ' '; // 0 1 2 4 5 6 7 8 9
+
+  it = v.begin() + 3;
+  v.insert(it, 3);
+  for (int i = 0; i < v.size(); i++)
+    std::cout << v[i] << ' '; // 0 1 2 3 4 5 6 7 8 9
 }
 	\end{lstlisting}
 	Az iterátorok kezelésének azonban komoly veszélyei is vannak, a legnagyobb gonosz itt az un. iterátor invalidáció (\textit{iterator invalidation}). Amikor a \texttt{vector} által lefoglalt dinamikus tömb mérete túl kicsi az újabb elemek beszúrásához, és egy újabb tömbbe másolja át őket, minden iterátor, pointer és referencia ami a régebbi tömbre hivatkozott invalidálódik, lévén olyan területre hivatkoznak, melyeket már felszabadultak. 
@@ -228,16 +208,15 @@ int main()
 	
 	Az invalidálódott objektumokkal végzett műveletek nem definiált viselkedést eredményeznek.
 	\begin{lstlisting}
-int main()
-{
-	std::vector<int> v;
-	v.push_back(3);
-	std::vector<int>::iterator it = v.begin();
-	
-	for (int i = 0; i<1000; i++)
-		v.push_back(i);
-		
-	*it = 10; // nem definiált viselkedés
+int main() {
+  std::vector<int> v;
+  v.push_back(3);
+  std::vector<int>::iterator it = v.begin();
+
+  for (int i = 0; i < 1000; i++)
+    v.push_back(i);
+
+  *it = 10; // nem definiált viselkedés
 }
 	\end{lstlisting}
 	Az invalidáció elkerülése végett számos tagfüggvény egy iterátorral tér vissza, erre lehet példa az \texttt{insert}, mely az új elemre, vagy az \texttt{erase}, mely az utolsó eltávolított elem rákövetkezőjére hivatkozik.
@@ -245,18 +224,16 @@ int main()
 	\smallskip
 	Töröljünk egy vektorból minden páratlan számot!
 	\begin{lstlisting}
-int main()
-{
-	std::vector<int> v;
-	for (int i = 0; i<10; i++)
-		v.push_back(i);
-	for(std::vector<int>::iterator it = v.begin(); it != v.end(); )
-	{
-		if(*it % 2 == 1)
-			it = v.erase(it); //iterátor invalidáció elkerülése végett
-		else
-			++it;
-	}
+int main() {
+  std::vector<int> v;
+  for (int i = 0; i < 10; i++)
+    v.push_back(i);
+  for (std::vector<int>::iterator it = v.begin(); it != v.end();) {
+    if (*it % 2 == 1)
+      it = v.erase(it); // iterátor invalidáció elkerülése végett
+    else
+      ++it;
+  }
 }
 	\end{lstlisting}
 	\begin{note}
@@ -279,20 +256,15 @@ int main()
 	
 	Ezt a következőféleképpen képzelhetjük el:
 	\begin{lstlisting}
-namespace std
-{
-	template <class T>
-	struct less
-	{
-		bool operator()(const T &lhs, const T &rhs) const
-		{
-			return lhs < rhs;
-		}
-	};
+namespace std {
+template <class T>
+struct less {
+  bool operator()(const T &lhs, const T &rhs) const { return lhs < rhs; }
+};
 
-	template <class T, class Compr = less<T> >
-	class set;
-}
+template <class T, class Compr = less<T>>
+class set;
+} // namespace std
 	\end{lstlisting}
 	\begin{note}
 		cppreference-en megfigyelhető, hogy ennél több template paraméterrel is rendelkezik az \texttt{std::set} -- mivel ezek mind rendelkeznek alapértelmezett értékkel, a továbbiakban az egyszerűség kedvéért figyelmen kívül hagyjuk őket.
@@ -305,41 +277,38 @@ namespace std
 	
 	Lássunk példát pár speciális tagfüggvényre is!
 \begin{lstlisting}
-#include <set>
 #include <iostream>
+#include <set>
 
 template <class T>
-void printSet(const std::set<T> &s)
-{
-	for(typename std::set<T>::const_iterator it = s.begin(); 
-													    it != s.end(); ++it)
-		std::cout << *it << ' ';
+void printSet(const std::set<T> &s) {
+  for (typename std::set<T>::const_iterator it = s.begin(); it != s.end(); ++it)
+    std::cout << *it << ' ';
 }
 
-int main()
-{
-	std::set<int> si; 
-	for(int i = 10; i>0; i--) //forditva!
-		si.insert(i);
-	std::cout << si.size() << std::endl; // 10
-	si.insert(5); //5 már szerepel a halmazban
-	std::cout << si.size() << std::endl; // 10
-	
-	printSet(si); // 1 2 3 4 5 6 7 8 9 10
-	//operator< növekvően rendez, hiába fordított sorrendben illesztettük be az elmeket
-	
-	//adott értékű elem törlése
-	std::set<int>::iterator it = si.find(4);
-	if(it != si.end())
-		si.erase(it);
-	printSet(si); // 1 2 3 5 6 7 8 9 10
-	
-	//töröljük ki az [6, 8) intervallumot!
-	std::set<int>::iterator begin = si.find(6), end = si.find(8);
-	if(begin != si.end())
-		si.erase(begin, end);
-	printSet(si); // 1 2 3 5 8 9
-	
+int main() {
+  std::set<int> si;
+  for (int i = 10; i > 0; i--) // forditva!
+    si.insert(i);
+  std::cout << si.size() << std::endl; // 10
+  si.insert(5);                        // 5 már szerepel a halmazban
+  std::cout << si.size() << std::endl; // 10
+
+  printSet(si); // 1 2 3 4 5 6 7 8 9 10
+  // operator< növekvően rendez, hiába fordított sorrendben illesztettük be az
+  // elmeket
+
+  // adott értékű elem törlése
+  std::set<int>::iterator it = si.find(4);
+  if (it != si.end())
+    si.erase(it);
+  printSet(si); // 1 2 3 5 6 7 8 9 10
+
+  // töröljük ki az [6, 8) intervallumot!
+  std::set<int>::iterator begin = si.find(6), end = si.find(8);
+  if (begin != si.end())
+    si.erase(begin, end);
+  printSet(si); // 1 2 3 5 8 9
 }
 \end{lstlisting}
 	Figyeljük meg, hogy az elemek törlésekor, leellenőriztük, valóban szerepel-e az az adott elem a halmazban. Mivel a \texttt{find} tagfüggvény egy past-the-end iterátorral tér vissza, hogyha az adott elemet nem találja, az azzal való egyenlőség segítéségvel tudjuk ezt megvizsgálni.
@@ -349,52 +318,45 @@ int main()
 	\medskip
 	A következő példában tekintsünk egy \texttt{int}-től különböző típust tároló halmazt. Ne feledjük, mivel e konténer rendezi az elemeit, mindenképpen muszáj a struktúránk mellé még valamit megírnunk. Ez lehet az alapértelmezetten alkalmazott \texttt{operator<} függvény vagy egy új funktor.
 \begin{lstlisting}
-struct Point
-{
-	int x, y;
-	Point(int _x, int _y) : x(_x), y(_y) {}
+struct Point {
+  int x, y;
+  Point(int _x, int _y) : x(_x), y(_y) {}
 };
 
-std::ostream& operator<<(std::ostream& os, const Point &p)
-{
-	os << p.x << ' ' << p.y;
-	return os;
+std::ostream &operator<<(std::ostream &os, const Point &p) {
+  os << p.x << ' ' << p.y;
+  return os;
 }
 
-//operator< y koordináta szerint rendez
-bool operator<(const Point &lhs, const Point &rhs)
-{
-	return lhs.y < rhs.y;
-}
+// operator< y koordináta szerint rendez
+bool operator<(const Point &lhs, const Point &rhs) { return lhs.y < rhs.y; }
 
-//LessByX funktor x koordináta szerint
-struct LessByX
-{
-	bool operator()(const Point &lhs, const Point &rhs) const
-	{
-		return lhs.x < rhs.x;
-	}
+// LessByX funktor x koordináta szerint
+struct LessByX {
+  bool operator()(const Point &lhs, const Point &rhs) const {
+    return lhs.x < rhs.x;
+  }
 };
 
-int main()
-{	
-	std::set<Point> spy;
-	spy.insert(Point(3, 1));
-	spy.insert(Point(1, 3));
-	spy.insert(Point(2, 2));
-	for(std::set<Point>::iterator it = spy.begin(); it != spy.end(); ++it)
-		std::cout << *it << ", "; // 3 1, 2 2, 1 3,
-	
-	std::set<Point, LessByX> spx;
-	spx.insert(Point(3, 1));
-	spx.insert(Point(1, 3));
-	spx.insert(Point(2, 2));
-	for(std::set<Point, LessByX>::iterator it = spx.begin(); 
-												    it != spx.end(); ++it)
-		std::cout << *it << ", "; // 1 3, 2 2, 3 1,
-	
-	spy.insert(Point(1, 1)); spx.insert(Point(1, 1));
-	std::cout << spy.size() << ' ' << spx.size() << std::endl; // 3 3
+int main() {
+  std::set<Point> spy;
+  spy.insert(Point(3, 1));
+  spy.insert(Point(1, 3));
+  spy.insert(Point(2, 2));
+  for (std::set<Point>::iterator it = spy.begin(); it != spy.end(); ++it)
+    std::cout << *it << ", "; // 3 1, 2 2, 1 3,
+
+  std::set<Point, LessByX> spx;
+  spx.insert(Point(3, 1));
+  spx.insert(Point(1, 3));
+  spx.insert(Point(2, 2));
+  for (std::set<Point, LessByX>::iterator it = spx.begin(); it != spx.end();
+       ++it)
+    std::cout << *it << ", "; // 1 3, 2 2, 3 1,
+
+  spy.insert(Point(1, 1));
+  spx.insert(Point(1, 1));
+  std::cout << spy.size() << ' ' << spx.size() << std::endl; // 3 3
 }
 \end{lstlisting}
 	\begin{note}
@@ -416,23 +378,20 @@ int main()
 	\end{center}
 	Egy egyedi rendezés használata veszélyekkel is járhat azonban. Térjünk át \texttt{std::string}-ekre, és rendezzünk azok hossza szerint.
 	\begin{lstlisting}
-struct strlen
-{
-	bool operator()(const std::string &lhs, const std::string &rhs) const
-	{
-		return lhs.length() < rhs.length();
-	}
+struct strlen {
+  bool operator()(const std::string &lhs, const std::string &rhs) const {
+    return lhs.length() < rhs.length();
+  }
 };
 
-int main()
-{
-	std::set<std::string, strlen> s;
-	s.insert("C++");
-	s.insert("Java");
-	s.insert("Haskell");
-	s.insert("GOD");
-	std::cout << s.size() << std::endl; // 3
-	std::cout << s.count("GOD") << ' ' << s.count("ADA"); // 1 1
+int main() {
+  std::set<std::string, strlen> s;
+  s.insert("C++");
+  s.insert("Java");
+  s.insert("Haskell");
+  s.insert("GOD");
+  std::cout << s.size() << std::endl;                   // 3
+  std::cout << s.count("GOD") << ' ' << s.count("ADA"); // 1 1
 }
 \end{lstlisting}
 %miért pocakos a dékán úr? mert has kell
@@ -442,23 +401,20 @@ int main()
 	\end{note}
 	Most figyeljük meg (emlékezzünk vissza dimatra), mi történik hogyha szigorú rendezés helyett egy gyenge rendezést definiálunk! Miért lehet ez problémás?
 \begin{lstlisting}
-struct strlenWrong
-{
-	bool operator()(const std::string &lhs, const std::string &rhs) const
-	{
-		return lhs.length() <= rhs.length(); //ekvivalensek is lehetnek
-	}
+struct strlenWrong {
+  bool operator()(const std::string &lhs, const std::string &rhs) const {
+    return lhs.length() <= rhs.length(); // ekvivalensek is lehetnek
+  }
 };
 
-int main()
-{
-	std::set<std::string, strlenWrong> s;
-	s.insert("C++");
-	s.insert("Java");
-	s.insert("Haskell");
-	s.insert("GOD");
-	std::cout << s.count("GOD") << std::endl; // 0
-	std::cout << s.size() << std::endl; // 4
+int main() {
+  std::set<std::string, strlenWrong> s;
+  s.insert("C++");
+  s.insert("Java");
+  s.insert("Haskell");
+  s.insert("GOD");
+  std::cout << s.count("GOD") << std::endl; // 0
+  std::cout << s.size() << std::endl;       // 4
 }
 \end{lstlisting}
 	Keressünk magyarázatot erre az eredményre, vizsgáljuk meg \texttt{C++} és \texttt{GOD} ekvivalenciáját.
@@ -502,14 +458,14 @@ int main()
 #include <iostream>
 #include <list>
 
-int main()
-{
-	std::list<int> l;
-	for (int i = 0; i < 5; i++)
-		l.push_back(i);
-	std::list<int>::iterator it = l.begin();
-	++it; ++it;
-	std::cout << *it << std::endl; // 2
+int main() {
+  std::list<int> l;
+  for (int i = 0; i < 5; i++)
+    l.push_back(i);
+  std::list<int>::iterator it = l.begin();
+  ++it;
+  ++it;
+  std::cout << *it << std::endl; // 2
 }
 	\end{lstlisting}	
 	Az iterátorok léptetésére kell hogy legyen egy egyszerűbb módszer. Írhatnánk egy ciklust, azonban beszédesebb lenne egy léptető függvény írása.
@@ -522,25 +478,23 @@ int main()
 	
 	Léteznek kifejezetten a listára specifikus műveletek is. Ezek azért nagyon fontosak, mert nem igénylik azt, hogy az adott objektumot lehessen másolni (vagy mozgatni, C++11 szerint). Ez olyankor is fontos lehet, ha például a tárolt objektumok mérete nagyon nagy, és költséges lenne másolni. Példaképp, a \texttt{splice} tagfüggvény egy másik listát (is) vár paraméterül, és azt a listát fűzi be a saját elemei közé.
 \begin{lstlisting}
-std::ostream& operator<<(std::ostream& out, const std::list<int> &l)
-{
-	for (std::list<int>::const_iterator it = l.begin(); it != l.end(); it++)
-	out << *it << ' ';
-	return out;
-}	
+std::ostream &operator<<(std::ostream &out, const std::list<int> &l) {
+  for (std::list<int>::const_iterator it = l.begin(); it != l.end(); it++)
+    out << *it << ' ';
+  return out;
+}
 
-int main()
-{
-	std::list<int> list1, list2{};
-	for(int i = 0; i<5; i++)
-		list1.push_back(i); 
-	for(int i = 0; i<5; i++)
-		list2.push_front(i);
-	std::cout << list1 << std::endl; // 0 1 2 3 4
-	std::cout << list2 << std::endl; // 4 3 2 1 0 
-	
-	list1.splice(list1.end(), list2);
-	std::cout << list1 << std::endl; // 0 1 2 3 4 4 3 2 1 0
+int main() {
+  std::list<int> list1, list2{};
+  for (int i = 0; i < 5; i++)
+    list1.push_back(i);
+  for (int i = 0; i < 5; i++)
+    list2.push_front(i);
+  std::cout << list1 << std::endl; // 0 1 2 3 4
+  std::cout << list2 << std::endl; // 4 3 2 1 0
+
+  list1.splice(list1.end(), list2);
+  std::cout << list1 << std::endl; // 0 1 2 3 4 4 3 2 1 0
 }
 \end{lstlisting}
 	Link: \url{http://en.cppreference.com/w/cpp/container/list}
@@ -556,17 +510,16 @@ int main()
 	\end{figure}
 	Van egy speciális beszúró függvénye is:
 \begin{lstlisting}
-#include <map>
 #include <iostream>
+#include <map>
 
-int main()
-{
-	std::map<std::string, int> m;
-	m["Hello"] = 42;
-	m["xyz"] = 8;
-	m["Hello"] = 9;
-	std::cout << m.size() << std::endl; // 2
-	std::cout << m["Hello"] << std::endl; // 9
+int main() {
+  std::map<std::string, int> m;
+  m["Hello"] = 42;
+  m["xyz"] = 8;
+  m["Hello"] = 9;
+  std::cout << m.size() << std::endl;   // 2
+  std::cout << m["Hello"] << std::endl; // 9
 }
 \end{lstlisting}
 	A \texttt{[]} operátor egy új kulcsot hoz létre, és ahhoz rendel egy új értéket. Az utolsó sornál mivel a \texttt{''Hello''}-t már tartalmazza a map, így annak az értékét felülírja.
@@ -574,21 +527,19 @@ int main()
 	\medskip
 	Sajnos ez az operátor azonban okozhat pár kellemetlen meglepetést is.
 	\begin{lstlisting}
-int main()
-{
-	std::map<std::string, int> m;
-	std::cout << m.size() << std::endl; // 0
-	if(m["c++"] != 0)
-		std::cout << "nem 0" << std::endl;
-	std::cout << m.size() << std::endl; // 1
+int main() {
+  std::map<std::string, int> m;
+  std::cout << m.size() << std::endl; // 0
+  if (m["c++"] != 0)
+    std::cout << "nem 0" << std::endl;
+  std::cout << m.size() << std::endl; // 1
 }
 	\end{lstlisting}
 	A \texttt{[]} operátor úgy működik, hogy ha a \texttt{map} nem tartalmazza a paraméterként kapott kulcsot, akkor létrehozza és beszúrja, ha benne van, visszaadja az értékét. Bár mi nem tettük bele azt hogy \texttt{c++} szándékosan, de pusztán azzal, hogy rákérdeztünk, akaratlanul is megtettük. (Figyeljük meg, hogy akkor tudnánk új elemet hozzátenni, ha azt írnánk pl. hogy \texttt{m["C++"] = 3}; azonban mi nem adtunk meg ehhez a kulcshoz értéket. Ilyenkor a map alapértelmezett értéket rendel a kulcshoz, szám típusoknál 0-t, így be fog szúrni egy \texttt{("c++", 0)} párt.)
 	\begin{lstlisting}
-bool contains(const std::map<std::string, int> &m)
-{
-	//m["c++"]; fordítási hiba: [] operator nem konstans függvény.
-	return m.find("C++") != m.end();
+bool contains(const std::map<std::string, int> &m) {
+  // m["c++"]; fordítási hiba: [] operator nem konstans függvény.
+  return m.find("C++") != m.end();
 }
 	\end{lstlisting}
 	Ez a függvény helyesen vizsgálja, hogy a \texttt{c++} benne van-e. (Ha cppreference-en rákeresünk, a \texttt{map}-nek a \texttt{find} nevű tagfüggvénye egy iterátort ad vissza a talált elemre, illetve visszaadja egy past-the-end iterátort ha nem találja meg.)
@@ -598,17 +549,15 @@ bool contains(const std::map<std::string, int> &m)
 	\texttt{std::map}-ban az iterálás kicsit trükkösebb, ugyanis \texttt{std::map} párokat tárol, méghozzá egy más alapból megírt struktúrát használ, az \texttt{std::pair}-t, ami kb. így néz ki:
 	\begin{lstlisting}
 template <typename T1, typename T2>
-struct pair
-{
-	T1 first;
-	T2 second;
+struct pair {
+  T1 first;
+  T2 second;
 };
 	\end{lstlisting}
 	Így az az adott kulcs ill. érték lekérdezése így fog kinézni:
 	\begin{lstlisting}
-for(std::map<std::string, int>::iterator i = m.begin(); i != m.end(); i++)
-{
-	std::cout << i->first << " " << i->second;
+for (std::map<std::string, int>::iterator i = m.begin(); i != m.end(); i++) {
+  std::cout << i->first << " " << i->second;
 }
 	\end{lstlisting}
 	Amennyiben új elemeket szúrunk be, gyakran megkerülhető a problémás \texttt{[]} használata. Az \texttt{std::map} insert függvénye egy \texttt{std::pair}-t vár paraméterül, melyet könnyen tudunk alkotni \texttt{std::make\_pair} függvény segítségével.

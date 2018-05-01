@@ -28,49 +28,49 @@
 
 class List;
 
-class Iterator 
-{
+class Iterator {
 public:
-	explicit Iterator(List *p) : p(p) {}
-	bool operator==(Iterator other) const { return p == other.p; }
-	bool operator!=(Iterator other) const { return !(*this == other); }
-	Iterator operator++();
-	int& operator*() const;
+  explicit Iterator(List *p) : p(p) {}
+  bool operator==(Iterator other) const { return p == other.p; }
+  bool operator!=(Iterator other) const { return !(*this == other); }
+  Iterator operator++();
+  int &operator*() const;
+
 private:
-	friend class ConstIterator;
-	List *p;
+  friend class ConstIterator;
+  List *p;
 };
 
-class ConstIterator
-{
+class ConstIterator {
 public:
-	ConstIterator(Iterator it) : p(it.p) {}
-	explicit ConstIterator(const List *p) : p(p) {}
-	bool operator==(ConstIterator other) const { return p == other.p; }
-	bool operator!=(ConstIterator other) const { return !(*this == other); }
-	ConstIterator operator++();
-	int operator*() const;
+  ConstIterator(Iterator it) : p(it.p) {}
+  explicit ConstIterator(const List *p) : p(p) {}
+  bool operator==(ConstIterator other) const { return p == other.p; }
+  bool operator!=(ConstIterator other) const { return !(*this == other); }
+  ConstIterator operator++();
+  int operator*() const;
+
 private:
-	const List *p;
+  const List *p;
 };
 
-class List 
-{
+class List {
 public:
-	explicit List(int data_, List *next = 0) : data(data_), next(next) {}
-	~List() { delete next; }
-	List(const List &other);
-	List& operator=(const List &other);
-	void add(int data);
-	Iterator begin() { return Iterator(this); }
-	ConstIterator begin() const { return ConstIterator(this); }
-	Iterator end() { return Iterator(0); }
-	ConstIterator end() const { return ConstIterator(0); }
+  explicit List(int data_, List *next = 0) : data(data_), next(next) {}
+  ~List() { delete next; }
+  List(const List &other);
+  List &operator=(const List &other);
+  void add(int data);
+  Iterator begin() { return Iterator(this); }
+  ConstIterator begin() const { return ConstIterator(this); }
+  Iterator end() { return Iterator(0); }
+  ConstIterator end() const { return ConstIterator(0); }
+
 private:
-	friend Iterator;
-	friend ConstIterator;
-	int data;
-	List *next;
+  friend Iterator;
+  friend ConstIterator;
+  int data;
+  List *next;
 };
 
 #endif
@@ -83,87 +83,65 @@ private:
 #include "list.hpp"
 #include <iostream>
 
-List::List(const List &other) : data(other.data), next(0) 
-{
-	if (other.next != 0) 
-	{
-		next = new List(*other.next);
-	}
+List::List(const List &other) : data(other.data), next(0) {
+  if (other.next != 0) {
+    next = new List(*other.next);
+  }
 }
 
-List& List::operator=(const List &other) 
-{
-	if (this == &other)
-		return *this;
-	delete next;
-	data = other.data;
-	if (other.next) 
-	{
-		next = new List(*other.next);
-	} 
-	else 
-	{
-		next = 0;
-	}
-	return *this;
+List &List::operator=(const List &other) {
+  if (this == &other)
+    return *this;
+  delete next;
+  data = other.data;
+  if (other.next) {
+    next = new List(*other.next);
+  } else {
+    next = 0;
+  }
+  return *this;
 }
 
-void List::add(int data) 
-{
-	if (next == 0) 
-	{
-		next = new List(data);
-	} 
-	else 
-	{
-		next->add(data);
-	}
+void List::add(int data) {
+  if (next == 0) {
+    next = new List(data);
+  } else {
+    next->add(data);
+  }
 }
 
-Iterator Iterator::operator++() 
-{
-	p = p->next;
-	return *this;
+Iterator Iterator::operator++() {
+  p = p->next;
+  return *this;
 }
 
-int& Iterator::operator*() const 
-{
-	return p->data;
+int &Iterator::operator*() const { return p->data; }
+
+ConstIterator ConstIterator::operator++() {
+  p = p->next;
+  return *this;
 }
 
-ConstIterator ConstIterator::operator++() 
-{
-	p = p->next;
-	return *this;
-}
-
-int ConstIterator::operator*() const 
-{
-	return p->data;
-}
+int ConstIterator::operator*() const { return p->data; }
 \end{lstlisting}
 	\fbox{\textbf{main.cpp:}}
 \begin{lstlisting}
-#include <iostream>
 #include "list.hpp"
+#include <iostream>
 
-void print(const List &l)
-{
-	for(ConstIterator it = l.begin(); it != begin(); ++it)
-	{
-		std::cout << *i << ' ';
-	}
-	std::cout << std::endl;
+void print(const List &l) {
+  for (ConstIterator it = l.begin(); it != begin(); ++it) {
+    std::cout << *i << ' ';
+  }
+  std::cout << std::endl;
 }
 
-int main() 
-{
-	List head(5);
-	head.add(8);
-	head.add(10);
-	head.add(8);
+int main() {
+  List head(5);
+  head.add(8);
+  head.add(10);
+  head.add(8);
 }
-
 \end{lstlisting}
 	
 	Ez a szétválasztás sok egyéb előnnyel is jár: a \texttt{List}-hez tartozó információk sokkal kisebb helyen elférnek. Azonban ahogy a fenti megjegyzés is felhívta rá a figyelmet, a list.hpp továbbá is tartalmaz definíciókat! Ennek ellenére azt tapasztaljuk, hogyha több fordítási egységbe illesztjük be a headert, még akkor sem kapunk fordítási idejű hibát. Ennek a magyarázatához tegyünk egy kisebb kitérőt.
@@ -198,13 +176,11 @@ inline void f() {}
 	Cseréljük le a print függvényt:
 	%TODO nem ártana megmagyarázni, ez miért nem tagfüggvény
 	\begin{lstlisting}
-std::ostream& operator<<(std::ostream &os, const List &l)
-{
-	for(ConstIterator it = l.begin(); it != l.end(); ++it)
-	{
-		os << *it;
-	}
-	return os;
+std::ostream &operator<<(std::ostream &os, const List &l) {
+  for (ConstIterator it = l.begin(); it != l.end(); ++it) {
+    os << *it;
+  }
+  return os;
 }
 	\end{lstlisting}
 	Sajnos ismét fordítási hibát kapunk, hisz a fordító nem tudja mi az az \texttt{ostream}, hisz az ismerős \texttt{iostream} könyvtár nincs include-olva. Ilyenkor azonban érdemes inkább az \texttt{iosfwd} headert beilleszteni az \texttt{iostream} helyett, mert ez minden beolvasással és kiíratással kapcsolatos osztály/függvénynek csak a deklarációját tartalmazza, és így csökken a fordítási egység mérete (azonban a cpp fájlban muszáj \texttt{iostream}-et használni, hogy a definíciók meglegyenek).
@@ -217,30 +193,25 @@ std::ostream& operator<<(std::ostream &os, const List &l)
 	
 	Megoldás lehet, hogyha inline class-t hozunk létre, azaz az iterátor teljes deklarációját beillesztjük a \texttt{List}-be, így csak a \texttt{List} lát rá \texttt{Iterator}-ra követlenül, mindenhol máshol úgy kell hivatkozni rá, hogy \texttt{List::Iterator}.
 	\begin{lstlisting}
-class List
-{
+class List {
 public:
-	class Iterator
-	{
-		//...
-	};
-	//...
+  class Iterator {
+    //...
+  };
+  //...
 };
 	\end{lstlisting}
 	
 	Azonban szerencsésebb, ha az iterátorainkat egy névtérbe (\textit{namesspace}) rakjuk.
 \begin{lstlisting}
-namespace detail
-{
-	class Iterator
-	{
-		//...
-	};
-	class ConstIterator
-	{
-		//...
-	};
-}
+namespace detail {
+class Iterator {
+  //...
+};
+class ConstIterator {
+  //...
+};
+} // namespace detail
 \end{lstlisting}
 	Így az \texttt{Iterator} és \texttt{ConstIterator} osztályra a későbbiekben csak úgy hivatkozhatunk, ha megmondjuk, mely névtérből származnak. Ugyanezzel a módszerrel, ha létrehozunk pl. egy \texttt{Vector} nevű osztályt, annak is írhatunk egy \texttt{Iterator} nevű osztályt, amit pl. egy \texttt{VectorDetail} névtérbe tehetünk.
 	\begin{lstlisting}
@@ -262,26 +233,26 @@ detail::ConstIterator cit;
 	\smallskip
 	Hozzunk létre egy osztályt, melynek adatokat kell tárolnia. Tegyük fel, hogy egyenlőre nem fontos számunkra az, hogy milyen konténerben tároljuk az adatokat az osztályon belül, és a példa kedvéért követeljük meg ettől a leendő konténertől hogy rendelkezzen \texttt{push\_back} tagfüggvénnyel. Az \texttt{std::vector} konténerrel ez így nézhetne ki:
 	\begin{lstlisting}
-class StoreIntData
-{
+class StoreIntData {
 private:
-	std::vector<int> data;
+  std::vector<int> data;
 };
 	\end{lstlisting}
 	Írjunk egy tagfüggvényt, mellyel két \texttt{StoreIntData} típus tárolt adatait össze tudjuk fűzni.
 	\begin{lstlisting}
-class StoreIntData
-{
+class StoreIntData {
 public:
-	std::vector<int> merge(StoreIntData &other)
-	{
-		std::vector<int> ret;
-		for(int i = 0; i<data.size(); i++)  ret.push_back(data[i]);
-		for(int i = 0; i<other.size(); i++) ret.push_back(other.data[i]);
-		return ret;
-	}
+  std::vector<int> merge(StoreIntData &other) {
+    std::vector<int> ret;
+    for (int i = 0; i < data.size(); i++)
+      ret.push_back(data[i]);
+    for (int i = 0; i < other.size(); i++)
+      ret.push_back(other.data[i]);
+    return ret;
+  }
+
 private:
-	std::vector<int> data;
+  std::vector<int> data;
 };
 	\end{lstlisting}
 	\begin{note}
@@ -289,20 +260,21 @@ private:
 	\end{note}
 	Tegyük fel, hogy az implementáció egy pontján úgy döntünk, mégse \texttt{std::vector}-ban, hanem \texttt{std::deque}-ban szeretnénk tárolni (erről a konténerről részletesen szó lesz később, egyenlőre legyen elég annyi, hogy az \texttt{std::vector}-hoz hasonló). Ekkor rákényszerülünk arra, hogy minden helyen, ahova \texttt{std::vector}-t írtunk, módosítanunk kelljen, és a kódismétlés áldozatai lettünk. Ehelyett használjunk egy \texttt{typedef}-et!
 	\begin{lstlisting}
-class StoreIntData
-{
+class StoreIntData {
 public:
-	typedef std::deque<int> Container;
-	
-	Container merge(StoreIntData &other)
-	{
-		Container ret;
-		for(int i = 0; i<data.size(); i++)  ret.push_back(data[i]);
-		for(int i = 0; i<other.size(); i++) ret.push_back(other.data[i]);
-		return ret;
-	}
+  typedef std::deque<int> Container;
+
+  Container merge(StoreIntData &other) {
+    Container ret;
+    for (int i = 0; i < data.size(); i++)
+      ret.push_back(data[i]);
+    for (int i = 0; i < other.size(); i++)
+      ret.push_back(other.data[i]);
+    return ret;
+  }
+
 private:
-	Container data;
+  Container data;
 };
 	\end{lstlisting}
 	Így ha módosítanunk kell a konténerünk típusát, elég a typedefet átírni.
@@ -310,12 +282,11 @@ private:
 	
 	Visszatérve a láncolt listánkra, a módosítás után \texttt{List} nem tudja, mi az az \texttt{Iterator}, hisz az egy \texttt{datail} nevű névtérben van, ezért vagy minden \texttt{Iterator}-t lecserélünk \texttt{detail::Iterator}-ra, vagy pedig létrehozunk egy szinonimát.
 	\begin{lstlisting}
-class List
-{
+class List {
 public:
-	typedef detail::Iterator Iterator;
-	typedef detail::ConstIterator ConstIterator;
-	//...
+  typedef detail::Iterator Iterator;
+  typedef detail::ConstIterator ConstIterator;
+  //...
 };
 	\end{lstlisting}
 	A typedef segítségével viszont még egy dolgot nyertünk: mivel ezen a szinonimák publikusak, így az osztályon kívül is tudunk rájuk hivatkozni így:

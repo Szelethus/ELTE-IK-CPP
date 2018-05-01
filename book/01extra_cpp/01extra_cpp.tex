@@ -142,51 +142,48 @@ const int *p = &a;
 	\medskip
 	Mi lesz az alábbi kód kimenete?
 	\begin{lstlisting}
-int t[][2] = {{2,3}, {4,5}, {9, 0}};
+int t[][2] = {{2, 3}, {4, 5}, {9, 0}};
 std::cout << *(0 + *(t + 1));
-std::cout << 2[*(t + 3)];
-std::cout << *(2 + 1[t]);
+std::cout << 2 [*(t + 3)];
+std::cout << *(2 + 1 [t]);
 	\end{lstlisting}
 	Rendre 4, nem definiált (túlindexelünk), és 9.
 	\section{Második $+/-$ megoldás}
 	Paraméter dedukció az, amikor a fordító ki tudja találni a template paraméterét egy függvénynek (nagyon dióhéjban). Példa:
 	\begin{lstlisting}
 template <class T>
-void f(const T& param) {}
+void f(const T &param) {}
 
-int main()
-{
-	f<std::string>("Hello"); //nincs dedukcio
-	f("Hello"); //van dedukcio
+int main() {
+  f<std::string>("Hello"); // nincs dedukcio
+  f("Hello");              // van dedukcio
 }
 	\end{lstlisting}
 	
 	A második feladat egy olyan template osztály létrehozása, amely heapen tárol egy objektumot, és reguláris típus. Mivel ez egy template osztály, nem tudjuk milyen típust kapunk, alapértelmezetten vegyük úgy, hogy a másolás költséges, így másolás helyett vegyünk át konstans referenciákat.
 	\begin{lstlisting}
 template <class T>
-class X
-{
+class X {
 public:
-	X(const T& val) : data(new T(val)) {}
-	~X() {delete data;}
-	X(const X &other) : data(new T(*other.data)) {}
-	X &operator=(const X &other)
-	{
-		if (this == &other)
-			return *this;
-		delete data;
-		data = new T(*other.data);
-		return *this;
-	}
+  X(const T &val) : data(new T(val)) {}
+  ~X() { delete data; }
+  X(const X &other) : data(new T(*other.data)) {}
+  X &operator=(const X &other) {
+    if (this == &other)
+      return *this;
+    delete data;
+    data = new T(*other.data);
+    return *this;
+  }
+
 private:
-	T *data;
+  T *data;
 };
 
-int main()
-{
-	X<int> a;
-	X<int> y(a);
-	y = a;
+int main() {
+  X<int> a;
+  X<int> y(a);
+  y = a;
 }
 	\end{lstlisting}
 	Bővebb magyarázathoz az 5-6. gyakorlat anyagát érdemes megnézni.
@@ -197,17 +194,16 @@ int main()
 	Helyes-e az elábbi kód?
 		
 	\begin{lstlisting}
-struct X
-{
-	virtual a();
+struct X {
+  virtual a();
 };
 
-struct Y : public X {/* ... */};
+struct Y : public X { /* ... */
+};
 
-int main()
-{
-	X *x = new Y;
-	delete x;
+int main() {
+  X *x = new Y;
+  delete x;
 }
 	\end{lstlisting}
 		
@@ -221,12 +217,10 @@ int main()
 	
 	 Írjunk egy funktort mely két string hosszát hasonlítja össze!
 	\begin{lstlisting}
-struct PlusMinusFunctor
-{
-	bool operator()(const std::string &lhs, const std::string &rhs) const
-	{
-		return lhs.size() < rhs.size();
-	}
+struct PlusMinusFunctor {
+  bool operator()(const std::string &lhs, const std::string &rhs) const {
+    return lhs.size() < rhs.size();
+  }
 };
 		\end{lstlisting}
 \end{document}

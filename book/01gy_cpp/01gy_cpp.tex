@@ -70,11 +70,8 @@
 #include <iostream>
 
 using namespace std;
-	
-int main()
-{
-	cout << "Hello World!" << endl;
-}
+
+int main() { cout << "Hello World!" << endl; }
 	\end{lstlisting}
 	A \texttt{main.cpp} fájl meghatároz egy \textbf{fordítási egység}et (\textit{compilation unit}). Fordításkor folyamata során fordítási egységeket fordítunk gépi kódra. Egy fordítási egységben az a kód található, amelyhez a fordító a fordítás során hozzáfér. A C++ fájlon túl ez a fájlban felhaszált headerek tranzitív lezártját is jelenti.
 	
@@ -88,10 +85,7 @@ int main()
 	
 	A standard könyvtárban található implementációk az \texttt{std} névtéren belül találhatóak. Ennek az az oka, hogy a standard könyvtár gazdag eszközkészletet biztosít, amelynek során számos gyakran használt nevet is felhasznál, mint például \texttt{find}, \texttt{max}, stb. Ha nem az \texttt{std} névtérben lennének ezek a nevek, akkor bizonyos kontextusban nem használhatnánk fel ezeket a neveket a saját programunkban. Éppen ezért gyakran kihagyjuk ezt a sort a progamunkból, eztán pedig a standard könyvtárbeli elemekre minősített nevek segítségével hivatkozunk:
 	\begin{lstlisting}
-int main()
-{
-	std::cout << "Hello World!" << std::endl;
-}
+int main() { std::cout << "Hello World!" << std::endl; }
 	\end{lstlisting}
 	\begin{note}
 		A fenti kódban nem írtuk ki az \texttt{\#include <iostream>} sort. Ilyen rövidítésekkel gyakran fogunk élni a továbbiakban is. 
@@ -117,11 +111,11 @@ operator<<(std::cout, "Hello World");
 	\medskip
 	Fentebb a \texttt{main} függvényt definiáltuk. Egy függvényhez több deklaráció is tartozhat, ha azok nem mondanak egymásnak ellent:
 	\begin{lstlisting}
-int main(); // csak deklaráció	
+int main(); // csak deklaráció
 
 int main() // deklaráció és definíció
 {
-	std::cout << "Hello World!" << std::endl;
+  std::cout << "Hello World!" << std::endl;
 }
 	\end{lstlisting}
 	\subsection{A C++ nyelvi elemei}
@@ -182,10 +176,9 @@ int main() // deklaráció és definíció
 
 	\subsection{Nem definiált viselkedések}
 	\begin{lstlisting}
-int main()
-{
-	int i = 0;
-	std::cout << i++ << i++ << std::endl;
+int main() {
+  int i = 0;
+  std::cout << i++ << i++ << std::endl;
 }
 	\end{lstlisting}
 	Lehetséges kimenet: \texttt{01} (GCC 6.1 fordítóval 64 bites x86 Linux platformon)
@@ -206,10 +199,7 @@ int main()
 	A C++ban nem meghatározott, hogy két szekvenciapont között mi a kifejezések és részkifejezések kiértékelésének a sorrendje. Az adatfüggőségek azonban definiálnak egy sorrendet.
 
 	\begin{lstlisting}
-int main()
-{
-	std::cout << f();
-}
+int main() { std::cout << f(); }
 	\end{lstlisting}
 
 	Bár a fenti kódban csak az \texttt{f} meghívása után található szekvenciapont, a függvény eredményének a kiírása előtt ki kell számolni az eredményt, különben nem tudnánk, hogy mit írjunk ki. Tehát a fenti kódban garantált, hogy a \texttt{f} az eredmény kiírása előtt fog lefutni.
@@ -225,11 +215,10 @@ int main()
   A nem specifikált viselkedés csak akkor probléma, ha a program végeredményét (megfigyelhető működését) befolyásolhatja a fordító választása. Például a fenti kódot módosíthatjuk a következő képpen:
 
 	\begin{lstlisting}
-int main()
-{
-	int i = 0;
-	int j = 0;
-	std::cout << ++i << ++j << std::endl; // 11
+int main() {
+  int i = 0;
+  int j = 0;
+  std::cout << ++i << ++j << std::endl; // 11
 }
 	\end{lstlisting}
 	Bár azt továbbra se tudjuk, hogy \texttt{++i} vagy \texttt{++j} értékelődik ki hamarabb, (\textit{nem specifikált}), azt biztosan tudjuk, hogy 11-et fog kiírni (a program végeredménye \textit{jól definiált}).
@@ -358,10 +347,7 @@ void fecske() {}
 	\smallskip
 	\fbox{\textbf{main.cpp}}
 	\begin{lstlisting}
-int main()
-{
-	fecske();
-}
+int main() { fecske(); }
 	\end{lstlisting}
 	Fordítsuk le őket az alábbi parancsok kiadásával:
 	
@@ -376,10 +362,7 @@ int main()
 	\begin{lstlisting}
 void fecske();
 
-int main()
-{
-	fecske();
-}
+int main() { fecske(); }
 	\end{lstlisting}
 	Ekkor \texttt{g++ main.cpp} paranccsal történő fordítás során a linkelési fázisánál kapunk hibát, mert nem találja a \texttt{fecske} függvény definícióját. Ezt ahogy korábban láttuk, úgy tudjuk megoldani, ha \texttt{main.cpp}-ből és \texttt{fecske.cpp}-ből is tárgykódot készítünk, majd összelinkeljük őket. \texttt{main.cpp}-ben lesz egy hivatkozás egy olyan \texttt{fecske} függvényre, és \texttt{fecske.cpp} fogja tartalmazni e függvény definícióját. 
 		
@@ -402,7 +385,7 @@ int main()
 	\begin{lstlisting}
 #ifndef _FECSKE_H_
 #define _FECSKE_H_
-	void fecske();
+void fecske();
 #endif
 	\end{lstlisting}
 	Ilyenkor elég a \texttt{fecske.h}-t includeolni.
@@ -416,8 +399,8 @@ int main()
 	\begin{lstlisting}
 #ifndef _FECSKE_H_
 #define _FECSKE_H_
-	void fecske();
-	int macska() {}
+void fecske();
+int macska() {}
 #endif
 	\end{lstlisting}
 		
@@ -442,16 +425,14 @@ int main()
 	
 	\fbox{\textbf{hello.cpp}}
 	\begin{lstlisting}
-int factorial(int n)
-{
-	if (n <= 0) return 1;
-	else return n*factorial(n-1);
+int factorial(int n) {
+  if (n <= 0)
+    return 1;
+  else
+    return n * factorial(n - 1);
 }
 
-int main()
-{
-	std::cout << factorial(5) << std::endl;
-}
+int main() { std::cout << factorial(5) << std::endl; }
 	\end{lstlisting}
 	
 	A \texttt{g++ -save-temps hello.cpp} paranccsal fordítva a temporális fájlokat is meg tudjuk nézni -- hello.s lesz az assembly fájl neve, mely a fordító a kódunk alapján generált. Kiolvasható benne ez a két sor:
@@ -480,11 +461,8 @@ movl	$120, (%esp)
 	\subsection{Féligazságok előzménytárgyakból}
 	Előzménytárgyakból azt tanultuk, hogy a program futása a main függvény végrehajtásával kezdődik. Biztosan igaz ez?
 	\begin{lstlisting}
-std::ostream& os = std::cout << "Hello";
-int main()
-{
-	std::cout << "valami";
-}
+std::ostream &os = std::cout << "Hello";
+int main() { std::cout << "valami"; }
 	\end{lstlisting}
 	Kimenet: \texttt{Hellovalami}.
 	\medskip
@@ -493,17 +471,11 @@ int main()
 	
 	Ennek az oka az, hogy a globális változók olyan objektumok, melyekre a program bármely pontján hivatkozni lehet, így ha \texttt{os}-t akarnám használni a \texttt{main} függvény első sorában, akkor ezt meg lehessen tenni. Inicializálatlan változó használata pedig nem definiált viselkedés, ezért fontos már a \texttt{main} végrehajtása előtt inicializálni a globálisokat.
 	\begin{lstlisting}
-int f()
-{
-	return 5;
-}
+int f() { return 5; }
 
 int x = f();
 
-int main()
-{
-	std::cout << "valami";
-}
+int main() { std::cout << "valami"; }
 	\end{lstlisting}
 	Itt szintén az \texttt{f()} kiértékelése a \texttt{main} függvény meghívása előtt történik, hogy a globális változót létre lehessen hozni.
 	\subsection{Globális változók definíciója és deklarációja}
@@ -523,10 +495,7 @@ int main() {}
 	\begin{lstlisting}
 int x;
 
-void f() 
-{
-	x = 0;
-}
+void f() { x = 0; }
 	\end{lstlisting}
   Sajnos ha \texttt{main.cpp}-t és \texttt{other.cpp}-t együtt fordítjuk, fordítási hibát kapunk, ugyanis megsértettük az ODR-t, hiszen \texttt{x} kétszer van definiálva. Ezt úgy tudjuk megoldani, ha \texttt{x}-et forward deklaráljuk az \texttt{extern} kulcsszóval!
 	\medskip
@@ -535,10 +504,7 @@ void f()
 	\begin{lstlisting}
 extern int x;
 
-void f() 
-{
-	x = 0;
-}
+void f() { x = 0; }
 	\end{lstlisting}
 	Egy globális változó deklarációja hasonlít a függvényekéhez, információval látja el a fordítót arról hogy az adott szimbólum egy globális változó, és milyen a típusa. Csupán annyi a fontos, hogy \texttt{x}-et valamikor definiálni is kell (mely jelenleg a \texttt{main.cpp}-bentalálható).
 	\begin{note}
@@ -549,9 +515,8 @@ void f()
 	\begin{lstlisting}
 int i;
 
-int main() 
-{
-	std::cout << i << std::endl; // 0
+int main() {
+  std::cout << i << std::endl; // 0
 }
 	\end{lstlisting}   
 	Azonban mégis mindig 0-t fog ez a program kiírni. Ennek oka az, hogy a globális változók mindig 0-ra inicializálódnak (legalábbis az \texttt{int}-ek). A globális változókat csak egyszer hozzuk létre a program futásakot, így érdemes jól definiált kezdőértéket adni neki.
@@ -566,14 +531,14 @@ int main()
 	
 	\fbox{\textbf{main.cpp}}
 	\begin{lstlisting}
-std::ostream& o = std::cout << "Hello";
+std::ostream &o = std::cout << "Hello";
 int main() {}
 	\end{lstlisting}
 	\bigskip
 	
 	\fbox{\textbf{fecske.cpp}}
 	\begin{lstlisting}
-std::ostream& o2 = std::cout << " World";
+std::ostream &o2 = std::cout << " World";
 	\end{lstlisting}
 	(Nem fontos itt feltétlen értenünk a lenti inicializációt, más problémát demonstrál a kód.)
 	

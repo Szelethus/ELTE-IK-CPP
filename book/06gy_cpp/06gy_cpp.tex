@@ -14,30 +14,27 @@
 	\subsection{Értékadó operátor}
   Az előző órán elkészült másoló konstruktor megoldotta a probléma egy részét, de az értékadással hasonló problémák merülnek fel. Hasonlóan a fordító által generált másoló konstruktorhoz, az alapértelmezetten az értékadás operátor (\textit{assignment operator}, vagy röviden \texttt{=}) is meghívja az egyes tagok értékadó operátorait, amik a primitív típusok esetén bitről bitre másolnak.
 \begin{lstlisting}
-struct List
-{
-	// ...
-	
-	// copy constructor
-	List(const List &other) : data(other.data), next(0)
-	{
-		if (other.next != 0)
-			next = new List(*other.next);
-	}
-	
-	// assignment operator
-	List& operator=(const List &other)
-	{
-		delete next;
-		data = other.data;
-		if (other.next) // if(other.next) == if(other.next != 0)
-			next = new List(*other.next);
-		else
-			next = 0;
-		return *this;
-	}
-	
-	//...
+struct List {
+  // ...
+
+  // copy constructor
+  List(const List &other) : data(other.data), next(0) {
+    if (other.next != 0)
+      next = new List(*other.next);
+  }
+
+  // assignment operator
+  List &operator=(const List &other) {
+    delete next;
+    data = other.data;
+    if (other.next) // if(other.next) == if(other.next != 0)
+      next = new List(*other.next);
+    else
+      next = 0;
+    return *this;
+  }
+
+  //...
 };
 \end{lstlisting}
 	Az új értékadás operátor először kitörli az aktuális lista elemeit, majd rekurzív módon lemásolja az \texttt{other} elemeit.
@@ -49,7 +46,7 @@ struct List
 	
 	Figyeljük meg, hogy az értékadás operátorban egy az adott objektumra mutató referenciával tértünk vissza. Ennek oka az, hogy szeretnénk, ha lehetséges lenne az értékadások láncolása:
 	\begin{lstlisting}
-			int a = b = c = d = 0; // a = (b = (c = (d = 0)))
+int a = b = c = d = 0; // a = (b = (c = (d = 0)))
 	\end{lstlisting}
   Itt rendre (az operátorok kiértékelési sorrendjét tekintve) \texttt{d}-re, \texttt{c}-re, \texttt{b}-re, \texttt{a}-ra mutató referenciát ad vissza az értékadás operátor, így a végeredmény az lesz, hogy mindegyik változót 0-ra inicializáltuk.
 	\begin{note}
@@ -58,55 +55,49 @@ struct List
 	
 	Egyszerűsítsük a lista kiírását is!
 	\begin{lstlisting}
-struct List
-{
-	//...
-	
-	void print ()
-	{
-		std::cout << data << ' ';
-		if (next)
-			next->print();
-	}
-	
-	//...
+struct List {
+  //...
+
+  void print() {
+    std::cout << data << ' ';
+    if (next)
+      next->print();
+  }
+
+  //...
 };
 	\end{lstlisting}
 	Ellenőrizzük, hogy az eredeti elemek nem változtak a másolás következtében!
 	\begin{lstlisting}
-int main ()
-{
-	List head(7);
-	head.add(8);
-	head.add(2);
-	{
-		List cHead = head;
-	}
-	head.print();
+int main() {
+  List head(7);
+  head.add(8);
+  head.add(2);
+  { List cHead = head; }
+  head.print();
 }
 	\end{lstlisting}
 	Kimenet: \texttt{7 8 2}
 	
 	Elértük, hogy biztonságos legyen a lista használata? Most már látszólag a másolás és az értékadás sem okozhat memóriakezeléssel kapcsolatos problémát. Van egy eset, amire a kód még nincs felkészítve! Mi történik, ha önmagának adjuk értékül a listát? Az első lépésben törlésre fog kerülni a fejelemet leszámítva minden elem. Eztán a következő lépésekben már felszabadított memóriaterületetről próbáljuk átmásolni a megfelelő adatokat. A \texttt{cHead = cHead} tehát use-after-free hibát fog okozni. Mennyire valós a félelem ettől a hibától? Hiszen nem gyakran adunk értékül egy objektumot önmagának! Tekintsük a következő függvényt:
 	\begin{lstlisting}
-void f(List &l1, List &l2)
-{
-	//...
-	l1 = l2;
-	//...
+void f(List &l1, List &l2) {
+  //...
+  l1 = l2;
+  //...
 }
 	\end{lstlisting}
 	Ha valaki ugyanazt a listát adja meg mindkét paraméternek, akkor máris megvan a baj. Látható tehát, hogy ilyen jellegű hibát nem feltétlen olyan nehéz elkövetni.  Módosítsuk az értékadás operátorunkat oly módon, hogy ne okozzon problémát az önértékadás:
 \begin{lstlisting}
-List& operator=(const List &other)
-{
-	if (this == &other) return *this;
-	delete next;
-	if (other.next)
-		next = new List(*other.next);
-	else
-		next = 0;
-	return *this;
+List &operator=(const List &other) {
+  if (this == &other)
+    return *this;
+  delete next;
+  if (other.next)
+    next = new List(*other.next);
+  else
+    next = 0;
+  return *this;
 }
 \end{lstlisting}
   Emlékezzünk, a \texttt{this} kulcssszó segítségével tudunk rámutatni tagfüggvényen belül az adott objektumra, amin a tagfüggvény meghívásra került. Tulajdonképpen arról van szó, hogy például a \texttt{head.print()} esetében enélkül a kulcsszó nélkül nem tudnánk \texttt{print()}-en belül \texttt{head}-re hivatkozni. Az objektum neve tagfüggvényen belül nem elérhető. A \texttt{this} egy pointerként is felfogható, mely a \texttt{head} objektumra mutat.
@@ -140,12 +131,11 @@ T a = b;
 	\subsection{Adattagok védettsége}
 	Biztonságossá sikerült tenni a lista használatát? A felhasználó most már a megfelelő metódusok, valamint a másolás és értékadás használatával nem tud elkövetni memóriakezeléssel kapcsolatos hibát. Az adattagokhoz azonban továbbra is hozzá fér. Így, a következő módon továbbra is érhetik meglepetések:
 	\begin{lstlisting}
-int main()
-{
-	List head(8);
-	head.add(7);
-	head.add(2);
-	head.next = 0;
+int main() {
+  List head(8);
+  head.add(7);
+  head.add(2);
+  head.next = 0;
 }
 	\end{lstlisting}
 	Itt az első listaelem utáni elemeket lecsatoljuk, és azoknak a memóriája elszivárog. A probléma forrása az, hogy a \textbf{felhasználó hozzáfér az adattagokhoz.} A felhasználó így olyan állapotba állíthatja az adott objektumot, amire az objektum tagfüggvényei nincsenek felkészülve. Másik probléma, hogy a felhasználó azáltal, hogy hozzáfér az adattagokhoz, ki tudja használni a lista belső reprezentációját. Emiatt nehezebben fenntarthatóvá válik a kód, mivel a lista reprezentációját érintő változtatások esetén a felhasználói kódokat is módosítani kell. Példaképp, ha a \texttt{List} \texttt{next} adattagjának új nevet adunk, akkor át kéne írni minden olyan kódot ami \texttt{next}re hivatkozik.
@@ -158,14 +148,16 @@ int main()
 class List // lehetne struct is
 {
 public:
-	List(int data, List *next = 0) : //...
-	void add(int data) {//...}
-	List(const List &other) //...
-	List& operator=(const List &other) {//...}
-private:
-	int data;
-	List *next;
-};
+  List(int data, List *next = 0)
+      :                      //...
+        void add(int data) { //...}
+    List(const List &other)  //...
+        List &
+        operator=(const List &other) { //...}
+    private:
+      int data;
+      List *next;
+    };
 \end{lstlisting}
   Az osztály minden tagja, mely a \texttt{public} kulcsszó után jön, elérhető bárki számára. A \texttt{private} kulcsszó után következő adatok csak is kizárólag az adott osztályon belül érhető el (leszámítva a \texttt{friend}eket, de erről később).
 
@@ -178,13 +170,13 @@ private:
 	\medskip
 	Próbáljunk találni egy megoldást erre a problémára. Figyeljük meg (feltéve hogy az adattagok még nem privátok) hogy így például végig tudnánk menni a lista elemein:
 	\begin{lstlisting}
-int main()
-{
-	List head(8);
-	head.add(7); head.add(2);
-	List *ptr = &head; //ptr első elemre mutat
-	ptr = ptr->next; //második elemre
-	ptr = ptr->next; //harmadik elemre
+int main() {
+  List head(8);
+  head.add(7);
+  head.add(2);
+  List *ptr = &head; // ptr első elemre mutat
+  ptr = ptr->next;   // második elemre
+  ptr = ptr->next;   // harmadik elemre
 }
 	\end{lstlisting}
 	
@@ -196,31 +188,30 @@ int main()
 	\end{figure}
 	A problémát tehát orvosolhatnánk azzal, hogyha ezt a pointert adattaggá tennénk, és metódusokon keresztül tudnánk léptetni, illetve az adott elemet lekérdezni. Ezt megoldhatjuk egy un. felsorolóval:
 \begin{lstlisting}
-class List
-{
-	//...
-	
-	void First() //pointert az első elemre állítja
-	{
-		cursor = this;
-	}
-	int& Current() //adott elem lekérdezése
-	{
-		return cursor->data;
-	}
-	void Next() //pointer léptetése a következő elemre
-	{
-		cursor = cursor->next;
-	}	
-	bool End() //a lista végére értük-e
-	{
-		return cursor == NULL;
-	}
-	
+class List {
+  //...
+
+  void First() // pointert az első elemre állítja
+  {
+    cursor = this;
+  }
+  int &Current() // adott elem lekérdezése
+  {
+    return cursor->data;
+  }
+  void Next() // pointer léptetése a következő elemre
+  {
+    cursor = cursor->next;
+  }
+  bool End() // a lista végére értük-e
+  {
+    return cursor == NULL;
+  }
+
 private:
-	int data;
-	List *next;
-	List *cursor;
+  int data;
+  List *next;
+  List *cursor;
 };
 \end{lstlisting}
 	Figyeljük meg, hogy \texttt{Current()} referenciával tér vissza, hogy ne \texttt{data} másolatát, hanem a \texttt{data}-ra hivatkozó referenciát kapjunk meg, így tudjuk a lista elemeinek az értékeit módosítani. Az \texttt{End} metódus azt vizsgálja meg, hogy a \texttt{cursor} nullpointer-e, lévén a lista utolsó eleme mindig nullpointer.
@@ -228,54 +219,29 @@ private:
 		Gyorsan megállapíthatjuk, hogy ha az \texttt{End} metóus igazat ad, akkor \texttt{Current} metódus egy nullpointer dereferálna, ami nem definiált viselkedés. Ez azonban nem probléma, hisz addigra a lista összes elemén végigiteráltunk. Tulajdonképpen azt is mondhatjuk, hogy ekkor \texttt{cursor} a lista ,,utolsó utáni elemére mutat''. 
 	\end{note}
 \begin{lstlisting}
-for(head.Init(); !head.End(); head.Next())
-	doSomething(head.Current());
+for (head.Init(); !head.End(); head.Next())
+  doSomething(head.Current());
 \end{lstlisting}
 	Első látásra a problémát orvosoltuk, tudunk a listákkal tárolt adatokkal dolgozni (pl. összeadni őket, stb). De egy rendezésnél már problémásabb. Ha csak egy kurzorunk van, nem tudunk egyszerre 2 elemhez hozzáférni, hogy összehasonlítsuk őket vagy megcseréljük őket. Egy lehetséges megoldás, ha még egy kurzort hozzáadunk a listához:
 \begin{lstlisting}
-class List
-{
-	//...
-	
-	void First()
-	{
-		cursor = this;
-	}
-	int& Current()
-	{
-		return cursor->data;
-	}
-	void Next()
-	{
-		cursor = cursor->next;
-	}	
-	bool End()
-	{
-		return cursor == 0;
-	}
-	
-	void First2()
-	{
-		cursor2 = this;
-	}
-	int& Current2()
-	{
-		return cursor2->data;
-	}
-	void Next2()
-	{
-		cursor2 = cursor2->next;
-	}	
-	bool End2()
-	{
-		return cursor2 == 0;
-	}
-	
+class List {
+  //...
+
+  void First() { cursor = this; }
+  int &Current() { return cursor->data; }
+  void Next() { cursor = cursor->next; }
+  bool End() { return cursor == 0; }
+
+  void First2() { cursor2 = this; }
+  int &Current2() { return cursor2->data; }
+  void Next2() { cursor2 = cursor2->next; }
+  bool End2() { return cursor2 == 0; }
+
 private:
-	int data;
-	List *next;
-	List *cursor;
-	List *cursor2;
+  int data;
+  List *next;
+  List *cursor;
+  List *cursor2;
 };
 \end{lstlisting}
 	Ezzel már egy rendezést meg tudunk oldani. De talán érezhető, hogy ez nem a legszebb megoldás. Ha három \texttt{cursor} kéne egy algoritmushoz, akkor megint bajban lennénk. Ennél létezik sokkal szofisztikáltabb megoldás: az \textbf{iterátorok}.
@@ -284,46 +250,33 @@ private:
 	
 	Amíg amíg a kurzor adattag volt, könnyedén meg tudtuk adni a konténerünk első és utolsó elemét, azonban ezt most máshogy kell megoldanunk. Először is, állapodjunk meg abban, hogy leendő iterátorunk neve \texttt{Iterator} legyen. Mivel tudjuk, hogy lényegében egy pointert fogunk osztályba csomagolni, már valami ötletünk lehet arról, hogyan fog kinézni:
 	\begin{lstlisting}
-class List {/* ... */};
-
-class Iterator
-{
-public:
-	Iterator(List *_p) : p(_p) {}
-	bool operator==(Iterator &other)
-	{
-		return p == other.p;
-	}
-	bool operator!=(Iterator &other)
-	{
-		return !(*this == other);
-	}
-	//TODO: kéne valami a léptetésre, adott elem lekérdezésére
-private:
-	List *p;
+class List { /* ... */
 };
 
+class Iterator {
+public:
+  Iterator(List *_p) : p(_p) {}
+  bool operator==(Iterator &other) { return p == other.p; }
+  bool operator!=(Iterator &other) { return !(*this == other); }
+  // TODO: kéne valami a léptetésre, adott elem lekérdezésére
+private:
+  List *p;
+};
 	\end{lstlisting}
 	\begin{note}
 		Figyeljük meg, hogy a \texttt{!=} operátor meghívja a \texttt{==} operátort, és negálja. Ha bármikor módosulna az iterátorunk implementációja, elég lesz \texttt{==} operátort módosítani.
 	\end{note}
 	A megoldás az lesz, hogy nem az \texttt{Iterator}, hanem a \texttt{List} osztályban fog szerepelni a lista elejét és hátulját lekérdező metódus:
 	\begin{lstlisting}
-class List
-{
-	//...
+class List {
+  //...
 public:
-	Iterator begin()
-	{
-		return Iterator(this);
-	}
-	Iterator end()
-	{
-		return Iterator(0);
-	}
+  Iterator begin() { return Iterator(this); }
+  Iterator end() { return Iterator(0); }
 };
 
-class Iterator {/* ... */};
+class Iterator { /* ... */
+};
 	\end{lstlisting}
 	 A \texttt{head.begin()} vissza fog adni egy iterátort, ami a \texttt{head} a legelső elemére mutat, \texttt{head.end()} az utolsó utáni elem. Az iterátor osztályból már csak a lépegetés és az adott elem lekérdezése hiányzik, melyeket a \texttt{++} és a \texttt{*} operátorok túlterhelésével fogunk megoldani. Megállapítható, hogy \texttt{Iterator} kielégíti az un. \textbf{forward iterátor} követelményeit:
 
@@ -336,11 +289,13 @@ class Iterator {/* ... */};
 	\end{enumerate}
 	Sajnos azonban fordítási hibát kapunk. Hova írjuk az \texttt{Iterator} osztályt? Hiszen ha a lista elé tesszük, az \texttt{Iterator} nem fogja tudni, hogy mi az a \texttt{List}. Ha utána tesszük, nem fogja tudni a \texttt{List} hogy mi az az \texttt{Iterator}. Erre szükség van a listában az \texttt{end} és a \texttt{begin} metódus megírásához. A körkörös függőség feloldása érdekében \textbf{forward deklarálni} fogunk. 
 	\begin{lstlisting}
-class List; //forward declaration
+class List; // forward declaration
 
-class Iterator {/* ... */};
+class Iterator { /* ... */
+};
 
-class List {/* ... */};
+class List { /* ... */
+};
 	\end{lstlisting}
 	A fordító ezek után nem fog arra panaszkodni, hogy a \texttt{List} egy ismeretlen azonosító (\textit{incomplete type}). A forward deklaráció azt mondja a fordítónak, hogy a \texttt{List} később, akár egy másik fordítási egységben definiálva lesz. Amíg egy pointerrel csak az adott memóriaterületre mutatunk, de rajta keresztül nem akarunk műveletek végrehajtani (azaz, nem akarjuk a pointert dereferálni) addig nem szükséges az adott osztályt definiálni. (Például így lehet az, hogy minden pointer mérete egyenlő.)
 	
@@ -349,75 +304,54 @@ class List {/* ... */};
 \begin{lstlisting}
 class List;
 
-class Iterator
-{
+class Iterator {
 public:
-	Iterator(List *_p) : p(_p) {}
-	bool operator==(Iterator &other)
-	{
-		return p == other.p;
-	}
-	bool operator!=(Iterator &other)
-	{
-		return !(*this == other);
-	}
-	Iterator operator++()
-	{
-		p = p->next;
-		return *this;
-	}
-	int& operator*()
-	{
-		return p->data;
-	}
+  Iterator(List *_p) : p(_p) {}
+  bool operator==(Iterator &other) { return p == other.p; }
+  bool operator!=(Iterator &other) { return !(*this == other); }
+  Iterator operator++() {
+    p = p->next;
+    return *this;
+  }
+  int &operator*() { return p->data; }
+
 private:
-	List *p;
+  List *p;
 };
 
-class List {//...};
+class List { //...};
 \end{lstlisting}
 	Amennyiben az előbb említett operátorokat az \texttt{Iterátor}on belül fejtjük ki, pont az előbb említett hibát követjük el: dereferáltuk \texttt{p}-t, melyhez ismerni kéne az osztály implementációját. A forward deklaráció miatt a fordító tudja már, hogy a \texttt{List} az egy osztály, de nem tudja ellenőrizni, hogy \texttt{next} adattaggal rendelkezik-e. Ezért ezeknek a tagfüggvényeknek szét kell választani a deklarációját és definícióját úgy, hogy a definíció a \texttt{List} kifejtése után szerepeljen:
 \begin{lstlisting}
 class List;
 
-class Iterator
-{
+class Iterator {
 public:
-	Iterator(List *_p) : p(_p) {}
-	bool operator==(Iterator &other)
-	{
-		return p == other.p;
-	}
-	bool operator!=(Iterator &other)
-	{
-		return !(*this == other);
-	}
-	Iterator operator++();
-	int& operator*();
+  Iterator(List *_p) : p(_p) {}
+  bool operator==(Iterator &other) { return p == other.p; }
+  bool operator!=(Iterator &other) { return !(*this == other); }
+  Iterator operator++();
+  int &operator*();
+
 private:
-	List *p;
+  List *p;
 };
 
-class List {//...};
+class List { //...};
 
-//hivatkoznunk kell arra, hogy operator++ Iterator egy metódusa
-Iterator Iterator::operator++()
-{
-	p = p->next;
-	return *this;
-}
-int& Iterator::operator*()
-{
-	return p->data;
-}
+  // hivatkoznunk kell arra, hogy operator++ Iterator egy metódusa
+  Iterator Iterator::operator++() {
+    p = p->next;
+    return *this;
+  }
+  int &Iterator::operator*() { return p->data; }
 \end{lstlisting}
   Felmerül még egy probléma: a \texttt{next} és \texttt{data} private adattagok. Az \texttt{Iterator} nem fér hozzá! Erre megoldás, ha \textbf{barát} (\textit{friend}) osztálya lesz az Iterátor a \texttt{List}nek.
 	\begin{lstlisting}
-class List
-{
-	//...
-	friend class Iterator;
-	//...
+class List {
+  //...
+  friend class Iterator;
+  //...
 }
 	\end{lstlisting}
 	A barátként deklarált osztályok és függvények hozzá tudnak férni az osztály privát adattagjaihoz is.
@@ -427,13 +361,11 @@ class List
  	
  	Amennyiben lehetőségünk van egy függvényt szabad (osztályon kívüli) függvényként megírni, érdemes élni a lehetőséggel. Ezáltal az osztályaink kisebbek és könnyebben érthetőek lesznek.
 	\begin{lstlisting}
-void print(List &l)
-{
-	for(Iterator it = l.begin(); it != l.end(); ++it)
-	{
-		std::cout << *it << ' ';
-	}
-	std::cout << std::endl;
+void print(List &l) {
+  for (Iterator it = l.begin(); it != l.end(); ++it) {
+    std::cout << *it << ' ';
+  }
+  std::cout << std::endl;
 }
 	\end{lstlisting}
 	Ez a függvény, csak úgy mint az \textit{STL} függvények is, balról zárt, jobbról nyitott $[\ )$ intervallummal dolgozik. Azaz az \texttt{end()} már nem eleme a listának, az az utolsó {utáni} elem (\textit{past-the-end iterator}).
@@ -454,78 +386,61 @@ void print(List &l)
 \begin{lstlisting}
 class List;
 
-class Iterator {/* ... */};
+class Iterator { /* ... */
+};
 
-class ConstIterator
-{
+class ConstIterator {
 public:
-	Const Iterator(const List *_p) : p(_p) {}
-	bool operator==(ConstIterator &other) const
-	{
-		return p == other.p;
-	}
-	bool operator!=(ConstIterator &other) const
-	{
-		return !(*this == other);
-	}
-	ConstIterator operator++();
-	int operator*() const; //nem referenciával tér vissza!
+  Const Iterator(const List *_p) : p(_p) {}
+  bool operator==(ConstIterator &other) const { return p == other.p; }
+  bool operator!=(ConstIterator &other) const { return !(*this == other); }
+  ConstIterator operator++();
+  int operator*() const; // nem referenciával tér vissza!
 private:
-	const List *p; //konstanra mutató pointer!
+  const List *p; // konstanra mutató pointer!
 };
 
-class List
-{
-	//...
-	ConstIterator begin() const
-	{
-		return ConstIterator(this);	
-	}
-	ConstIterator end() const
-	{
-		return ConstIterator(0);	
-	}
-	
-	friend class ConstIterator;
-	//...
+class List {
+  //...
+  ConstIterator begin() const { return ConstIterator(this); }
+  ConstIterator end() const { return ConstIterator(0); }
+
+  friend class ConstIterator;
+  //...
 };
 
-Iterator Iterator::operator++() {/* ... */}
-int& Iterator::operator*() {/* ... */}
+Iterator Iterator::operator++() { /* ... */
+}
+int &Iterator::operator*() { /* ... */
+}
 
-ConstIterator ConstIterator::operator++()
-{
-	p = p->next;
-	return *this;
+ConstIterator ConstIterator::operator++() {
+  p = p->next;
+  return *this;
 }
-int ConstIterator::operator*() const
-{
-	return p->data;
-}
+int ConstIterator::operator*() const { return p->data; }
 \end{lstlisting}
 	\begin{note}
 		Ahogy az korábban említve volt, azok a tagfüggvények, melyek konstansságban nem egyeznek meg (pl. az \texttt{Iterator}-ral visszatérő \texttt{begin} és \texttt{end} tagfüggvények nem konstansok, míg a \texttt{ConstIterator}-ral visszatérő \texttt{begin} és \texttt{end} azok), azok különböző függvények számítanak (azaz, a \texttt{begin} és az \texttt{end} két-két overload-dal rendelkeznek).
 	\end{note}
 	Egy \texttt{const List} típusú objektumon csak a konstans metódusok hívhatóak meg, így a meghívott \texttt{begin()} visszatérési értékének típusa \texttt{ConstIterator} lesz. Egy nem konstans \texttt{List} objektumnál viszont \texttt{Iterator} lesz.
 	\begin{lstlisting}
-int main()
-{
-	List head(8); //nem const
-	head.add(7);
-	head.add(2);
-	{
-		ConstIterator cit = head.begin(); //hiba
-	}
+int main() {
+  List head(8); // nem const
+  head.add(7);
+  head.add(2);
+  {
+    ConstIterator cit = head.begin(); // hiba
+  }
 }
 	\end{lstlisting}
 	Két különböző típust nem tudunk egymásnak értékül adni, ha nem létezik köztük konverzió. Mivel nem konstansra mutató mutató konvertálódhat konstansra mutató mutatóvá, ezért természetes lenne hasonló konverziót az iterátorok közt is bevezetni. Ezt egy új konstruktor segítségével tehetjük meg:
 	\begin{lstlisting}
-class ConstIterator
-{
-	//...
+class ConstIterator {
+  //...
 public:
-	ConstIterator(Iterator &other) : p(other.p) {}
-	//...
+  ConstIterator(Iterator &other) : p(other.p) {}
+  //...
 };
 	\end{lstlisting}
 	Emlékezzünk, hogy az \texttt{Iterator}-nak a \texttt{p} adattagja privát. A forduló kódhoz egy friend deklaráció bevezetése szükséges!
@@ -536,67 +451,59 @@ public:
 	Azt, hogy az egy paraméteres konstruktorokat a fordító implicit konverzióra felhasználja a fenti módon, megtilthatjuk itt is, ha \texttt{explicit} kulcsszót írunk a konstruktor elé.
 	
 	\begin{lstlisting}
-class ConstIterator
-{
-	//...
+class ConstIterator {
+  //...
 public:
-	explicit ConstIterator(Iterator &other) : p(other.p) {}
-	//...
+  explicit ConstIterator(Iterator &other) : p(other.p) {}
+  //...
 };
 	\end{lstlisting}
 	Jelen esetben nem akarjuk a konverziót megtiltani, lévén az \texttt{Iterator} és a \texttt{ConstIterator} hasonló feladatot lát el. Nézzük meg az eddigi kódjainket. Okozhat valahol meglepetést egy konverzió? A \texttt{List} egyik konstruktra gyanús lehet. Ha egy függvény listát vár paraméterül, egy darab \texttt{int}-et is elfogad, hisz a \texttt{List} konstruktorát felhasználva tudott volna csinálni abból az \texttt{int}-ből egy egy elemű listát! Ezt elkerülendő, tegyük a \texttt{List} konstruktorát \texttt{explicit}-té.
 	\begin{lstlisting}
-class List
-{
+class List {
 public:
-	explicit List(const int _data, List *_next = 0) : data(_data), next(_next) {}
-	//...
+  explicit List(const int _data, List *_next = 0) : data(_data), next(_next) {}
+  //...
 };
 	\end{lstlisting}
 	\subsection{Konverziós operátor}
 	Más módon is át lehet konvertálni egy \texttt{Iterator} típusú objektumot \texttt{ConstIterator} típusúvá. Azzal, hogy létrehozunk egy un. \textbf{konverziós operátor}t (\textit{conversion operator} vagy \textit{user defined conversion}). 
 	\begin{lstlisting}
 // ...
-class ConstIterator; //forward deklaráció itt szükséges
+class ConstIterator; // forward deklaráció itt szükséges
 
-class Iterator
-{
+class Iterator {
 public:
-	// ...
-	operator ConstIterator() const; //konverziós operátor
-	// ...
+  // ...
+  operator ConstIterator() const; // konverziós operátor
+  // ...
 };
 
-class ConstIterator{//...}
+class ConstIterator { //...}
 
-Iterator::operator ConstIterator() const
-{
-	return ConstIterator(p);
-}
-// ...
+  Iterator::operator ConstIterator() const { return ConstIterator(p); }
+  // ...
 	\end{lstlisting}
 	A fenti konverziós operátor segítségével implicit módon végre lehet hajtani a konverziót. 
 	\begin{lstlisting}
-ConstIterator cit2 = head.begin(); //ok
+ConstIterator cit2 = head.begin(); // ok
 	\end{lstlisting}	
 	Amennyiben azt szeretnénk, hogy a konverzió létezzen, de implicit módon ne jöjjön létre, használhatjuk az \texttt{explicit} kulcsszót. Ez a kulcsszó azonban csak C++11 óta használható ilyen módon:
 	\begin{lstlisting}
-class Iterator
-{
+class Iterator {
 public:
-	// ...
-	explicit operator ConstIterator() const;
-	// ...
+  // ...
+  explicit operator ConstIterator() const;
+  // ...
 };
 	\end{lstlisting}
 	Nézzünk meg pár példát, hogyan lehet a konverziót explicit módon használni:
 	\begin{lstlisting}
-int main()
-{
-	List head(8);
-	ConstIterator cit1 = head.begin(); // hiba
-	ConstIterator cit2 = ConstIterator(head.begin()); // ok
-	ConstIterator cit3 = static_cast<ConstIterator>(head.begin()); // ok
+int main() {
+  List head(8);
+  ConstIterator cit1 = head.begin();                             // hiba
+  ConstIterator cit2 = ConstIterator(head.begin());              // ok
+  ConstIterator cit3 = static_cast<ConstIterator>(head.begin()); // ok
 }
 	\end{lstlisting}
 	\begin{note}

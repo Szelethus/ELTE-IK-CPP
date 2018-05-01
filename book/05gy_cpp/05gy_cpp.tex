@@ -52,17 +52,15 @@
 	\begin{lstlisting}
 #include <iostream>
 
-int f()
-{
-	int x = 0;
-	++x;
-	return x;
+int f() {
+  int x = 0;
+  ++x;
+  return x;
 }
 
-int main()
-{
-  for(int i = 0; i < 5; ++i)
-	  std::cout << f() << std::endl;
+int main() {
+  for (int i = 0; i < 5; ++i)
+    std::cout << f() << std::endl;
 }
 	\end{lstlisting}
 	Kimenet: \texttt{1 1 1 1 1}
@@ -72,14 +70,14 @@ int main()
 	\subsection{Globális/statikus tárhely}
 	Írjuk át a fenti \texttt{f} függvényt, hogy \texttt{x} ne automatikus, hanem \textbf{statikus változó} (\textit{static variable}) legyen!
 	\begin{lstlisting}
-int f()
-{
-	static int x = 0;
-	++x;
-	return x;
+int f() {
+  static int x = 0;
+  ++x;
+  return x;
 }
 
-int main() {/*...*/}
+int main() { /*...*/
+}
 	\end{lstlisting}
 	Kimenet: \texttt{1 2 3 4 5}
 	
@@ -95,10 +93,9 @@ int main() {/*...*/}
 	\subsection{Heap/Free store}
 	A heapen létrehzoott változókat \textbf{dinamikus változók}nak (\textit{dynamic variable}) is szokás szokás hívni. A heap segítségével nagy szabadságra tehetünk szert, azonban ez a szabadság nagy felelősséggel is jár.
 	\begin{lstlisting}
-int main()
-{
-	int *p = new int(2);
-	delete p;
+int main() {
+  int *p = new int(2);
+  delete p;
 }
 	\end{lstlisting}
 	Fentebb láthatjuk hogyan lehet egy intnek lefoglalni helyet a heapen. Fontos, hogy a stack-et nem kerültük meg, mert szükségünk van egy pointerre, mely a heap-en lefoglalt címre mutat (\texttt{p}).
@@ -141,29 +138,27 @@ int main()
 	\subsection{Struct-ok}
 	Egy láncolt lista elemét implementálhatjuk pl. így:
 	\begin{lstlisting}
-struct List
-{
-	int data;
-	List *next;
+struct List {
+  int data;
+  List *next;
 };
 	\end{lstlisting}
 	Alkalmazzuk is ezt úgy, hogy  a listaelemek dinamikusan legyen eltárolva!
 	\begin{lstlisting}
-int main()
-{
-	List *head = new List;
-	head->data = 8; //(*head).data   ==   head->data
-	head->next = new List;
-	
-	head->next->data = 7;
-	head->next->next = new List;
-	
-	head->next->next->data = 2;
-	head->next->next->next = NULL;
-	
-	delete head;
-	delete head->next;
-	delete head->next->next;
+int main() {
+  List *head = new List;
+  head->data = 8; //(*head).data   ==   head->data
+  head->next = new List;
+
+  head->next->data = 7;
+  head->next->next = new List;
+
+  head->next->next->data = 2;
+  head->next->next->next = NULL;
+
+  delete head;
+  delete head->next;
+  delete head->next->next;
 }
 	\end{lstlisting}
 	Ezen a ponton mondhatnánk, hogy készen vagyunk, hisz \texttt{List} használható láncolt listaként (bár valójában igen kényelmetlen).
@@ -190,17 +185,15 @@ delete head;
 	
 	Ez a ,,láncolt lista'' eddig elég szegényes. A fő gond az, hogy nagyon sokat kell írni a használatához. Ez sért egy programozási elvet, a DRY-t : \textit{Dont Repeat Yourself}. Itt sokszor írjuk le közel ugyanazt -- erre kell, hogy legyen egy egyszerűbb megoldás. Írjunk függvényt az új listaelem létrehozásához!
 	\begin{lstlisting}
-List *add(List *head, int data)
-{
-	if (head == 0)
-	{
-		List *ret = new List;
-		ret->data = data;
-		ret->next = 0;
-		return ret;
-	}
-	head->next = add(head->next, data);
-	return head;
+List *add(List *head, int data) {
+  if (head == 0) {
+    List *ret = new List;
+    ret->data = data;
+    ret->next = 0;
+    return ret;
+  }
+  head->next = add(head->next, data);
+  return head;
 }
 	\end{lstlisting}
 	Ez egy olyan rekurzív függvény, mely addig hívja saját magát, míg a paraméterként kapott lista végére nem ér (azaz a \texttt{head} egy nullpointer). Amikor oda elér, létrehoz egy új listaelemet és azt visszaadja. A rekurzió felszálló ágában a lista megfelelő elemeit összekapcsolja. 
@@ -208,12 +201,11 @@ List *add(List *head, int data)
 	
 	Írjunk egy függvényt a lista által birtokolt memória felszabadítására is.
 	\begin{lstlisting}
-void free(List *head)
-{
-	if (head == 0)
-		return;
-	free(head->next);
-	delete head;
+void free(List *head) {
+  if (head == 0)
+    return;
+  free(head->next);
+  delete head;
 }
 	\end{lstlisting}
 	Itt a rekurzió szintén a lista végéig megy. A rekurzió felszálló ágában történik a listaelemek felszabadítása. Ennek az oka, hogy a felszabadítás a megfelelő sorrendben történjen meg.
@@ -225,14 +217,13 @@ void free(List *head)
 	\subsection{Osztályra statikus változók}
 	Teszteljünk!
 	\begin{lstlisting}
-int main()
-{
-	List *head = 0;
-	head = add(head, 8);
-	head = add(head, 7);
-	head = add(head, 2);
-	
-	free(head);
+int main() {
+  List *head = 0;
+  head = add(head, 8);
+  head = add(head, 7);
+  head = add(head, 2);
+
+  free(head);
 }
 	\end{lstlisting}
 	A program lefordult, és a gyakorlaton tökéletesen le is futott. Azonban, ha történt memory leak vagy double free, esetleg use after free, az nem definiált viselkedés. Ezért nem lehetünk benne biztosak, hogy valóban nem történt memóriakezeléssel kapcsolatos hiba. A sanitizerek segítségével megyőződhetünk róla, hogy nem követtünk el ilyen jellegű hibát.
@@ -242,48 +233,43 @@ int main()
 	
 	Hozzunk létre \texttt{List}-ben egy számlálót, ami számon tartja mennyi objektumot hoztunk belőle létre, és semmisítettünk meg! Ezzek a trükkel megnézhetjük, hogy elfelejtettünk-e felszabadítani listaelemet.
 	\begin{lstlisting}
-struct List
-{
-	int data;
-	List *next;
-	
-	static int count; // !
+struct List {
+  int data;
+  List *next;
+
+  static int count; // !
 };
 
 int List::count = 0;
 
-List *add(List *head, int data)
-{
-	if (head == 0)
-	{
-		List *ret = new List;
-	    List::count++; // !
-		ret->data = data;
-		ret->next = 0;
-		return ret;
-	}
-	head->next = add(head->next, data);
-	return head;
+List *add(List *head, int data) {
+  if (head == 0) {
+    List *ret = new List;
+    List::count++; // !
+    ret->data = data;
+    ret->next = 0;
+    return ret;
+  }
+  head->next = add(head->next, data);
+  return head;
 }
 
-void free(List *head)
-{
-	if (head == 0)
-	return;
-	free(head->next);
-	List::count--; // !
-	delete head;
+void free(List *head) {
+  if (head == 0)
+    return;
+  free(head->next);
+  List::count--; // !
+  delete head;
 }
 
-int main()
-{
-	List *head = 0;
-	head = add(head, 8);
-	head = add(head, 7);
-	head = add(head, 2);
-	
-	free(head);
-	std::cout << List::count; // !
+int main() {
+  List *head = 0;
+  head = add(head, 8);
+  head = add(head, 7);
+  head = add(head, 2);
+
+  free(head);
+  std::cout << List::count; // !
 }
 	\end{lstlisting}
 	
@@ -306,18 +292,16 @@ int List::count = 0;
 	\subsection{Konstruktorok}
 	Kényelmesebbé tehetjük az életünket, ha írunk egy tagfüggvényt, mellyel kényelmesebben tudjuk létrehozni a listaelemeket:
 	\begin{lstlisting}
-struct List
-{
-	//tagfüggvények
-	List(int _data, List *_next = NULL)
-	{
-		data = _data;
-		next = _next;
-	}
-	
-	//adattagok
-	int data;
-	List *next;
+struct List {
+  // tagfüggvények
+  List(int _data, List *_next = NULL) {
+    data = _data;
+    next = _next;
+  }
+
+  // adattagok
+  int data;
+  List *next;
 };
 	\end{lstlisting}
 	A fenti tagfüggvényt, vagy metódust \textbf{konstruktor}nak (\textit{constructor}, vagy röviden \textit{ctor}) hívjuk. A konstruktorok hozzák létre az objektumokat; vannak paraméterei, és nincs visszatérési értéke. A fenti konrtruktor még egy alapértelmezett paraméterrel is rendelkezik - ha mi csak egy \texttt{int} paraméterrel hívjuk meg a konstruktort, akkor a \texttt{\_next}-et alapértelmezetten nullpointernek veszi. Mint minden tagfüggvény, ez a konstruktor is hozzáfér az adott struktúra adattagjaihoz.
@@ -328,8 +312,8 @@ struct List
 	\medskip
 	Így a következőféleképpen tudunk egy \texttt{List} típusú objektumot létrehozni:
 	\begin{lstlisting}
-List head(5); //ok, létrehoz egy 5 értékkel rendelkező, 1 elemű listát
-List head2; //nem ok, már nincs paraméter nélküli konstruktor
+List head(5); // ok, létrehoz egy 5 értékkel rendelkező, 1 elemű listát
+List head2;   // nem ok, már nincs paraméter nélküli konstruktor
 	\end{lstlisting}
 	Egy trükkel megoldható, hogy tömörebb szintaxissal tudjuk inicializálni a listaelemeinket.
 	\begin{lstlisting}
@@ -349,13 +333,11 @@ List(int _data, List *_next = 0) : data(_data), next(_next) {}
 	
 	Ennek többek között ilyen következményei lehetnek:
 	\begin{lstlisting}
-struct Printer
-{
-	Printer(int i) : x(i), y(x) 
-	{
-		std::cout << y << " " << x << std::endl; // nem definiált viselkedés
-	}
-	int y, x;
+struct Printer {
+  Printer(int i) : x(i), y(x) {
+    std::cout << y << " " << x << std::endl; // nem definiált viselkedés
+  }
+  int y, x;
 };
 
 int main() { Printer a(5); }
@@ -367,21 +349,21 @@ int main() { Printer a(5); }
 	\begin{lstlisting}
 void printFirstElement(const List &l) { std::cout << l.data << std::endl; }
 
-int main
-{
-	//...
-	{
-		List l(4);
-		printFirstElement(l);
-	} // l megsemmisül
-	//...
+int main {
+  //...
+  {
+    List l(4);
+    printFirstElement(l);
+  } // l megsemmisül
+    //...
 }
 	\end{lstlisting}
 	Ha csak egy kifejezésben van szükségünk erre a listára, létrehozhatunk egy \textbf{név nélküli temporális változót}. Ennek a létrehozásához elhagyjuk a változó nevét, és a típus után egyből a konstruktor paramétereit adjuk meg.
 	\begin{lstlisting}
-List(4); //amint létrejön ez a változó, meg is fog semmisülni.
+List(4); // amint létrejön ez a változó, meg is fog semmisülni.
 //...
-printFirstElement(List(4)); //a lista élettartama a függvényhívástól a függ-vény futásának végéig tart.
+printFirstElement(List(4)); // a lista élettartama a függvényhívástól a
+                            // függ-vény futásának végéig tart.
 	\end{lstlisting}
 	\begin{note}
     A literálok is név nélküli temporális értékek (bár nem változók). Ha pl. az \texttt{f} függvény egy darab \texttt{int}-et vár paraméterül, akkor \texttt{f(5)} hívásakor \texttt{5} egy név nélküli temporális érték.
@@ -392,16 +374,15 @@ printFirstElement(List(4)); //a lista élettartama a függvényhívástól a fü
 	\subsection{Destrukorok}
 	Ahogy gondoskodtunk a listaelemek létrehozásáról, gondoskodhatnánk annak megfelelő megsemmisüléséről is.
 	\begin{lstlisting}
-struct List
-{
-	List(int _data, List *_next = 0) : data(_data), next(_next) {}
-	~List() // dtor
-	{
-		delete next;
-	}
-	
-	int data;
-	List *next;
+struct List {
+  List(int _data, List *_next = 0) : data(_data), next(_next) {}
+  ~List() // dtor
+  {
+    delete next;
+  }
+
+  int data;
+  List *next;
 };
 	\end{lstlisting}
 	Az fenti tagfüggvényt, melynél a hullámvonalat közvetlenül a struktúra neve követi \textbf{destruktor}nak (\textit{destruktor}, röviden \textit{dtor}) nevezzük. A destruktor mindig az objektum élettartamának végén hívódik meg, és gondoskodik a megfelelő erőforrások felszabadításáról. 
@@ -412,11 +393,10 @@ struct List
 	\medskip
 	Teszteljünk!
 	\begin{lstlisting}
-int main()
-{
-	List head(8);
-	add(&head, 7);
-	add(&head, 2);
+int main() {
+  List head(8);
+  add(&head, 7);
+  add(&head, 2);
 }
 	\end{lstlisting}
 	Most úgy alakítottuk át a kódot, hogy amikor létrehozzuk a listát, akkor a fejelemet a stacken hozzuk létre, melynek értéke 8, és a pointer része nullpointer. Később az \texttt{add} függvénnyel létrehozunk a heapen egy olyan listaelemet, mely 7-et tárol, és pointer része nullpointer, és az eredeti lista fejét ráállítjuk erre.
@@ -432,27 +412,22 @@ int main()
 	\medskip
 	Csináljunk az \texttt{add} függvényből tagfüggvényt!
 	\begin{lstlisting}
-struct List
-{	
-	void add(int data) //eltűnt egy paraméter!
-	{
-		if (next == 0)
-		{
-			next = new List(data);
-		}
-		else
-		{
-			next->add(data);
-		}
-	}
-	//...
+struct List {
+  void add(int data) // eltűnt egy paraméter!
+  {
+    if (next == 0) {
+      next = new List(data);
+    } else {
+      next->add(data);
+    }
+  }
+  //...
 };
 
-int main()
-{
-	List head(8);
-	head.add(7);
-	head.add(2);
+int main() {
+  List head(8);
+  head.add(7);
+  head.add(2);
 }
 	\end{lstlisting}
 	A nyelv egyik szépsége, hogy a felhasználónak nem kell tudnia, hogy hogyan reprezentáltuk a listát. A listát az a felhasználó is tudja használni, aki nem ismeri a heap-et, nem hallott még soha láncolt adatszerkezetekről. A későbbiekben a lista prerezentációja kicserélhető akár egy vektor szerű adatszerkezetre anélkül, hogy a felhasználói kódot módosítani kellene.
@@ -462,14 +437,13 @@ int main()
 	
 	A fordító sok kódot generál a structunkba: konstruktoron és destruktoron kívül még \textbf{másoló konstruktor}t (\textit{copy constructor}) is. A másoló konstruktor egy olyan konstrukor, melynek egyetlen paramétere egy azonos típusú objektum. Ez alapértelmezetten minden adattagot lemásol az adott adattag másoló konstruktora segítségével. Primitív típusoknál ez bitről bitre másolást jelent. Mi ennek a következménye?
 	\begin{lstlisting}
-int main()
-{
-	List head(8);
-	head.add(7);
-	head.add(2);
-	{
-		List cHead = head; //másoló konstruktor hívása
-	} //itt lefut cHead destruktora
+int main() {
+  List head(8);
+  head.add(7);
+  head.add(2);
+  {
+    List cHead = head; // másoló konstruktor hívása
+  }                    // itt lefut cHead destruktora
 }
 	\end{lstlisting}
 	Fentebb létrehoztunk egy új listát \texttt{head} mintájára. A másolatnak a destruktora hamarabb lefut. Ha sanitizerrel fordítunk, futáskor hibaüzenetet kapunk: felszabadított memóriaterületet szeretnénk használni. Ennek az az oka, hogy a \texttt{cHead}-ben lévő pointer \textbf{ugyanarra} a listára fog mutatni (lévén a bitről bitre történő másolás történt a pointernél). A \texttt{cHead} megsemmisülése után a \texttt{head} destruktora megpróbál beleolvasni a már felszabadított memóriaterületbe.
@@ -485,26 +459,20 @@ int main()
 	
 	
 \begin{lstlisting}
-struct List
-{
-	List(const List &other) : data(other.data), next(0)
-	{
-		if (other.next != 0)
-		{
-			next = new List(*other.next);
-		}
-	}
-	//...
+struct List {
+  List(const List &other) : data(other.data), next(0) {
+    if (other.next != 0) {
+      next = new List(*other.next);
+    }
+  }
+  //...
 };
 
-int main()
-{
-	List head(8);
-	head.add(7);
-	head.add(2);
-	{
-		List cHead = head;
-	}
+int main() {
+  List head(8);
+  head.add(7);
+  head.add(2);
+  { List cHead = head; }
 }
 \end{lstlisting}
 	Mint a korábbi függvényeink, ez is rekurzív: a \texttt{new List(*other.next)} újra meghívja a copy konstruktort, ha az other.next nem nullpointer.
@@ -519,7 +487,7 @@ int main()
 	
 	Figyelem, ez egy \textbf{copy konstruktor, nem értékadás operátor!} Itt a \texttt{cHead} még nincs létrehozva, amikor head-el \textbf{inicializáljuk}. Ha az egyenlőségjel bal oldalán lévő objektum még nem jött létre, mint itt, akor a copy konstruktor hívás történik. Ellenkező esetben értékadás operátor.
 	\begin{lstlisting}
-List cHead = head; //copy ctor
+List cHead = head; // copy ctor
 
 List cHead;
 cHead = head; //értekadás

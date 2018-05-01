@@ -143,11 +143,10 @@
 	\end{enumerate}
 		Esetleges megoldás:
 		\begin{lstlisting}
-int f (...)
-{
-	//...
-	return -1;
-	//..
+int f(...) {
+  //...
+  return -1;
+  //..
 }
 		\end{lstlisting}
 
@@ -158,7 +157,7 @@ int f (...)
 		\begin{lstlisting}
 int e = g(...);
 if (e)
-	return e;
+  return e;
 		\end{lstlisting}
 		
 		Ha valaki nem kezeli ebben a hibákat, akkor nem fog máködni az egész. Fentebb e-ben tároljuk el g-nek az eredményét, és utána e-től függ hogy az mit ad tovább. Probléma, hogy ha hiba van fent, akkor nagyon alacsony szintre kell visszaolvasni hogy a hiba forrását fel lehessen lelni.
@@ -168,11 +167,10 @@ if (e)
 		C++ kód hibakezelése:
 		
 		\begin{lstlisting}
-f()
-{
-	g();
-	h();
-	l();
+f() {
+  g();
+  h();
+  l();
 }
 		\end{lstlisting}
 		
@@ -181,95 +179,76 @@ f()
 		\textbf{Exception kezelés}
 		
 		\begin{lstlisting}
-void l()
-{
-	if (/* ... */)
-	{
-		throw e;
-	}
+void l() {
+  if (/* ... */) {
+    throw e;
+  }
 }
 		\end{lstlisting}
 		
 		Így jelzünk hibát
 		
 		\begin{lstlisting}
-void a()
-{
-	try
-	{
-		f();
-	}catch(E &e){
-		//...	
-	}
+void a() {
+  try {
+    f();
+  } catch (E &e) {
+    //...
+  }
 }
 		\end{lstlisting}
 		\texttt{a}-ban van csak valami, ami lekezeli. Így \texttt{l}-ben dobja a hibát, átmegy \texttt{f}-en, és ott landol. (Ez a stack unwind, vagy stack visszatekerése)
 		
 		\begin{lstlisting}
-struct S
-{
-	~S()
-	{
-		std::cout << "dtor S" << std::endl;
-	}
+struct S {
+  ~S() { std::cout << "dtor S" << std::endl; }
 };
 
-int main()
-{
-	S s;
-	throw 5;
+int main() {
+  S s;
+  throw 5;
 }
 		\end{lstlisting}
 		Mivel dobtam valamit amit sose kaptam el, ami nem definiált viselkedés.
 		\begin{lstlisting}
-struct S
-{
-	~S()
-	{
-		std::cout << "dtor S" << std::endl;
-	}
+struct S {
+  ~S() { std::cout << "dtor S" << std::endl; }
 };
 
-int main()
-{
-	try
-	{
-		S s;
-		throw 5;
-	}catch(int i){
-		std::cout << "catch int" << std::endl;
-	}
+int main() {
+  try {
+    S s;
+    throw 5;
+  } catch (int i) {
+    std::cout << "catch int" << std::endl;
+  }
 }
 		\end{lstlisting}
 		
 		Lekezelt hibák esetén a destruktorok lefutnak rendesen.
 		\begin{lstlisting}
-int main()
-{
-	try
-	{
-		int *p = new int{5};
-		f();
-		delete p;
-	}catch(int i){
-		std::cout << "catch int" << std::endl;
-	}
+int main() {
+  try {
+    int *p = new int{5};
+    f();
+    delete p;
+  } catch (int i) {
+    std::cout << "catch int" << std::endl;
+  }
 }
 		\end{lstlisting}
 		
 		Ez memory leakhez vezethet, mert ha az \texttt{f()} dob kivételt, akkor a \texttt{delete p;} sor sose fog lefutni. Erre jó nekünk a RAII. 
 		
 		\begin{lstlisting}
-int main()
-{
-	try
-	{
-		std::unique_ptr<int> p(new int{5});
-		f();
-		delete p;
-	}catch(int i){
-		std::cout << "catch int" << std::endl;
-	}
+int main() {
+  try {
+    std::unique_ptr<int> p(new int{5});
+    f();
+    delete p;
+  } catch (int i) {
+    std::cout << "catch int" << std::endl;
+  }
 }
 		\end{lstlisting}
 		
@@ -292,20 +271,16 @@ int main()
 			
 			CAS - Copy And Swap
 			\begin{lstlisting}
-f (T &t)
-{
-	T t2 = t;
-}
+f(T &t) { T t2 = t; }
 			\end{lstlisting}
 			
 			Itt ha a copy konstruktor dob egy kivételt, akkor még a strong teljesül.
 			
 			\begin{lstlisting}
-f (T &t)
-{
-	T t2 = t;
-	g(t2);	
-	swap(t2, t);
+f(T &t) {
+  T t2 = t;
+  g(t2);
+  swap(t2, t);
 }
 			\end{lstlisting}
 			
@@ -317,16 +292,13 @@ int g();
 
 void f(std::unique_ptr<int> p, int);
 
-int main()
-{
-	try 
-	{
-		f(std::unique_ptr<int>(new int{5}, g());
-	}catch(int i){
-		std::cout << "catch int" << std::endl;
-	}
+int main() {
+  try {
+    f(std::unique_ptr<int>(new int{5}, g());
+  } catch (int i) {
+    std::cout << "catch int" << std::endl;
+  }
 }
-
 			\end{lstlisting}
 		Ez expection safe lesz? A válasz az hogy nem, mert a c++ban nem specifikált a végrehajtási sorrend. Előbb hajtódik végre a két paraméter kiértékelése mint az \texttt{f} meghívása. a paraméterek kiértékelési sorrend azonban már kérdéses. Az is lehet hogy létrehoz egy 5-öt a heap-en, és utána hoz neki létre egy unique pointert, és lehet g csak utána fut le. Ha g az dob egy kivételt.
 		
@@ -344,69 +316,52 @@ f(std::move(p), g());
 		\subsection{Problémák a konstruktorokkal}
 		
 		\begin{lstlisting}
-struct Y
-{
-	Y()
-	{
-		throw 5;
-	}
-}
-struct X
-{
-	X() : y() {}
-	
-	Y y;
+struct Y {
+  Y() { throw 5; }
+};
+
+struct X {
+  X() : y() {}
+
+  Y y;
 }
 		\end{lstlisting}
 		
 		Ez nem lesz jó, hogyan kapjuk el? így:
 		
 		\begin{lstlisting}
-struct Y
-{
-	Y()
-	{
-	throw 5;
-	}
+struct Y {
+  Y() { throw 5; }
 };
-struct X
-{
-	X() try : y() 
-	{
-		//constructor code
-	}catch(int i)
-	{ 
-		std::cout << "X ctor exc" << std::endl;
-	}
-	
-	Y y;
+struct X {
+  X() try : y() {
+    // constructor code
+  } catch (int i) {
+    std::cout << "X ctor exc" << std::endl;
+  }
+
+  Y y;
 };
 
-int main()
-{
-	try
-	{
-		X x;
-	}catch (int i)
-	{
-		std::cout << "catch int main" << std::endl;
-	}
+int main() {
+  try {
+    X x;
+  } catch (int i) {
+    std::cout << "catch int main" << std::endl;
+  }
 }
 		\end{lstlisting}
 		Ekkor a kimenetben mindkét string benne lesz.
 		Ha \texttt{X x} helyett \texttt{throw 5;}-t írnánk, és catch-be írok egy \texttt{throw}-t, akkor hajíthatjuk a hibát tovább. Ha ez lenne:
 		\begin{lstlisting}
-		
-int main()
-{
-	try
-	{
-		throw 5;
-	}catch (int i)
-	{
-		std::cout << "catch int main" << std::endl;
-		throw 5;
-	}
+
+int main() {
+  try {
+    throw 5;
+  } catch (int i) {
+    std::cout << "catch int main" << std::endl;
+    throw 5;
+  }
 }
 		\end{lstlisting}
 		Ekkor csak az egyik dobódik el, a másik nem definiált.
@@ -425,26 +380,17 @@ int main()
 		
 		
 		\begin{lstlisting}
-struct Y
-{
-	~Y()
-	{
-		std::cout << "dtor y" << std::endl;
-	}
+struct Y {
+  ~Y() { std::cout << "dtor y" << std::endl; }
 };
 
-
-
-int main()
-{
-	try
-	{
-		Y y1;
-		Y y2;
-	}catch (int i)
-	{
-		std::cout << "catch int main" << std::endl;
-	}
+int main() {
+  try {
+    Y y1;
+    Y y2;
+  } catch (int i) {
+    std::cout << "catch int main" << std::endl;
+  }
 }
 		\end{lstlisting}
 		Kimenet ekkor:
@@ -455,35 +401,23 @@ catch int main
 		\end{lstlisting}
 		Mivan, ha kivétel az X-nek a destruktorából jön?
 		\begin{lstlisting}
-struct Y
-{
-	~Y()
-	{
-		std::cout << "dtor y" << std::endl;
-	}
-
+struct Y {
+  ~Y() { std::cout << "dtor y" << std::endl; }
 };
-struct X
-{
-	~X()
-	{
-		std::cout << "dtor x" << std::endl;
-		throw 5;
-	}
+struct X {
+  ~X() {
+    std::cout << "dtor x" << std::endl;
+    throw 5;
+  }
 };
 
-
-
-int main()
-{
-	try
-	{
-		X x1;
-		X x2;
-	}catch (int i)
-	{
-		std::cout << "catch int main" << std::endl;
-	}
+int main() {
+  try {
+    X x1;
+    X x2;
+  } catch (int i) {
+    std::cout << "catch int main" << std::endl;
+  }
 }
 		\end{lstlisting}
 		Itt a RAII miatt mind \texttt{x1}-nek, mind \texttt{x2}-nek le fog futni a destruktora, viszont 2 különböző exception lesz hajítva, ami hibára vezet.
@@ -493,56 +427,44 @@ int main()
 		\subsection{Hogyan viselkedik az eldobott exception}
 		
 		\begin{lstlisting}
-int main()
-{
-	try
-	{
-		char c = 5;
-		throw c;
-	}catch(int i){
-		std::cout << "catch int main" << std::endl;
-	}
+int main() {
+  try {
+    char c = 5;
+    throw c;
+  } catch (int i) {
+    std::cout << "catch int main" << std::endl;
+  }
 }
 		\end{lstlisting}
 		A karakter implicit módon át tud konvertálódni integerré, de viszont ha változóval dobom át, akkor az implicit konverziókat nem vesszük figyelembe. A catch ádban semmiféle konverzió nem történhet. Lambdát semmi se tudja elkapni.
 		
 		\begin{lstlisting}
-int main()
-{
-	throw
-	{
-		throw new int{5};
-	}
-	catch(int i)
-	{
-		std::cout << "catch int main" << std::endl;
-		delete i;
-		throw;
-	}
+int main() {
+  throw { throw new int{5}; }
+  catch (int i) {
+    std::cout << "catch int main" << std::endl;
+    delete i;
+    throw;
+  }
 }
 		\end{lstlisting}
 		MINDIG ÉRTÉK szerint dobunk, és catchelni néha referencia szerint. Itt fent kinek a dolga \texttt{i} törlése? Mival ha továbbdobjuk?
 		
 		\begin{lstlisting}
-struct FileError
-{
-	virtual int errorCode() {return 0;}
+struct FileError {
+  virtual int errorCode() { return 0; }
 };
 
-struct FileNotExist : FileError
-{
-	virtual int errorCode() {return 1;}
+struct FileNotExist : FileError {
+  virtual int errorCode() { return 1; }
 };
 
-int main()
-{
-	try
-	{
-		throw FileNotExist();
-	}catch (FileError e)
-	{
-		std::cout << "catch main" << e.errorCode() << std::endl;
-	}
+int main() {
+  try {
+    throw FileNotExist();
+  } catch (FileError e) {
+    std::cout << "catch main" << e.errorCode() << std::endl;
+  }
 }
 		\end{lstlisting}
 		
@@ -554,32 +476,25 @@ int main()
 		
 		Lehet több catch-el is játszani.
 		\begin{lstlisting}
-struct FileError
-{
-	virtual int errorCode() {return 0;}
+struct FileError {
+  virtual int errorCode() { return 0; }
 };
 
-struct FileNotExist : FileError
-{
-	virtual int errorCode() {return 1;}
+struct FileNotExist : FileError {
+  virtual int errorCode() { return 1; }
 };
 
-int main()
-{
-	try
-	{
-		throw FileNotExist();
-	}catch (FileNotExist e)
-	{
-		std::cout << "catch main" << e.errorCode() << std::endl;
-		throw 5;
-	}catch (FileError e)
-	{
-		std::cout << "catch main" << e.errorCode() << std::endl;
-	}catch (...)
-	{
-		//...	
-	}
+int main() {
+  try {
+    throw FileNotExist();
+  } catch (FileNotExist e) {
+    std::cout << "catch main" << e.errorCode() << std::endl;
+    throw 5;
+  } catch (FileError e) {
+    std::cout << "catch main" << e.errorCode() << std::endl;
+  } catch (...) {
+    //...
+  }
 }
 		\end{lstlisting}
 		Itt az elsőbe fog belefutni. A legleszármazottabbat érdemes előreírni, és megyünk így kijjebb. a Z\texttt{catch(...)} mindenre illeszkedik. Mindig csak egy \texttt{catch} futhat le.

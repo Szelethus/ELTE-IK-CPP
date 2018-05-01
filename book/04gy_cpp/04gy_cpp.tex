@@ -29,10 +29,9 @@
 	
 	\vspace{-4mm}
 	\begin{lstlisting}
-int main()
-{
-	char* hello= "Hello";
-	hello[1] = 'o';
+int main() {
+  char *hello = "Hello";
+  hello[1] = 'o';
 }
 	\end{lstlisting}
 	A fenti kódban megsértettük a konstans korrektséget, hisz egy nem konstansra mutató pointerrel mutatuk egy konstans karakterlánc literál első elemére. Ennek ellenére, a fenti kód lefordul. Ennek az az oka, hogy az eredeti C-ben nem volt const kulcsszó, a kompatibilitás végett ezért C++ban lehet konstans karakterlánc literál elemire nem konstansra mutató pointerrel mutatni.
@@ -85,16 +84,15 @@ int main()
 	\medskip
 	Mint tudjuk, a nem egész számoknál a törtrészt magyarban vesszővel, C++ban ponttal választjuk el. Azonban mégis, az alábbi kód helyesen lefordul:
 	\begin{lstlisting}
-int pi = 3,14;
+int pi = 3, 14;
 	\end{lstlisting}
 	Ennek oka az, hogy a vessző operátor egy szekvenciapont is, így a fordító az egyenlőség bal oldalát amikor kiértékeli, először rendre kiértékeli a 3 számliterált, eldobja, utána kiértékeli a 14-et, és értékül adja \texttt{pi}-nek. Ez azt jelenti, hogy az ilyen jellegű hibát nem olyan könnyű megfogni, mint elsőre gondolnánk.
 	
 	\smallskip
 	A lebegőpontos számok másik veszélye, az összehasonlítás. Jusson eszünkbe, ami Numerikus Módszereken hangzik el: minden lebegőpontos szám tartalmazhat egy kis pontatlanságot.
 	\begin{lstlisting}
-for (double d = 0; d != 1; d += 0.1)
-{
-	std::cout << d << ' ';
+for (double d = 0; d != 1; d += 0.1) {
+  std::cout << d << ' ';
 }
 	\end{lstlisting}
 	Itt bár azt várnánk, hogy a kimenet \texttt{0 0.1 0.2 ... 1.0} legyen, legnagyobb valószínűséggel végtelen ciklusba futunk. Ez amiatt van, hogy a 0.1 (várhatóan) tartalmaz egy kis pontatlanságot, és így hiába írja ki  a programunk hogy \texttt{d} értéke 1, az várhatóan csak nagyon közel lesz hozzá.
@@ -132,27 +130,25 @@ for (double d = 0; d != 1; d += 0.1)
 	\begin{lstlisting}
 #include <iostream>
 
-struct Hallgato
-{
-	double atlag;
-	int kor;
-	int magassag;
+struct Hallgato {
+  double atlag;
+  int kor;
+  int magassag;
 }
 
 int main()
 {
-	std::cout << sizeof(double) << std::endl;
-	std::cout << sizeof(int) << std::endl;
-	std::cout << sizeof(Hallgato) << std::endl;
+  std::cout << sizeof(double) << std::endl;
+  std::cout << sizeof(int) << std::endl;
+  std::cout << sizeof(Hallgato) << std::endl;
 }
 	\end{lstlisting}
 	A gyakorlaton használt gépen a \texttt{double} mérete 8, az \texttt{int} mérete 4, \texttt{Hallgato}-é 16. Ezen azt látjuk, hogy a \texttt{Hallgato} tiszta adat.
 	\begin{lstlisting}
-struct Hallgato
-{
-	int kor;
-	double atlag;
-	int magassag;
+struct Hallgato {
+  int kor;
+  double atlag;
+  int magassag;
 }
 	\end{lstlisting} 
 	Miután átrendeztük a mezők sorrendjét, és újra kiírjuk a struktúra méretét, akkor a válasz 24. Ennek az oka az, hogy míg az első esetben így volt eltárolva a memóriában: (ne feledjük, ez még mindig implementációfüggő!)
@@ -181,13 +177,12 @@ struct Hallgato
 	
 	Egy \texttt{struct} egyes adattagjaira a pont operátor segítségével hivatkozhatunk:
 	\begin{lstlisting}
-int main()
-{
-	//...
-	Hallgato a;
-	std::cout << a.kor << std::endl;
-	Hallgato b = a;
-	b.magassag = 3;
+int main() {
+  //...
+  Hallgato a;
+  std::cout << a.kor << std::endl;
+  Hallgato b = a;
+  b.magassag = 3;
 }
 	\end{lstlisting}      
 	

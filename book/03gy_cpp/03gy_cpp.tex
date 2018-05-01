@@ -24,10 +24,7 @@
 
 static int x;
 
-int main()
-{
-	x = 2;
-}
+int main() { x = 2; }
 	\end{lstlisting}
 	\medskip
 	
@@ -37,10 +34,7 @@ int main()
 
 static int x;
 
-void f()
-{
-	x = 0;
-}
+void f() { x = 0; }
 	\end{lstlisting}
 	Ha ezt a két fájlt együtt fordítjuk, nem kapunk linkelési hibát, ugyanis a \texttt{main.cpp}-ben lévő \texttt{x} egy teljesen más változó, mint ami az \texttt{other.cpp}-ben van.
 	
@@ -49,39 +43,33 @@ void f()
 	\begin{lstlisting}
 static int x;
 
-int main()
-{
-	int x = 4;
-	std::cout << ::x << std::endl; // 0
+int main() {
+  int x = 4;
+  std::cout << ::x << std::endl; // 0
 }
 	\end{lstlisting}
 	\subsection{Függvényen belüli statikus változók}
 	Azokat a változókat, melyek függvényen belül vannak a \texttt{static} kulcsszóval definiálva, függvényszintű változónak is szokás hívni. Élettartamuk a függvény első hívásától a program futásának végéig tart, míg láthatóságuk csak az adott függvényen belül van. A hagyományos lokális változókkal ellenben tehát nem semmisülnek meg, amikor az adott függvény futása befejeződik. A következő kódrészlet szemlélteti ezt a viselkedést.
 	
 	\begin{lstlisting}
-int f()
-{
-	static int x = 0;
-	++x;
-	return x;
+int f() {
+  static int x = 0;
+  ++x;
+  return x;
 }
 
-int main() 
-{
-	for(int i = 0; i<5; i++)
-		std::cout << f() << ' '; // 1 2 3 4 5
+int main() {
+  for (int i = 0; i < 5; i++)
+    std::cout << f() << ' '; // 1 2 3 4 5
 }
 	\end{lstlisting}
 	Ahogy az megfigyelhető fent, \texttt{x} csak egyszer inicializálódik, majd a későbbi függvényhívások után egyre növekszik az értéke.
 	\subsection{Fordítási egységre lokális függvények}
   Nem csak változókat, függvényeket is deklarálhatunk statikusnak, melyek a fordítási egységre lokálisak. 
 	\begin{lstlisting}
-static int f()
-{
-	return 0;
-}
+static int f() { return 0; }
 
-int main() {std::cout << f();} // 0
+int main() { std::cout << f(); } // 0
 	\end{lstlisting}
 	Ezek a függvények csak az adott fordítási egységen belül érhetőek el.
 	\begin{note}
@@ -90,12 +78,11 @@ int main() {std::cout << f();} // 0
 	\subsection{Névtelen/anonim névterek}
 	Fordítási egységre lokális változókat és függvényeket tudunk deklarálni névtelen névterek (\textit{unnamed namespaces}, vagy \textit{anonymous namespaces}) segítségével. Egy név nélküli névteren belül deklarált változók és függvények hasonlóan viselkednek, mintha eléjük lenne írva a \texttt{static} kulcsszó.
 	\begin{lstlisting}
-namespace
-{
-	int x;
-	std::string y;
-	void f() {}
-}
+namespace {
+int x;
+std::string y;
+void f() {}
+} // namespace
 	\end{lstlisting}
 	\begin{note}
     A \texttt{static} osztályon belüli jelentéséről később lesz szó.
@@ -103,20 +90,18 @@ namespace
 	\section{Függvény túlterhelés}
 	Térjünk vissza a korábban megírt swap függvényünkhöz.
 	\begin{lstlisting}
-void swap(int &a, int &b)
-{
-	int tmp = a;
-	a = b;
-	b = tmp;
+void swap(int &a, int &b) {
+  int tmp = a;
+  a = b;
+  b = tmp;
 }
 	\end{lstlisting}
 	Ez a függvény addig jó, amíg csak \texttt{int}-eket szeretnénk megcserélni. Mi van, ha \texttt{std::string}-eket kéne? A megoldás egyszerű, \textbf{túlterheljük} (\textit{overload}) a \texttt{swap} függvényt.
 	\begin{lstlisting}
-void swap(std::string &a, std::string &b)
-{
-	std::string tmp = a;
-	a = b;
-	b = tmp;
+void swap(std::string &a, std::string &b) {
+  std::string tmp = a;
+  a = b;
+  b = tmp;
 }
 	\end{lstlisting}
 	Túlterhelésnek azt nevezzük, amikor két vagy több függvénynek a neve azonos, de a paramétereik különböznek. Tagfüggvényeket konstansság alapján is túl lehet terhelni.
@@ -127,27 +112,28 @@ void swap(std::string &a, std::string &b)
 	Ha példaként vesszük a lineáris algebrából tanult rendezett valós számhármasokat ($\mathbb{R}^3$), lehetőségünk van arra, hogy a tanultak alapján definiáljuk a köztük értelmezett összeadást.
 	%TODO temporális változók
 	\begin{lstlisting}
-struct LinAlgVector
-{
-	double x1, x2, x3;
+struct LinAlgVector {
+  double x1, x2, x3;
 };
 
-LinAlgVector operator+(const LinAlgVector &lhs, const LinAlgVector &rhs)
-{
-	LinAlgVector ret;
-	ret.x1 = lhs.x1 + rhs.x1;
-	ret.x2 = lhs.x2 + rhs.x2; 
-	ret.x3 = lhs.x3 + rhs.x3;
-	return ret;
+LinAlgVector operator+(const LinAlgVector &lhs, const LinAlgVector &rhs) {
+  LinAlgVector ret;
+  ret.x1 = lhs.x1 + rhs.x1;
+  ret.x2 = lhs.x2 + rhs.x2;
+  ret.x3 = lhs.x3 + rhs.x3;
+  return ret;
 }
 
-int main()
-{
-	LinAlgVector a, b;
-	a.x1 = 1; a.x2 = 2; a.x3 = 3;
-	b.x1 = 1; b.x2 = 1; b.x3 = 1;
-	
-	LinAlgVector c = a + b; 
+int main() {
+  LinAlgVector a, b;
+  a.x1 = 1;
+  a.x2 = 2;
+  a.x3 = 3;
+  b.x1 = 1;
+  b.x2 = 1;
+  b.x3 = 1;
+
+  LinAlgVector c = a + b;
 }
 	\end{lstlisting}
 	A \texttt{main} függvényben lévő értékadás ezzel ekvivalens: \texttt{c = operator+(a, b)}, így láthatjuk, hogy az operátorok túlterhelése gyakorlatilag a függvénytúlterhelés speciális esete. 
@@ -158,16 +144,14 @@ int main()
 	\begin{lstlisting}
 /* ... */
 
-std::ostream& operator<<(std::ostream& os, const LinAlgVector &l)
-{
-	os << l.x1 << ' ' << l.x2 << ' ' << l.x3;
-	return os;
+std::ostream &operator<<(std::ostream &os, const LinAlgVector &l) {
+  os << l.x1 << ' ' << l.x2 << ' ' << l.x3;
+  return os;
 }
 
-int main()
-{
-	/* ... */
-	std::cout << c << std::endl; // 2 3 4
+int main() {
+  /* ... */
+  std::cout << c << std::endl; // 2 3 4
 }
 	\end{lstlisting}
 	

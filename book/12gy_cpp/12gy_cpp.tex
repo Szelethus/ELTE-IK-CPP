@@ -59,16 +59,14 @@
 		\item Az \texttt{X::f()} függvényhívás során mit ír ki a program?
 		\begin{lstlisting}
 int i = 1;
-namespace X
-{
-	int i = 2;
-	void f()
-	{
-		int a = i;
-		int i = a + X::i + ::i;
-		std::cout << i << std::endl;
-	}
+namespace X {
+int i = 2;
+void f() {
+  int a = i;
+  int i = a + X::i + ::i;
+  std::cout << i << std::endl;
 }
+} // namespace X
 		\end{lstlisting}
 		\begin{enumerate}
 			\item 1
@@ -79,9 +77,8 @@ namespace X
 		\textbf{Válasz:} 5
 		\item Melyik igaz az alábbiak közül?
 		\begin{lstlisting}
-struct X
-{
-	X(int i = 0) {}
+struct X {
+  X(int i = 0) {}
 };
 		\end{lstlisting}
 		\begin{enumerate}
@@ -93,10 +90,9 @@ struct X
 		\textbf{Válasz:} Az első az igaz, továbbá sok egyéb dolgot is generál még.
 		\item Az alábbi példában a \texttt{Foo f(10);} konstruktor hívása után mennyi lesz \texttt{f.x} értéke?
 		\begin{lstlisting}
-struct Foo
-{
-	int x, y;
-	Foo(int i):y(i),x(y++) {}
+struct Foo {
+  int x, y;
+  Foo(int i) : y(i), x(y++) {}
 };
 		\end{lstlisting}
 		\begin{enumerate}
@@ -117,13 +113,12 @@ struct Foo
 		\item Mi lesz az \texttt{a} változó értéke a függvényhívás után?
 		\begin{lstlisting}
 int a = 1, b = 2;
-void f(int x, int y)
-{
-	int t = x;
-	x = y;
-	y = t;
+void f(int x, int y) {
+  int t = x;
+  x = y;
+  y = t;
 }
-f(a,b);
+f(a, b);
 		\end{lstlisting}
 		\begin{enumerate}
 			\item 1
@@ -164,11 +159,10 @@ f(a,b);
 		\item Az alábbiak közül melyik függvényhívással lehet ekvivalens az alábbi
 		(csillaggal jelölt) operátorhívás?
 		\begin{lstlisting}
-class Matrix
-{
-	// ...
+class Matrix {
+  // ...
 };
-Matrix a,b;
+Matrix a, b;
 a + b; // (*)
 		\end{lstlisting}
 		\begin{enumerate}
@@ -202,145 +196,135 @@ a + b; // (*)
 	
 	\fbox{\textbf{lemain.cpp}}
 \begin{lstlisting}
-#include <iostream>
 #include "lineedit.h"
-#include <string>
 #include <algorithm>
+#include <iostream>
 #include <iterator>
-#include "lineedit.h"
 #include <list>
+#include <string>
 #include <vector>
 
 const int max = 1000;
 
-int main()
-{
-	int your_mark = 1;
-	
-	//2-es
-	
-	line_editor<std::vector<int>, int> lev;
-	for( int i = 0; i < max; ++i )
-	{
-		lev.press( i );
-		lev.home();
-		lev.press( i );
-	}
-	std::vector<int> v = lev.enter();
-	
-	line_editor<std::list<double>, double> lel;
-	lel.press( 4.8 );
-	lel.home();
-	lel.press( 1.1 );
-	std::list<double> c = lel.enter();
-	
-	line_editor<std::string, char> les;
-	les.press( 'W' );
-	les.press( 'o' );
-	les.press( 'r' );
-	les.press( 'l' );
-	les.press( 'd' );
-	les.home();
-	les.press( 'H' );
-	les.press( 'e' );
-	les.press( 'l' );
-	les.press( 'l' );
-	les.press( 'o' );
-	
-	std::string s = les.enter();
-	if ( "HelloWorld" == s && "" == les.enter() && 2.2 > *(c.begin()) &&
-	2 * max == v.size() && max - 1 == v[ 0 ] )
-	{
-		your_mark = c.size();
-	}
-	
-	//3-as
-	
-	les.press( 'H' );
-	les.press( 'e' );
-	les.press( 'l' );
-	les.press( 'l' );
-	les.press( 'o' );
-	les.home();
-	les.insert();
-	les.press( 'H' );
-	les.press( 'a' );
-	s = les.enter();
-	
-	
-	for( int i = 0; i < max; ++i )
-	{
-		lev.press( 2 );
-	}
-	lev.home();
-	lev.insert();
-	for( int i = 0; i < max; ++i )
-	{
-		lev.press( 1 );
-	}
-	v = lev.enter();
-	
-	lel.press( 7.9 );
-	lel.press( 1.2 );
-	lel.home();
-	lel.insert();
-	lel.press( 1.5 );
-	lel.insert();
-	lel.press( 3.7 );
-	c = lel.enter();
-	
-	if ( 1.7 > c.front() && 1.3 < c.front() && v[ max / 2 ] == v[ max / 5 ] &&
-	1.4 > c.back() && 1U * max == v.size() && "Hallo" == s && 1 == v[ max / 4 ] )
-	{
-		your_mark = c.size();
-	}
-	
-	//4-es
-	
-	line_editor<std::vector<int> > llev;
-	llev.press( 3.3 );
-	llev.press( 1.1 );
-	llev.home();
-	llev.del();
-	std::vector<int> lv = llev.enter();
-	
-	line_editor<std::string> lles;
-	lles.press( 'J' );
-	lles.press( 'a' );
-	lles.press( 'v' );
-	lles.press( 'a' );
-	lles.backspace();
-	lles.backspace();
-	std::string f = lles.enter();
-	
-	if ( "Ja" == f && lv[ 0 ] < 1.3 )
-	{
-		your_mark += lv.size();
-	}
-	
-	//5-os
-	
-	line_editor<std::list<int> > lle;
-	lle.press( 3 );
-	lle.home();
-	lle.insert();
-	
-	llev.press( 8 );
-	llev.press( 2 );
-	llev.home();
-	
-	lle.swap( llev );
-	lle.press( 1 );
-	std::list<int> cl = lle.enter();
-	v = llev.enter();
-	if ( 1 == cl.front() && cl.size() > v.size() && 3 == v[ 0 ] )
-	{
-		your_mark += v.size();
-	}
-	
-	
-	std::cout << "Your mark is " << your_mark;
-	std::endl( std::cout );
+int main() {
+  int your_mark = 1;
+
+  // 2-es
+
+  line_editor<std::vector<int>, int> lev;
+  for (int i = 0; i < max; ++i) {
+    lev.press(i);
+    lev.home();
+    lev.press(i);
+  }
+  std::vector<int> v = lev.enter();
+
+  line_editor<std::list<double>, double> lel;
+  lel.press(4.8);
+  lel.home();
+  lel.press(1.1);
+  std::list<double> c = lel.enter();
+
+  line_editor<std::string, char> les;
+  les.press('W');
+  les.press('o');
+  les.press('r');
+  les.press('l');
+  les.press('d');
+  les.home();
+  les.press('H');
+  les.press('e');
+  les.press('l');
+  les.press('l');
+  les.press('o');
+
+  std::string s = les.enter();
+  if ("HelloWorld" == s && "" == les.enter() && 2.2 > *(c.begin()) &&
+      2 * max == v.size() && max - 1 == v[0]) {
+    your_mark = c.size();
+  }
+
+  // 3-as
+
+  les.press('H');
+  les.press('e');
+  les.press('l');
+  les.press('l');
+  les.press('o');
+  les.home();
+  les.insert();
+  les.press('H');
+  les.press('a');
+  s = les.enter();
+
+  for (int i = 0; i < max; ++i) {
+    lev.press(2);
+  }
+  lev.home();
+  lev.insert();
+  for (int i = 0; i < max; ++i) {
+    lev.press(1);
+  }
+  v = lev.enter();
+
+  lel.press(7.9);
+  lel.press(1.2);
+  lel.home();
+  lel.insert();
+  lel.press(1.5);
+  lel.insert();
+  lel.press(3.7);
+  c = lel.enter();
+
+  if (1.7 > c.front() && 1.3 < c.front() && v[max / 2] == v[max / 5] &&
+      1.4 > c.back() && 1U * max == v.size() && "Hallo" == s &&
+      1 == v[max / 4]) {
+    your_mark = c.size();
+  }
+
+  // 4-es
+
+  line_editor<std::vector<int>> llev;
+  llev.press(3.3);
+  llev.press(1.1);
+  llev.home();
+  llev.del();
+  std::vector<int> lv = llev.enter();
+
+  line_editor<std::string> lles;
+  lles.press('J');
+  lles.press('a');
+  lles.press('v');
+  lles.press('a');
+  lles.backspace();
+  lles.backspace();
+  std::string f = lles.enter();
+
+  if ("Ja" == f && lv[0] < 1.3) {
+    your_mark += lv.size();
+  }
+
+  // 5-os
+
+  line_editor<std::list<int>> lle;
+  lle.press(3);
+  lle.home();
+  lle.insert();
+
+  llev.press(8);
+  llev.press(2);
+  llev.home();
+
+  lle.swap(llev);
+  lle.press(1);
+  std::list<int> cl = lle.enter();
+  v = llev.enter();
+  if (1 == cl.front() && cl.size() > v.size() && 3 == v[0]) {
+    your_mark += v.size();
+  }
+
+  std::cout << "Your mark is " << your_mark;
+  std::endl(std::cout);
 }
 \end{lstlisting}
 
@@ -353,17 +337,14 @@ int main()
 #ifndef LINE_EDIT_H
 #define LINE_EDIT_H
 
-#endif 
+#endif
 	\end{lstlisting}
 	Így már van egy 1esünk.
 	\subsection{2-es}
 	A ketteshez már létre kell hoznunk magát az osztályt, és ahogy korábban megállapítottuk, 2 template paraméter kell ehhez: az első egy konténer, amiben a felhasználó egy adott sor tartalmát fogja visszakapni, a második pedig a tárolandó típus.
 	\begin{lstlisting}
 template <typename Cont, typename CharT>
-class line_editor
-{
-
-};
+class line_editor {};
 	\end{lstlisting}
 	
 	A 2-eshez az alábbi függvényeket kell majd megírnunk:
@@ -380,19 +361,17 @@ class line_editor
 #include <list>
 
 template <typename Cont, typename CharT>
-class line_editor
-{
-	std::list<CharT> line;
+class line_editor {
+  std::list<CharT> line;
 };
 \end{lstlisting}
 	A következő kérdés, hogyan reprezentáljuk a kurzort, mely jelzi hova szúrjon majd be a \texttt{press} függvény. Erre praktikus megoldás lehet egy iterátor használata.
 
 \begin{lstlisting}
 template <typename Cont, typename CharT>
-class line_editor
-{
-	std::list<CharT> line;
-	typename std::list<CharT>::iterator cursor;
+class line_editor {
+  std::list<CharT> line;
+  typename std::list<CharT>::iterator cursor;
 };
 \end{lstlisting}
 	Felmerül az is, kell-e konstruktor, destruktor, copy konstruktor és értékadó operátor? 
@@ -402,25 +381,22 @@ class line_editor
 	Mivel mi dinamikusan nem foglaltunk le memóriát, és csak reguláris típusokat tárolunk, így a többi 3 függvényre nincs szükségünk.
 \begin{lstlisting}
 template <typename Cont, typename CharT>
-class line_editor
-{
-	std::list<CharT> line;
-	typename std::list<CharT>::iterator cursor;
+class line_editor {
+  std::list<CharT> line;
+  typename std::list<CharT>::iterator cursor;
+
 public:
-	line_editor() : cursor(line.end()) {}
-	
-	void press(CharT c)
-	{
-		//...
-	}
-	void home()
-	{
-		//...
-	}
-	Cont enter()
-	{
-		//...
-	}
+  line_editor() : cursor(line.end()) {}
+
+  void press(CharT c) {
+    //...
+  }
+  void home() {
+    //...
+  }
+  Cont enter() {
+    //...
+  }
 };
 \end{lstlisting}
 	\begin{note}
@@ -428,27 +404,22 @@ public:
 	\end{note}
 	A fentiek közül a \texttt{home} függvény talán a legegyszerűbb: állítsuk \texttt{cursor}-t a sor elejére!
 	\begin{lstlisting}
-void home()
-{
-	cursor = line.begin();
-}
+void home() { cursor = line.begin(); }
 	\end{lstlisting}
 	Térjünk \texttt{press}-re: mivel az iterátor könnyen invalidálódhat ha új elemet szúrunk be, az \texttt{insert} az \texttt{std::list}-nél visszaad egy iterátort az új elemre, így érdemes a \texttt{cursor}-t erre beállítani, és egyel előrébb vinni, hogy a következő beszúrás is az új elem után követekezzen be.
 	\begin{lstlisting}
-void press(CharT c)
-{
-	cursor = line.insert(cursor, c);
-	cursor++;
+void press(CharT c) {
+  cursor = line.insert(cursor, c);
+  cursor++;
 }
 	\end{lstlisting}
 	Az \texttt{enter}-nél vissza kell adnunk egy, a template paraméterként megadott konténer típususával megyező kontért, mert tartalmazza az eddig begépelt elemeket, majd törli a listát. Mivel minden STL konténer rendelkezik olyan konstruktorral, mely egy iterátor párt vár, és ez alapján a két iterátor közti elemeket be tudja szúrni, így ezt bátran írhatjuk:
 	\begin{lstlisting}
-Cont enter()
-{
-	Cont ret(line.begin(), line.end());
-	line.clear();
-	cursor = line.end();
-	return ret;
+Cont enter() {
+  Cont ret(line.begin(), line.end());
+  line.clear();
+  cursor = line.end();
+  return ret;
 }
 	\end{lstlisting}
 	Ezzel a kettesünk is készen van.
@@ -458,35 +429,30 @@ Cont enter()
 	Ehhez szükségünk lesz egy logikai változóra is, melyet alapértelmezetten állítsunk hamisra, és módosítanunk kell majd \texttt{press}-t is.
 \begin{lstlisting}
 template <typename Cont, typename CharT>
-class line_editor
-{
-	//...
-	bool isInsert;
+class line_editor {
+  //...
+  bool isInsert;
+
 public:
-	line_editor() : cursor(line.end()), isInsert(false) {}
-	
-	void insert()
-	{
-		isInsert = !isInsert;
-	}
-	void press(CharT c)
-	{
-		if(isInsert && cursor != line.end())
-			*cursor = c;
-		else
-			cursor = line.insert(cursor, c);
-		cursor++;
-	}
-	//...
+  line_editor() : cursor(line.end()), isInsert(false) {}
+
+  void insert() { isInsert = !isInsert; }
+  void press(CharT c) {
+    if (isInsert && cursor != line.end())
+      *cursor = c;
+    else
+      cursor = line.insert(cursor, c);
+    cursor++;
+  }
+  //...
 };
 \end{lstlisting}
 	\subsection{4-es}
 	Megfigyelhetjük, hogy a 4-eshez már a \texttt{line\_edit} osztályt csak 1 template paraméterrel is tudnunk kell példányosítani. Ez azt jelenti, hogy a második template paraméternek kell egy alapértelmezett behelyettesítést biztonsítani, melynek meg kell egyeznie a \texttt{Cont} által tárolt típussal.
 \begin{lstlisting}
 template <typename Cont, typename CharT = typename Cont::value_type>
-class line_editor
-{
-	//...
+class line_editor {
+  //...
 };
 \end{lstlisting}
 	\begin{note}
@@ -503,20 +469,15 @@ class line_editor
 	\end{enumerate}
 \begin{lstlisting}
 template <typename Cont, typename CharT = typename Cont::value_type>
-class line_editor
-{
-	//...
-public:	
-	void backspace()
-	{
-		cursor--;
-		del();
-	}
-	void del()
-	{
-		cursor = line.erase(cursor);
-	}
-	//...
+class line_editor {
+  //...
+public:
+  void backspace() {
+    cursor--;
+    del();
+  }
+  void del() { cursor = line.erase(cursor); }
+  //...
 };
 \end{lstlisting}
 	\subsection{5-ös}
@@ -525,29 +486,26 @@ public:
 //...
 #include <algorithm>
 
-class line_editor
-{
-	//...
+class line_editor {
+  //...
 public:
-	//...
-	template <class T, class U>
-	void swap(line_editor<T,U> &le)
-	{
-		std::swap(line, le.line);
-		std::swap(cursor, le.cursor);
-		std::swap(isInsert, le.isInsert);
-	}
+  //...
+  template <class T, class U>
+  void swap(line_editor<T, U> &le) {
+    std::swap(line, le.line);
+    std::swap(cursor, le.cursor);
+    std::swap(isInsert, le.isInsert);
+  }
 };
 	\end{lstlisting}
 	Azonban fordítási hibát kapunk, hisz egy különböző template pareméterekkel rendelkező \texttt{line\_editor} külön típusnak számít, így gondoskodunk kell arról is, hogy minden \texttt{line\_editor} barát legyen.
 	\begin{lstlisting}
-class line_editor
-{
-	//...
+class line_editor {
+  //...
 public:
-	//...
-	template <class T, class U>
-	friend class line_editor;
+  //...
+  template <class T, class U>
+  friend class line_editor;
 };
 	\end{lstlisting}
 	Így az ötöst is elértük.
