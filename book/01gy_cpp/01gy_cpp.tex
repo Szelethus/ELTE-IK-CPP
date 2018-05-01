@@ -151,7 +151,7 @@ int main() // deklaráció és definíció
 	Windowson nyomjuk le a windows gombot és az R-t egyszerre. Ennek hatására felugrik egy ablak, melyből lehet futtatni programokat. Írjuk be hogy \texttt{cmd}, és nyomjunk entert. 
 	
 	Hozzunk létre egy tetszőleges mappában (pl. \texttt{C:\textbackslash test\textbackslash}) egy Hello World programot \texttt{main.cpp} néven. Üssük be a parancssorba következőket:
-	\begin{lstlisting}
+	\begin{lstlisting}[language=bash]
 >cd C:\test
 >g++ main.cpp
 	\end{lstlisting}
@@ -168,11 +168,11 @@ int main() // deklaráció és definíció
 	 	A PATH változóhoz való eljutás minden Windows verziónál más lehet, különösképpen, ha pl. magyar nyelvű operációs rendszerünk van. Ez okból kifolyólag ennek megoldását ismét az Olvasóra bízzuk.
 	\end{note}
 	Amennyiben a fordítás sikeres volt, létrejött egy \texttt{a.exe} nevű fájl, melyet tudunk futtatni. Ha módosítjuk a kódot, akkor fordítani és futtatni 1 sorban így tudunk:
-	\begin{lstlisting}
+	\begin{lstlisting}[language=bash]
 >g++ main.cpp && a.exe
 	\end{lstlisting}
 	Linuxon általában előre telepítve van a GCC. Ennek használata szintén hasonló, azonban a létrejött fájl kiterjesztése \texttt{.out} lesz.
-	\begin{lstlisting}
+	\begin{lstlisting}[language=bash]
 ~$ g++ main.cpp && ./a.out
 	\end{lstlisting}
 	A jegyzetben később számos extra kapcsolót megismerünk a fordításhoz.
@@ -264,7 +264,7 @@ int main()
   \bigskip
 	
 	\fbox{\textbf{alma.h}}
-	\begin{lstlisting}
+	\begin{lstlisting}[style = customcpreproc]
 #define ALMA 5
 
 ALMA ALMA ALMA
@@ -277,7 +277,7 @@ ALMA ALMA ALMA
 	\bigskip
 	
 	\fbox{\textbf{alma.h}}
-	\begin{lstlisting}
+	\begin{lstlisting}[style = customcpreproc]
 #define KORTE
 
 #ifdef KORTE
@@ -290,7 +290,7 @@ ALMA ALMA ALMA
 	\bigskip
 	
 	\fbox{\textbf{alma.h}}
-	\begin{lstlisting}
+	\begin{lstlisting}[style = customcpreproc]
 #define KORTE
 #undef KORTE
 
@@ -311,7 +311,7 @@ ALMA ALMA ALMA
 	\bigskip
 	
 	\fbox{\textbf{pp.h}}
-	\begin{lstlisting}
+	\begin{lstlisting}[style = customcpreproc]
 #include "pp.h"
 	\end{lstlisting}
 		
@@ -321,7 +321,7 @@ ALMA ALMA ALMA
 	\bigskip
 	
 	\fbox{\textbf{pp.h}}
-	\begin{lstlisting}
+	\begin{lstlisting}[style = customcpreproc]
 #ifndef _PP_H_
 #define _PP_H_
 
@@ -331,7 +331,7 @@ ALMA ALMA ALMA
 	\end{lstlisting}
 	
 	\fbox{\textbf{alma.h}}
-	\begin{lstlisting}
+	\begin{lstlisting}[style = customcpreproc]
 #include "pp.h"
 #include "pp.h"
 #include "pp.h"
