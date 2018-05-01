@@ -22,12 +22,12 @@
 #include <iostream>
 
 int main() {
-	int t[] = {1, 2, 3, 4};
-	
-	int *ptr;
-	for(/* ... */) {
-		std::cout << /* t egyik eleme */ << std::endl;
-	}
+  int t[] = {1, 2, 3, 4};
+
+  int *ptr;
+  for (/* ... */) {
+    std::cout << /* t egyik eleme */ << std::endl;
+  }
 }
 		\end{lstlisting}
 		Iteráljunk végig \texttt{t} tömb elemein újabb változó létrehozása nélkül! Hogyan változna a megoldás, ha \texttt{t} méretét megváltoztatjuk?
@@ -41,14 +41,14 @@ int main() {
 #include <iostream>
 
 void changePointer(/* ... */) {
-	// ...
+  // ...
 }
 
 int main() {
-	int c = 5, d = 6;
-	int *ptr = &c;
-	changePointer(&ptr, &d);
-	std::cout << ptr << '\n' << &d << std::endl;
+  int c = 5, d = 6;
+  int *ptr = &c;
+  changePointer(&ptr, &d);
+  std::cout << ptr << '\n' << &d << std::endl;
 }
 		\end{lstlisting}
 		Implementáljuk a \texttt{changePointer} függvényt, mely egy \texttt{int}re mutatót egy, a paraméterként átadott \texttt{int} objektum címére állít! Megoldásunk helyességét azzal ellenőrizhetjük, hogy \texttt{ptr} és \texttt{\&d} értékét kiíratjuk -- amennyiben ezek azonosak, az azt jelenti hogy \texttt{ptr} \texttt{d}-re mutat.
@@ -65,27 +65,21 @@ int main() {
 #include <iostream>
 
 int findIf(/* ... */) {
-	// ...
+  // ...
 }
 
-bool isEven(int i) {
-	return i % 2 == 0;
-}
+bool isEven(int i) { return i % 2 == 0; }
 
-bool isEqualToSeven(int i) {
-	return i == 7;
-}
+bool isEqualToSeven(int i) { return i == 7; }
 
-bool isNegative(int i) {
-	return i < 0;
-}
+bool isNegative(int i) { return i < 0; }
 
 int main() {
-	int t [] = {1, 3, 4, 6, 7, 8, 10};
-	
-	std::cout << findIf(/* ... */, isEven) << ' '
-	           << findIf(/* ... */, isEqualToSeven) << ' '
-	           << findIf(/* ... */, isNegative) << std::endl;
+  int t[] = {1, 3, 4, 6, 7, 8, 10};
+
+  std::cout << findIf(/* ... */, isEven) << ' '
+            << findIf(/* ... */, isEqualToSeven) << ' '
+            << findIf(/* ... */, isNegative) << std::endl;
 }
 		\end{lstlisting}
 		Kimenet: \texttt{2 4 -1}

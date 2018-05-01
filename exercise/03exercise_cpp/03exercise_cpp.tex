@@ -22,16 +22,16 @@
 #include <iostream>
 
 void insertSpace(const char *orig, char *dest) {
-	// ...
+  // ...
 }
 
 int main() {
-	const char *str = "Sziamizujs?";
-	char buf[256];
-	
-	insertSpace(str, buf);
-	
-	std::cout << buf << std::endl;
+  const char *str = "Sziamizujs?";
+  char buf[256];
+
+  insertSpace(str, buf);
+
+  std::cout << buf << std::endl;
 }
 		\end{lstlisting}
 		Kimenet: \texttt{Szia mizujs?}
@@ -51,17 +51,17 @@ int main() {
 #include <iostream>
 
 int findIf(/* ... */) {
-	// ...
+  // ...
 }
 
 bool isSecondEven(int i) {
-	// ...
+  // ...
 }
 
 int main() {
-	int t [] = {1, 3, 4, 6, 7, 8, 10};
-	
-	std::cout << findIf(/* ... */, isSecondEven) << std::endl;
+  int t[] = {1, 3, 4, 6, 7, 8, 10};
+
+  std::cout << findIf(/* ... */, isSecondEven) << std::endl;
 }
 		\end{lstlisting}
 		Kimenet: \texttt{3}
@@ -81,20 +81,18 @@ int main() {
 #include <iostream>
 
 struct IntWrapper {
-	int i;
+  int i;
 };
 
 // *
 
 int main() {
-	int i = 10;
-	IntWrapper wrap;
-	wrap.i = 5;
-	
-	std::cout << add(i, wrap) << ' '
-	           << add(wrap, i) << ' '
-	           << add(wrap, wrap) << ' '
-	           << add(i, i) << std::endl;
+  int i = 10;
+  IntWrapper wrap;
+  wrap.i = 5;
+
+  std::cout << add(i, wrap) << ' ' << add(wrap, i) << ' ' << add(wrap, wrap)
+            << ' ' << add(i, i) << std::endl;
 }
 		\end{lstlisting}
 		Kimenet: \texttt{15 15 10 20}
@@ -111,20 +109,18 @@ int main() {
 #include <iostream>
 
 struct IntWrapper {
-int i;
+  int i;
 };
 
 // *
 
 int main() {
-	IntWrapper wrap1, wrap2;
-	wrap1.i = 10;
-	wrap1.i = 5;
-	
-	std::cout << wrap1 * wrap2 << ' '
-	           << wrap / wrap2 << ' '
-	           << wrap + wrap2 << ' '
-	           << wrap - wrap2 << std::endl;
+  IntWrapper wrap1, wrap2;
+  wrap1.i = 10;
+  wrap1.i = 5;
+
+  std::cout << wrap1 * wrap2 << ' ' << wrap / wrap2 << ' ' << wrap + wrap2
+            << ' ' << wrap - wrap2 << std::endl;
 }
 		\end{lstlisting}
 		Kimenet: \texttt{50 2 15 5}
