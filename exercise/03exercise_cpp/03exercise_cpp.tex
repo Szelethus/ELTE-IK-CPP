@@ -1,0 +1,138 @@
+% !TeX root = 03exercise_cpp
+\documentclass[../exercise_book/exercise_book.tex]{subfiles}
+\begin{document}
+	\onlyinsubfile{
+		\begin{center}
+			{\LARGE\textbf{C++}}
+			
+			{\Large Gyakorló feladatok}
+			
+			3. óra
+		\end{center}
+		A jegyzetet \textsc{Umann} Kristóf készítette. (\today)
+	}
+	\section{Láthatóság, élettartam, sztringkezelés, függvénytúlterhelés}
+	
+	\begin{exercise}
+		Legyen adott ez a C++ fájl:
+		
+		\smallskip
+		\fbox{\textbf{03\_01str\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+
+void insertSpace(const char *orig, char *dest) {
+	// ...
+}
+
+int main() {
+	const char *str = "Sziamizujs?";
+	char buf[256];
+	
+	insertSpace(str, buf);
+	
+	std::cout << buf << std::endl;
+}
+		\end{lstlisting}
+		Kimenet: \texttt{Szia mizujs?}
+		
+		\smallskip
+		Valósítsuk meg az \texttt{insertSpace} függvényt, mely minden \texttt{'a'} karakter után beszúr egy space-t a paraméterként kapott strigbe! Feltételezhetjük, hogy \texttt{dest} legalább akkora tömbre mutat, mint \texttt{orig}.
+		
+		\medskip
+		Hogyan változna a megoldás, ha \texttt{char*} és \texttt{char[]} helyett \texttt{std::string} objektumokkal dolgoznánk?
+	\end{exercise}
+	\begin{exercise}
+		Egészítsünk ki egy korábbi feladatot!
+		
+		\smallskip
+		\fbox{\textbf{03\_01static\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+
+int findIf(/* ... */) {
+	// ...
+}
+
+bool isSecondEven(int i) {
+	// ...
+}
+
+int main() {
+	int t [] = {1, 3, 4, 6, 7, 8, 10};
+	
+	std::cout << findIf(/* ... */, isSecondEven) << std::endl;
+}
+		\end{lstlisting}
+		Kimenet: \texttt{3}
+		
+		\smallskip
+		A korábban megvalósított \texttt{findIf} függvényhez írjunk egy újabb predikátumfüggvényt, mely egy statikus változó segítségével akkor ad igazat, ha a paraméterként kapott \texttt{int} a második páros szám! 
+		
+		\medskip
+		Soroljunk fel legalább két indokot, miért célszerűtlen ez a megoldás valós alkalmazásra!
+	\end{exercise}
+	\begin{exercise}
+		Legyen adott ez a C++ fájl:
+		
+		\smallskip
+		\fbox{\textbf{03\_01overload\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+
+struct IntWrapper {
+	int i;
+};
+
+// *
+
+int main() {
+	int i = 10;
+	IntWrapper wrap;
+	wrap.i = 5;
+	
+	std::cout << add(i, wrap) << ' '
+	           << add(wrap, i) << ' '
+	           << add(wrap, wrap) << ' '
+	           << add(i, i) << std::endl;
+}
+		\end{lstlisting}
+		Kimenet: \texttt{15 15 10 20}
+		
+		\smallskip
+		Valósítsuk meg az \texttt{add} függvényt, mely két tetszőleges szám összegét adja vissza! Függvénytúlterhelés segítségével érjük el azt, hogy ez a két paraméter mind \texttt{int} mind \texttt{IntWrapper} típusú is lehessen!
+	\end{exercise}
+	\begin{exercise}
+		Legyen adott ez a C++ fájl:
+		
+		\smallskip
+		\fbox{\textbf{03\_02overload\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+
+struct IntWrapper {
+int i;
+};
+
+// *
+
+int main() {
+	IntWrapper wrap1, wrap2;
+	wrap1.i = 10;
+	wrap1.i = 5;
+	
+	std::cout << wrap1 * wrap2 << ' '
+	           << wrap / wrap2 << ' '
+	           << wrap + wrap2 << ' '
+	           << wrap - wrap2 << std::endl;
+}
+		\end{lstlisting}
+		Kimenet: \texttt{50 2 15 5}
+		
+		\smallskip
+		Operátor túlterheléssel valósítsuk meg a szorzás, osztás, összeadás és a kivonás műveletét! Minden operátor két \texttt{IntWrapper} típusú paramétert várjon, és a visszatérési értéke is egy \texttt{IntWrapper} típusú változó legyen! Gondoljuk meg, érték vagy referencia szerinti átvétel lenne-e hatékonyabb!
+		
+		A kiíratáshoz terheljük túl a right shift operátort (\texttt{\<}) a jegyzetben található módon!
+	\end{exercise}
+	
+\end{document}
