@@ -29,4 +29,43 @@
 	
 	(Felhívnánk rá a figyelmet, hogy a szerkesztés jelen pillanatában a jegyzet nem teljes terjedelmében lektorált.)
 	
+	\section{Preprocesszor}
+	\begin{exercise}
+		Legyen adott ez a C++ fájl:
+		
+		\smallskip
+		\fbox{\textbf{01\_01pp\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+#include "01_01pp.h"
+#include "01_01pp.h"
+
+int main() {
+	std::cout << add(5, 6) << std::endl;
+}
+		\end{lstlisting}
+		Kimenet: \texttt{11}
+		
+		\smallskip
+		Implementáljuk a \texttt{01\_01pp.h} header fájlt mely tartalmazza az \texttt{add} függvény deklarációját, mely két egész számot vár paraméterül, és az összegüket adja vissza visszatérési értékeként! A függvényt definiáljuk a \texttt{01\_01pp.cpp} fájlban, majd fordítsuk le a programot és ellenőrizzük hogy helyesen működik-e!
+	\end{exercise}
+	\begin{exercise}
+		Legyen adott ez a C++ fájl:
+		
+		\smallskip
+		\fbox{\textbf{01\_02pp\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+
+// *
+
+int main() {
+	std::cout << 5 * ADD(1, 2) << std::endl;
+}
+		\end{lstlisting}
+		Kimenet: \texttt{15}
+		
+		\smallskip
+		Implementáljunk a \texttt{*}-al jelölt sorba egy preprocesszor függvényt, mely az összeadást valósítja meg! Figyeljünk a műveletek asszociativitására is!
+	\end{exercise}
 \end{document}
