@@ -26,7 +26,7 @@ int main() {
 	wrap.i = 5;
 	
 	std::cout << add(i, wrap) << ' '
-	           << add(wrap, i) << ' '
-	           << add(wrap, wrap) << ' '
-	           << add(i, i) << std::endl;
+	          << add(wrap, i) << ' '
+	          << add(wrap, wrap) << ' '
+	          << add(i, i) << std::endl;
 }
