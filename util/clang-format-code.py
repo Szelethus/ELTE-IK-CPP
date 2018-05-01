@@ -10,12 +10,32 @@ import os, re
 from subprocess import Popen, PIPE
 
 rootdirs = ['../book', '../exercise']
-cpp_pattern =  r'(\\begin\{lstlisting\}(\[.*\])?)([\w\W]+?)([\t ]*\\end\{lstlisting\})'
+cpp_pattern =  r'(\\begin\{lstlisting\})(\[[^\]]+\])?([\w\W]+?)([\t ]*\\end\{lstlisting\})'
 
 def format_cpp_section(match):
-  formatter = Popen(['clang-format'], stdout=PIPE, stdin=PIPE, shell=True)
-  cout, cerr = formatter.communicate(str.encode(match.group(3)))
-  return match.group(1) + cout.decode() + match.group(4)
+  prefix = match.group(1)
+  attributes = match.group(2)
+  code_content = match.group(3)
+  suffix = match.group(4)
+  treat_as_cpp = False
+  
+  if attributes:
+    tags = dict(map(str.strip, u.split("=")) for u in attributes[1:-1].split(","))
+  
+    if 'style' in tags and tags['style'].upper() == 'C++':
+      treat_as_cpp = True
+    if 'language' in tags and tags['language'].upper() == 'C++':
+      treat_as_cpp = True
+  else:
+    # if no attributes specified
+    treat_as_cpp = True
+  
+  if treat_as_cpp:
+    formatter = Popen(['clang-format'], stdout=PIPE, stdin=PIPE, shell=True)
+    cout, cerr = formatter.communicate(str.encode(code_content))
+    attributes = attributes if attributes else ''
+    return prefix + attributes + cout.decode() + suffix
+  return match.group(0)
 
 for rootdir in rootdirs:
   for folder, subs, files in os.walk(rootdir):

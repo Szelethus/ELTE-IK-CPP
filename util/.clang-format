@@ -3,7 +3,7 @@ Language:        Cpp
 # BasedOnStyle:  LLVM
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: false
+AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Right
 AlignOperands:   true
@@ -23,12 +23,12 @@ BinPackParameters: true
 BraceWrapping:   
   AfterClass:      true
   AfterControlStatement: false
-  AfterEnum:       true
+  AfterEnum:       false
   AfterFunction:   false
   AfterNamespace:  false
   AfterObjCDeclaration: false
-  AfterStruct:     true
-  AfterUnion:      true
+  AfterStruct:     false
+  AfterUnion:      false
   AfterExternBlock: false
   BeforeCatch:     false
   BeforeElse:      false
@@ -74,7 +74,7 @@ IndentWidth:     2
 IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
-KeepEmptyLinesAtTheStartOfBlocks: true
+KeepEmptyLinesAtTheStartOfBlocks: false
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
 MaxEmptyLinesToKeep: 1
