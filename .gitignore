@@ -5,3 +5,8 @@
 *.gz
 *.pdf
 *.toc
+
+#C++
+*.out
+*.exe
+*.o

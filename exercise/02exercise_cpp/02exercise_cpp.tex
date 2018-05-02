@@ -1,0 +1,95 @@
+% !TeX root = 02exercise_cpp
+\documentclass[../exercise_book/exercise_book.tex]{subfiles}
+\begin{document}
+	\onlyinsubfile{
+		\begin{center}
+			{\LARGE\textbf{C++}}
+			
+			{\Large Gyakorló feladatok}
+			
+			2. óra
+		\end{center}
+		A jegyzetet \textsc{Umann} Kristóf készítette. (\today)
+	}
+	\section{Mutatók}
+	
+	\begin{exercise}
+		Legyen adott ez a C++ fájl:
+		
+		\smallskip
+		\fbox{\textbf{02\_01ptr\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+
+int main() {
+  int t[] = {1, 2, 3, 4};
+
+  int *ptr;
+  for (/* ... */) {
+    std::cout << /* t egyik eleme */ << std::endl;
+  }
+}
+		\end{lstlisting}
+		Iteráljunk végig \texttt{t} tömb elemein újabb változó létrehozása nélkül! Hogyan változna a megoldás, ha \texttt{t} méretét megváltoztatjuk?
+	\end{exercise}
+	\begin{exercise}
+		Legyen adott ez a C++ fájl:
+		
+		\smallskip
+		\fbox{\textbf{02\_02ptr\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+
+void changePointer(/* ... */) {
+  // ...
+}
+
+int main() {
+  int c = 5, d = 6;
+  int *ptr = &c;
+  changePointer(&ptr, &d);
+  std::cout << ptr << '\n' << &d << std::endl;
+}
+		\end{lstlisting}
+		Implementáljuk a \texttt{changePointer} függvényt, mely egy \texttt{int}re mutatót egy, a paraméterként átadott \texttt{int} objektum címére állít! Megoldásunk helyességét azzal ellenőrizhetjük, hogy \texttt{ptr} és \texttt{\&d} értékét kiíratjuk -- amennyiben ezek azonosak, az azt jelenti hogy \texttt{ptr} \texttt{d}-re mutat.
+	\end{exercise}
+	\begin{exercise}
+		Miben változna az előző feladat megoldása, ha \texttt{c} és \texttt{d} konstansok lennének? Implementáljuk a \texttt{02\_03ptr\_main.cpp} fájlba!
+	\end{exercise}
+	\begin{exercise}
+		Legyen adott ez a C++ fájl:
+		
+		\smallskip
+		\fbox{\textbf{02\_04ptr\_main.cpp}}
+		\begin{lstlisting}
+#include <iostream>
+
+int findIf(/* ... */) {
+  // ...
+}
+
+bool isEven(int i) { return i % 2 == 0; }
+
+bool isEqualToSeven(int i) { return i == 7; }
+
+bool isNegative(int i) { return i < 0; }
+
+int main() {
+  int t[] = {1, 3, 4, 6, 7, 8, 10};
+
+  std::cout << findIf(/* ... */, isEven) << ' '
+            << findIf(/* ... */, isEqualToSeven) << ' '
+            << findIf(/* ... */, isNegative) << std::endl;
+}
+		\end{lstlisting}
+		Kimenet: \texttt{2 4 -1}
+		
+		\smallskip
+		Valósítsuk meg a \texttt{findIf} függvényt, mely egy tetszőleges \texttt{int}-eket tartalmazó tömböt és egy predikátum függvényt (olyan függvény, melynek \texttt{bool} a visszatérési értéke és egy paramétere van, ez esetben \texttt{int} típusú) kap paraméterül, és amennyiben a tömb tartalmaz olyan elemet amelyre a predikátumfüggvény igazat ad, adja vissza a tömbbéli indexét, különben térjen vissza \texttt{-1}-el!
+		
+		Azt, hogy az Olvasó hogyan szeretné a \texttt{findIf} függvény implementálni (beleértve azt is, hogy milyen paramétereket várjon) nincs megkötve, azzal a kivétellel, hogy a predikátumfüggvény függvény legyen az utolsó paraméter.
+	\end{exercise}
+	\begin{exercise}
+		Hogyan tudnánk a fenti feladatokat referenciákkal megoldani?
+	\end{exercise}
+\end{document}
