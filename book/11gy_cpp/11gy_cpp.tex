@@ -248,7 +248,7 @@ public:
 	\end{note}
 	A későbbiekben tekintsünk \texttt{Sikidom}-ra úgy, mintha nem lenne tisztán virtuális függvénye.
 	\subsection{Konstruktorok öröklődésnél}
-	Öröklődésnél a konstruktorok és destruktorok működése is újabb kihívásokat jelent. Lévén értelmetlen úgy létrehozni egy síkidomot, hogy nem adunk meg neki pozíciót (azaz, nem inicializáljuk az \texttt{x} és \texttt{y} változót), hozzunk létre e célra egy konstruktort. Így azt is el tudjuk érni, hogy a fordító nem generáljon default konstruktort:
+	Öröklődésnél a konstruktorok és destruktorok működése is újabb kihívásokat jelent. Lévén értelmetlen úgy létrehozni egy síkidomot, hogy nem adunk meg neki pozíciót (azaz, nem inicializáljuk az \texttt{x} és \texttt{y} változót), hozzunk létre e célra egy konstruktort. Így azt is el tudjuk érni, hogy a fordító ne generáljon default konstruktort:
 	\begin{lstlisting}
 class Sikidom {
 protected:
